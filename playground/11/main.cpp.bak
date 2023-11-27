@@ -1,0 +1,12 @@
+#include <stdio.h>
+int main()
+{
+  printf("Man   Women   Children\n");
+  for (size_t i = 0; i != 30; ++i) {
+    for (size_t j = 0; j != 30; ++j) {
+      if (i * 3 + j * 2 + 30 - i - j == 50) {
+        printf("%3d%8d%8d\n", i, j, 30 - i - j);
+      }
+    }
+  }
+}

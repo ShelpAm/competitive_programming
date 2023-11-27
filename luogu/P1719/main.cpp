@@ -1,0 +1,100 @@
+#include <algorithm>
+#include <array>
+#include <cstddef>
+#include <iostream>
+#include <limits>
+#include <ranges>
+#include <vector>
+
+using ::std::size_t;
+
+// constexpr bool debug{false};
+
+template<typename T> T read()
+{
+  T tmp;
+  std::cin >> tmp;
+  return tmp;
+}
+template<typename T> class input_value {
+public:
+  input_value(): value_(read<T>()) {}
+  input_value(const input_value&) = delete;
+  input_value(input_value&&) = delete;
+  input_value& operator=(const input_value&) = delete;
+  input_value& operator=(input_value&&) = delete;
+  ~input_value() = default;
+  operator T&() { return value(); }
+  T& value() { return value_; }
+private:
+  T value_;
+};
+template<size_t i, size_t j, typename value_type> using arr2
+    = std::array<std::array<value_type, j>, i>;
+template<size_t i, size_t j> using arr2uz = arr2<i, j, size_t>;
+template<size_t i, size_t j> using arr2ll = arr2<i, j, long long>;
+template<typename value_type> using vec2_impl
+    = std::vector<std::vector<value_type>>;
+template<typename value_type> class vec2 : public vec2_impl<value_type> {
+public:
+  vec2(size_t const i, size_t const j)
+      : vec2_impl<value_type>(i, std::vector<value_type>(j, {}))
+  {}
+};
+using vec2uz = vec2<size_t>;
+using vec2ll = vec2<long long>;
+void print(auto&& t)
+{
+  if constexpr (std::ranges::range<decltype(t)>) {
+    for (auto&& ele: t) {
+      print(ele);
+    }
+    std::cout << '\n';
+  }
+  else {
+    std::cout << t << ' ';
+  }
+}
+long long score(auto&& s, size_t x, size_t y, size_t i, size_t j)
+{
+  return s[i][j] + s[x - 1][y - 1] - s[x - 1][j] - s[i][y - 1];
+}
+void solve_case()
+{
+  input_value<size_t> n;
+  n += 1;
+  // vec2<long long> a(n, n);
+  // vec2<long long> s(n, n);
+  arr2ll<121, 121> a;
+  arr2ll<121, 121> s;
+  for (size_t i{1}; i != n; ++i) {
+    for (size_t j{1}; j != n; ++j) {
+      a[i][j] = read<long long>();
+    }
+  }
+  for (size_t i{1}; i != n; ++i) {
+    for (size_t j{1}; j != n; ++j) {
+      s[i][j] = a[i][j] + s[i - 1][j] + s[i][j - 1] - s[i - 1][j - 1];
+    }
+  }
+  long long max_score{std::numeric_limits<long long>::min()};
+  for (size_t x{1}; x != n; ++x) {
+    for (size_t y{1}; y != n; ++y) {
+      for (size_t i{x}; i != n; ++i) {
+        for (size_t j{y}; j != n; ++j) {
+          max_score = std::ranges::max(score(s, x, y, i, j), max_score);
+        }
+      }
+    }
+  }
+  std::cout << max_score;
+}
+int main()
+{
+  auto n{1UZ};
+  // n = read<size_t>();
+  for (size_t i{}; i != n; ++i) {
+    solve_case();
+  }
+  return 0;
+}

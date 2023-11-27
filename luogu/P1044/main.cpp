@@ -1,0 +1,110 @@
+#include <array>
+#include <cstddef>
+#include <iostream>
+#include <ranges>
+#include <vector>
+
+using ::std::size_t;
+template<typename T> T read()
+{
+  T tmp;
+  std::cin >> tmp;
+  return tmp;
+}
+template<typename T> class input_value {
+public:
+  input_value(): value_(read<T>()) {}
+  input_value(T const& initial_value): value_(initial_value + read<T>()) {}
+  operator T&() { return value_; }
+private:
+  T value_;
+};
+template<size_t i, size_t j, typename value_type> using dp2
+    = std::array<std::array<value_type, j>, i>;
+template<size_t i, size_t j> using dp2uz = dp2<i, j, size_t>;
+void print(auto&& t)
+{
+  if constexpr (std::ranges::range<decltype(t)>) {
+    for (auto const& ele: t) {
+      print(ele);
+    }
+    std::cout << '\n';
+  }
+  else {
+    std::cout << t << ' ';
+  }
+}
+class solution_a {
+public:
+  solution_a(size_t const n): n_(n) {}
+  auto run() { return search(0, 0); }
+private:
+  [[nodiscard]] size_t search(size_t const remainder, size_t const pos) const
+  {
+    if (pos == n_) {
+      return 1;
+    }
+    if (remainder == 0) {
+      return search(remainder + 1, pos + 1);
+    }
+    return search(remainder - 1, pos) + search(remainder + 1, pos + 1);
+  }
+  size_t n_;
+};
+class solution_b {
+public:
+  solution_b(size_t const n): n_(n) {}
+  [[nodiscard]] auto run() const
+  {
+    std::vector<size_t> s(n_ + 1);
+    s[0] = s[1] = 1;
+    for (size_t i{2}; i != n_ + 1; ++i) {
+      for (size_t k{1}; k != i + 1; ++k) {
+        s[i] += s[k - 1] * s[i - k];
+      }
+    }
+    // print(s);
+    return s[n_];
+  }
+private:
+  size_t n_;
+};
+void solve_case()
+{
+  // DP method
+  // input_value<size_t> n;
+  // // dp[i][j] 表示有i个元素入栈，j个元素出栈的情况数
+  // dp2uz<20, 20> dp{};
+  // dp[0][0] = 1;
+  // for (size_t i{1}; i != n + 1; ++i) {
+  //   for (size_t j{0}; j != i + 1; ++j) {
+  //     if (i == j) {
+  //       dp[i][j] = dp[i][j - 1];
+  //     }
+  //     else {
+  //       dp[i][j] = dp[i][j - 1] + dp[i - 1][j];
+  //     }
+  //   }
+  // }
+  // std::cout << dp[n][n];
+  // print(dp);
+
+  // Searching method
+  // size_t n{};
+  // std::cin >> n;
+  // std::cout << solution_a(n).run();
+
+  // DP method b
+  size_t n{};
+  std::cin >> n;
+  std::cout << solution_b(n).run();
+}
+int main()
+{
+  auto n{1UZ};
+  // n = read<size_t>();
+  for (size_t i{}; i != n; ++i) {
+    solve_case();
+  }
+  return 0;
+}
