@@ -112,7 +112,7 @@ struct player_t {
     if (contribution != other.contribution) {
       return contribution > other.contribution;
     }
-    return false;
+    return id < other.id;
   }
 };
 bool cmp(player_t const& lhs, player_t const& rhs)

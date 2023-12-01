@@ -66,8 +66,45 @@ auto&& operator>>(auto&& is, auto&& t)
 }
 void solve_case()
 {
+  constexpr size_t mod{10007};
+
   size_t n{};
   size_t m{};
+  std::cin >> n >> m;
+  std::vector<size_t> number(n + 1);
+  std::cin >> (number | std::ranges::views::drop(1));
+  std::vector<size_t> color(n + 1);
+  std::cin >> (color | std::ranges::views::drop(1));
+
+  std::vector<std::array<std::vector<size_t>, 2>> indices_of_color(m + 1);
+  for (size_t i{1}; i != n + 1; ++i) {
+    indices_of_color[color[i]][i % 2].emplace_back(i);
+  }
+
+  auto calc{[&number](auto&& indices) {
+    size_t sum_number{};
+    for (auto const idx: indices) {
+      sum_number += number[idx];
+    }
+    // std::cout << "Now is calculating ";
+    // print(indices);
+    // std::cout << "Precalculated sum_number is " << sum_number << ' ';
+    size_t sum{};
+    for (auto const idx: indices) {
+      sum += idx * ((indices.size() - 2) * number[idx] + sum_number);
+    }
+    // std::cout << " and total corresponding sum is " << sum << '\n';
+    return sum;
+  }};
+
+  size_t ans{};
+  for (auto&& by_color: indices_of_color) {
+    for (auto&& by_odd_even: by_color) {
+      ans += calc(by_odd_even);
+      ans %= mod;
+    }
+  }
+  std::cout << ans;
 }
 int main()
 {
