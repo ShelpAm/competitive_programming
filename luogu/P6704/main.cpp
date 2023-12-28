@@ -35,13 +35,10 @@ template<size_t i, size_t j, typename value_type> using arr2
     = std::array<std::array<value_type, j>, i>;
 template<size_t i, size_t j> using arr2uz = arr2<i, j, size_t>;
 template<size_t i, size_t j> using arr2ll = arr2<i, j, long long>;
-template<typename value_type> using vec2_impl
-    = std::vector<std::vector<value_type>>;
+template<typename value_type> using vec2_impl = std::vector<std::vector<value_type>>;
 template<typename value_t> class vec2 : public vec2_impl<value_t> {
 public:
-  vec2(size_t const i, size_t const j)
-      : vec2_impl<value_t>(i, std::vector<value_t>(j, {}))
-  {}
+  vec2(size_t const i, size_t const j): vec2_impl<value_t>(i, std::vector<value_t>(j, {})) {}
 };
 using vec2uz = vec2<size_t>;
 using vec2ll = vec2<long long>;

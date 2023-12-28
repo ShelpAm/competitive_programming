@@ -1,0 +1,123 @@
+#include <algorithm>
+#include <array>
+#include <cmath>
+#include <cstddef>
+#include <iomanip>
+#include <iostream>
+#include <numeric>
+#include <ranges>
+#include <string_view>
+#include <vector>
+
+// configs
+using ::std::size_t;
+
+namespace impl {
+  template<typename value_t> using vec2 = std::vector<std::vector<value_t>>;
+  template<typename T> concept is_pair = requires(T t) {
+    t.first;
+    t.second;
+  };
+} // namespace impl
+template<size_t i, size_t j, typename value_t> using arr2 = std::array<std::array<value_t, j>, i>;
+template<size_t i, size_t j> using arr2uz = arr2<i, j, size_t>;
+template<size_t i, size_t j> using arr2ll = arr2<i, j, long long>;
+template<typename value_t> class vec2 : public impl::vec2<value_t> {
+public:
+  vec2(size_t const i, size_t const j): vec2<value_t>(i, std::vector<value_t>(j)) {}
+};
+using vec2uz = vec2<size_t>;
+using vec2ll = vec2<long long>;
+auto&& operator>>(auto&& is, auto&& t)
+{
+  if constexpr (std::ranges::range<decltype(t)>) {
+    for (auto&& ele: t) {
+      is >> ele;
+    }
+  }
+  else if constexpr (impl::is_pair<decltype(t)>) {
+    is >> t.first >> t.second;
+  }
+  else {
+    is >> t;
+  }
+  return is;
+}
+auto&& operator<<(auto&& os, auto&& t)
+{
+  if constexpr (std::ranges::range<decltype(t)>) {
+    for (auto&& ele: t) {
+      os << ele << ' ';
+    }
+    os << '\n';
+  }
+  else if constexpr (impl::is_pair<decltype(t)>) {
+    os << t.first << ": " << t.second << ", ";
+  }
+  else {
+    os << t << ' ';
+  }
+  return os;
+}
+void debug(std::string_view const& sv, auto&& t)
+{
+#ifdef DEBUG
+  std::cout << sv << ": " << t << '\n';
+#endif
+}
+void solve_case()
+{
+  constexpr long double eps{1e-8};
+
+  size_t n{};
+  size_t p{};
+  std::cin >> n >> p;
+  std::vector<size_t> a(n);
+  std::vector<size_t> b(n);
+  for (size_t i{}; i != n; ++i) {
+    std::cin >> a[i] >> b[i];
+  }
+
+  size_t sum{std::accumulate(a.begin(), a.end(), 0UZ)};
+  if (sum <= p) {
+    std::cout << -1;
+    return;
+  }
+
+  auto check{[&](auto const t) {
+    long double resource{t * p};
+    for (size_t i{}; i != n; ++i) {
+      resource -= std::max(a[i] * t - b[i], static_cast<long double>(0));
+      if (resource < 0) {
+        return false;
+      }
+    }
+    return true;
+  }};
+
+  long double l{};
+  long double r{0x3f3f};
+  while (l + eps < r) {
+    auto m{(l + r) / 2};
+    if (check(m)) {
+      l = m;
+    }
+    else {
+      r = m;
+    }
+  }
+  std::cout << std::setprecision(8) << std::fixed << l;
+}
+int main()
+{
+  std::ios::sync_with_stdio(false);
+  std::cin.tie(nullptr);
+  // std::cout.tie(nullptr);
+
+  size_t t{1};
+  // std::cin >> t;
+  for (size_t i{}; i != t; ++i) {
+    solve_case();
+  }
+  return 0;
+}

@@ -1,0 +1,126 @@
+#include <algorithm>
+#include <array>
+#include <bitset>
+#include <cmath>
+#include <cstddef>
+#include <iomanip>
+#include <iostream>
+#include <ranges>
+#include <string_view>
+#include <vector>
+
+// configs
+using ::std::size_t;
+
+namespace impl {
+  template<typename value_t> using vec2 = std::vector<std::vector<value_t>>;
+  template<typename T> concept is_pair = requires(T t) {
+    t.first;
+    t.second;
+  };
+} // namespace impl
+template<size_t i, size_t j, typename value_t> using arr2 = std::array<std::array<value_t, j>, i>;
+template<size_t i, size_t j> using arr2uz = arr2<i, j, size_t>;
+template<size_t i, size_t j> using arr2ll = arr2<i, j, long long>;
+template<typename value_t> class vec2 : public impl::vec2<value_t> {
+public:
+  vec2(size_t const i, size_t const j, auto const v)
+      : impl::vec2<value_t>(i, std::vector<value_t>(j, v))
+  {}
+};
+using vec2uz = vec2<size_t>;
+using vec2ll = vec2<long long>;
+auto&& operator>>(auto&& is, auto&& t)
+{
+  if constexpr (std::ranges::range<decltype(t)>) {
+    for (auto&& ele: t) {
+      is >> ele;
+    }
+  }
+  else if constexpr (impl::is_pair<decltype(t)>) {
+    is >> t.first >> t.second;
+  }
+  else {
+    is >> t;
+  }
+  return is;
+}
+auto&& operator<<(auto&& os, auto&& t)
+{
+  if constexpr (std::ranges::range<decltype(t)>) {
+    for (auto&& ele: t) {
+      os << ele << ' ';
+    }
+    os << '\n';
+  }
+  else if constexpr (impl::is_pair<decltype(t)>) {
+    os << t.first << ": " << t.second << ", ";
+  }
+  else {
+    os << t << ' ';
+  }
+  return os;
+}
+void debug([[maybe_unused]] std::string_view const& sv, [[maybe_unused]] auto&& t)
+{
+#ifdef DEBUG
+  std::cout << sv << ": " << t << '\n';
+#endif
+}
+void solve_case()
+{
+  size_t n{};
+  std::cin >> n;
+  std::vector<long long> x(n);
+  std::vector<long long> y(n);
+  for (size_t i{}; i != n; ++i) {
+    std::cin >> x[i] >> y[i];
+  }
+
+  auto dist{[&](size_t const i, size_t const j) {
+    return std::sqrt(std::pow(x[i] - x[j], 2) + std::pow(y[i] - y[j], 2));
+  }};
+  vec2<double> distance(n, n, 0);
+  for (size_t i{}; i != n; ++i) {
+    for (size_t j{i + 1}; j != n; ++j) {
+      distance[i][j] = distance[j][i] = dist(i, j);
+    }
+  }
+  std::vector<double> len(n);
+  for (size_t i{}; i != n; ++i) {
+    len[i] = std::sqrt(x[i] * x[i] + y[i] * y[i]);
+  }
+
+  vec2<double> dp(n, 1 << n, std::numeric_limits<double>::max());
+  for (size_t i{}; i != n; ++i) {
+    dp[i][1 << i] = len[i];
+  }
+  for (size_t k{1}; k != 1 << n; ++k) {
+    for (size_t i{}; i != n; ++i) {
+      if ((k & (1 << i)) == 0) {
+        continue;
+      }
+      for (size_t j{}; j != n; ++j) {
+        if (i == j) {
+          continue;
+        }
+        if ((k & (1 << j)) == 0) {
+          continue;
+        }
+        dp[i][k] = std::ranges::min(dp[i][k], dp[j][k ^ (1 << i)] + distance[i][j]);
+      }
+    }
+  }
+  auto ans{std::numeric_limits<double>::max()};
+  for (size_t i{}; i != n; ++i) {
+    ans = std::ranges::min(ans, dp[i].back());
+  }
+  std::cout << std::setprecision(2) << std::fixed << ans;
+}
+int main()
+{
+  std::ios::sync_with_stdio(false);
+  std::cin.tie(nullptr);
+  solve_case();
+  return 0;
+}

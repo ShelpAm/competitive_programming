@@ -1,0 +1,115 @@
+#include <algorithm>
+#include <array>
+#include <cmath>
+#include <cstddef>
+#include <iostream>
+#include <numeric>
+#include <ranges>
+#include <string_view>
+#include <vector>
+
+// configs
+using ::std::size_t;
+
+namespace impl {
+  template<typename value_t> using vec2 = std::vector<std::vector<value_t>>;
+  template<typename T> concept is_pair = requires(T t) {
+    t.first;
+    t.second;
+  };
+} // namespace impl
+template<size_t i, size_t j, typename value_t> using arr2 = std::array<std::array<value_t, j>, i>;
+template<size_t i, size_t j> using arr2uz = arr2<i, j, size_t>;
+template<size_t i, size_t j> using arr2ll = arr2<i, j, long long>;
+template<typename value_t> class vec2 : public impl::vec2<value_t> {
+public:
+  vec2(size_t const i, size_t const j): impl::vec2<value_t>(i, std::vector<value_t>(j)) {}
+};
+using vec2uz = vec2<size_t>;
+using vec2ll = vec2<long long>;
+auto&& operator>>(auto&& is, auto&& t)
+{
+  if constexpr (std::ranges::range<decltype(t)>) {
+    for (auto&& ele: t) {
+      is >> ele;
+    }
+  }
+  else if constexpr (impl::is_pair<decltype(t)>) {
+    is >> t.first >> t.second;
+  }
+  else {
+    is >> t;
+  }
+  return is;
+}
+auto&& operator<<(auto&& os, auto&& t)
+{
+  if constexpr (std::ranges::range<decltype(t)>) {
+    for (auto&& ele: t) {
+      os << ele << ' ';
+    }
+    os << '\n';
+  }
+  else if constexpr (impl::is_pair<decltype(t)>) {
+    os << t.first << ": " << t.second << ", ";
+  }
+  else {
+    os << t << ' ';
+  }
+  return os;
+}
+void debug([[maybe_unused]] std::string_view const& sv, [[maybe_unused]] auto&& t)
+{
+#ifdef DEBUG
+  std::cout << sv << ": " << t << '\n';
+#endif
+}
+struct dsu {
+  dsu(size_t const sz): fa(sz), size(sz, 1) { std::iota(fa.begin(), fa.end(), 0); }
+  size_t find(size_t const x) { return fa[x] == x ? x : fa[x] = find(fa[x]); }
+  void unite(size_t x, size_t y)
+  {
+    x = find(x);
+    y = find(y);
+    if (size[x] < size[y]) {
+      std::swap(x, y);
+    }
+    fa[y] = x;
+    size[x] += size[y];
+  }
+  std::vector<size_t> fa;
+  std::vector<size_t> size;
+};
+void solve_case()
+{
+  while (true) {
+    size_t n{};
+    std::cin >> n;
+    if (n == 0) {
+      return;
+    }
+    dsu d(n + 1);
+    size_t m{};
+    std::cin >> m;
+    for (size_t i{}; i != m; ++i) {
+      size_t x{};
+      size_t y{};
+      std::cin >> x >> y;
+      d.unite(x, y);
+    }
+    std::vector<bool> is_fa(n + 1);
+    for (size_t i{1}; i != n + 1; ++i) {
+      is_fa[d.find(i)] = true;
+    }
+    std::cout << std::ranges::count(is_fa, true) - 1 << '\n';
+  }
+}
+int main()
+{
+  std::ios::sync_with_stdio(false);
+  std::cin.tie(nullptr);
+  // std::cout.tie(nullptr);
+
+  solve_case();
+  return 0;
+}

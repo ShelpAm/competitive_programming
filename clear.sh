@@ -1,3 +1,3 @@
 #!/bin/bash
 
-rm -rf env/ build/
+rm -rf build/

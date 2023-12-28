@@ -1,0 +1,123 @@
+#include <algorithm>
+#include <array>
+#include <cmath>
+#include <cstddef>
+#include <iostream>
+#include <numeric>
+#include <ranges>
+#include <string_view>
+#include <vector>
+
+// configs
+using ::std::size_t;
+
+namespace impl {
+  template<typename value_t> using vec2 = std::vector<std::vector<value_t>>;
+  template<typename T> concept is_pair = requires(T t) {
+    t.first;
+    t.second;
+  };
+} // namespace impl
+template<size_t i, size_t j, typename value_t> using arr2 = std::array<std::array<value_t, j>, i>;
+template<size_t i, size_t j> using arr2uz = arr2<i, j, size_t>;
+template<size_t i, size_t j> using arr2ll = arr2<i, j, long long>;
+template<typename value_t> class vec2 : public impl::vec2<value_t> {
+public:
+  vec2(size_t const i, size_t const j): impl::vec2<value_t>(i, std::vector<value_t>(j)) {}
+};
+using vec2uz = vec2<size_t>;
+using vec2ll = vec2<long long>;
+auto&& operator>>(auto&& is, auto&& t)
+{
+  if constexpr (std::ranges::range<decltype(t)>) {
+    for (auto&& ele: t) {
+      is >> ele;
+    }
+  }
+  else if constexpr (impl::is_pair<decltype(t)>) {
+    is >> t.first >> t.second;
+  }
+  else {
+    is >> t;
+  }
+  return is;
+}
+auto&& operator<<(auto&& os, auto&& t)
+{
+  if constexpr (std::ranges::range<decltype(t)>) {
+    for (auto&& ele: t) {
+      os << ele << ' ';
+    }
+    os << '\n';
+  }
+  else if constexpr (impl::is_pair<decltype(t)>) {
+    os << t.first << ": " << t.second << ", ";
+  }
+  else {
+    os << t << ' ';
+  }
+  return os;
+}
+void debug([[maybe_unused]] std::string_view const& sv, [[maybe_unused]] auto&& t)
+{
+#ifdef DEBUG
+  std::cout << sv << ": " << t << '\n';
+#endif
+}
+struct dsu {
+  dsu(size_t size_): pa(size_), size(size_, 1) { std::iota(pa.begin(), pa.end(), 0); }
+  size_t find(size_t const x) { return pa[x] == x ? x : pa[x] = find(pa[x]); }
+  void unite(size_t x, size_t y)
+  {
+    x = find(x);
+    y = find(y);
+    if (x == y) {
+      return;
+    }
+    if (size[x] < size[y]) {
+      std::ranges::swap(x, y);
+    }
+    pa[y] = x;
+    size[x] += size[y];
+  }
+  bool is_united(size_t const x, size_t const y) { return find(x) == find(y); }
+  std::vector<size_t> pa;
+  std::vector<size_t> size;
+};
+struct info_t {
+  bool operator<(info_t const& rhs) const { return t < rhs.t; }
+  size_t x, y, t;
+};
+void solve_case()
+{
+  size_t n{};
+  size_t m{};
+  std::cin >> n >> m;
+  dsu d(n + 1);
+  std::vector<info_t> info(m);
+  for (size_t i{}; i != m; ++i) {
+    std::cin >> info[i].x >> info[i].y >> info[i].t;
+  }
+  std::ranges::sort(info, std::less<>());
+  for (auto&& [x, y, t]: info) {
+    d.unite(x, y);
+    if (d.size[d.find(x)] == n) {
+      std::cout << t;
+      return;
+    }
+  }
+  std::cout << -1;
+}
+int main()
+{
+  std::ios::sync_with_stdio(false);
+  std::cin.tie(nullptr);
+  // std::cout.tie(nullptr);
+
+  size_t t{1};
+  // std::cin >> t;
+  for (size_t i{}; i != t; ++i) {
+    solve_case();
+  }
+  return 0;
+}

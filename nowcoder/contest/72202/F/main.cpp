@@ -1,0 +1,96 @@
+#include <algorithm>
+#include <array>
+#include <cmath>
+#include <cstddef>
+#include <iostream>
+#include <string_view>
+#include <vector>
+
+// configs
+using ::std::size_t;
+
+namespace impl {
+  template<typename value_t> using vec2 = std::vector<std::vector<value_t>>;
+} // namespace impl
+template<size_t i, size_t j, typename value_t> using arr2 = std::array<std::array<value_t, j>, i>;
+template<size_t i, size_t j> using arr2uz = arr2<i, j, size_t>;
+template<size_t i, size_t j> using arr2ll = arr2<i, j, long long>;
+template<typename value_t> class vec2 : public impl::vec2<value_t> {
+public:
+  vec2(size_t const i, size_t const j): impl::vec2<value_t>(i, std::vector<value_t>(j)) {}
+};
+using vec2uz = vec2<size_t>;
+using vec2ll = vec2<long long>;
+constexpr long long big{0x3f3f3f3f};
+void fill_lu(auto&& v)
+{
+  for (auto&& e: v[0]) {
+    e = -big;
+  }
+  for (auto&& e: v) {
+    e[0] = -big;
+  }
+}
+void print(auto&& dp)
+{
+  for (auto const& row: dp) {
+    for (auto const e: row) {
+      std::cout << e << ' ';
+    }
+    std::cout << '\n';
+  }
+}
+void solve_case()
+{
+  size_t n{};
+  size_t m{};
+  std::cin >> n >> m;
+  vec2ll a(n, m);
+  for (auto&& row: a) {
+    for (auto&& e: row) {
+      std::cin >> e;
+    }
+  }
+
+  auto check{[&](long long const mid) {
+    vec2ll dp(n + 1, m + 1);
+    fill_lu(dp);
+    dp[1][1] = mid;
+    for (size_t i{1}; i != n + 1; ++i) {
+      for (size_t j{1}; j != m + 1; ++j) {
+        if (i == j && i == 1) {
+          continue;
+        }
+        long long from{std::max(dp[i - 1][j], dp[i][j - 1])};
+        dp[i][j] = (from > 0 ? from + a[i - 1][j - 1] : -big);
+      }
+    }
+    return dp[n][m] > 0;
+  }};
+
+  long long l{1};
+  long long r{static_cast<size_t>(1e8 * 1e4 * 2)};
+  while (l < r) {
+    auto mid{(l + r) >> 1};
+    if (check(mid)) {
+      r = mid;
+    }
+    else {
+      l = mid + 1;
+    }
+  }
+  std::cout << l;
+}
+int main()
+{
+  std::ios::sync_with_stdio(false);
+  std::cin.tie(nullptr);
+  // std::cout.tie(nullptr);
+
+  size_t t{1};
+  // std::cin >> t;
+  for (size_t i{}; i != t; ++i) {
+    solve_case();
+  }
+  return 0;
+}

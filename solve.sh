@@ -1,10 +1,10 @@
 #!/bin/bash
 source utils.sh
 
-cpp_start_point='+69'
+cpp_start_point='168'
 
 function usage() {
-  echo Usage: solve.sh [--usage] [platform] [problem] [--force]
+  echo 'Usage: solve.sh [--usage] [path/to/problem/] [--force]'
 }
 
 if [[ ${1-""} == "--usage" ]]; then
@@ -12,22 +12,17 @@ if [[ ${1-""} == "--usage" ]]; then
   exit 0
 fi
 
-suffix="cpp"
-platform=${1-$(env_get platform)}
-problem=${2-$(env_get problem)}
-dir=$platform/$problem/
-src=${dir}main.$suffix
-template="main.cpp"
+problem="${1:-$(env_get problem)}"
+src=${problem}/main.cpp
 
-mkdir $dir -p
-if [[ -e $src ]]; then
-  cp $src ${src}.bak
-  if [[ ${3-""} == "--force" ]]; then
-    cp code_templates/main.cpp $src
+mkdir ${problem} -p
+if [[ -e ${src} ]]; then
+  cp ${src} ${src}.bak
+  if [[ ${2-""} == "--force" ]]; then
+    cp code_templates/main.cpp ${src}
   fi
 else  
-  cp code_templates/main.cpp $src
+  cp code_templates/main.cpp ${src}
 fi
-nvim $src ${cpp_start_point}
-env_set platform $platform
-env_set problem $problem
+nvim $src +${cpp_start_point}
+env_set problem ${problem}

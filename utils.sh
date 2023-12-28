@@ -1,19 +1,24 @@
 #!/bin/bash
 
+state_home=${XDG_STATE_HOME:=${HOME}/.local/state}/template_environment
+
 function env_set() {
-  mkdir env -p
-  echo $2 > env/$1
+  mkdir ${state_home} -p
+  echo ${2} > ${state_home}/$1
 }
 
 function env_get() {
-  cat env/$1
+  if [ -e "${state_home}/$1" ]; then
+    cat "${state_home}/$1"
+  else
+    echo ''
+  fi
 }
 
 function all_env() {
-  env_dir=${1:=env}
-  if [[ -e $env_dir ]]; then
-    for i in $(ls $env_dir); do
-      echo $i: $(env_get $i)
+  if [[ -e ${state_home} ]]; then
+    for i in $(ls ${state_home}); do
+      echo "$i: $(env_get $i)"
     done
   fi
 }
