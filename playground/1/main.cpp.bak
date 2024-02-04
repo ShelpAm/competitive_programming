@@ -60,11 +60,7 @@ void print(auto&& t)
     std::cout << t << ' ';
   }
 }
-void solve_case()
-{
-  char c{127};
-  char n{c + (char)1};
-}
+void solve_case() {}
 int main()
 {
   auto n{1UZ};

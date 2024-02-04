@@ -1,9 +1,9 @@
 #!/bin/bash
 
-state_home=${XDG_STATE_HOME:=${HOME}/.local/state}/template_environment
+state_home="${XDG_STATE_HOME}/template_environment"
 
 function env_set() {
-  mkdir ${state_home} -p
+  mkdir -p ${state_home}
   echo ${2} > ${state_home}/$1
 }
 

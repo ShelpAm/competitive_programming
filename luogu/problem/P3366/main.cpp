@@ -173,17 +173,36 @@ static inline auto solve_case()
 {
   size_t n, m;
   cin >> n >> m;
-  dsu d(n);
-  vec2<pii> G(n, 0);
+  vec2<pii> g(n, 0);
   for (size_t i{}; i != m; ++i) {
     size_t x, y, z;
     cin >> x >> y >> z;
-    G[x - 1].emplace_back(y - 1, z);
-    G[y - 1].emplace_back(x - 1, z);
+    g[x - 1].emplace_back(z, y - 1);
+    g[y - 1].emplace_back(z, x - 1);
   }
 
-  std::priority_queue<pii> q;
+  std::unordered_set<size_t> points;
+  std::priority_queue<pii, vec1<pii>, std::greater<>> q;
   q.emplace(0, 0);
+  size_t ans{};
+  while (!q.empty()) {
+    auto [d, i]{q.top()};
+    q.pop();
+    if (!points.contains(i)) {
+      // cout << "Connecting points " << i << endl;
+      points.emplace(i);
+      ans += d;
+      for (auto const next: g[i]) {
+        q.emplace(next);
+      }
+    }
+  }
+  if (points.size() != n) {
+    cout << "orz";
+  }
+  else {
+    cout << ans;
+  }
 }
 static inline void solve_all_cases(auto&& solve_case_f)
 {

@@ -1,0 +1,72 @@
+#include <bits/stdc++.h>
+using namespace std;
+using i64 = int64_t;
+
+int main()
+{
+  cin.tie(nullptr)->sync_with_stdio(false);
+  cout << fixed << setprecision(10);
+
+  int n, m, p, k;
+  cin >> n >> m >> p >> k;
+  string s[n];
+  int sx, sy, ex, ey;
+
+  for (int i = 0; i < n; i++) {
+    cin >> s[i];
+    for (int j = 0; j < m; j++) {
+      if (s[i][j] == 's') {
+        sx = i, sy = j;
+      }
+      else if (s[i][j] == 'e') {
+        ex = i, ey = j;
+      }
+    }
+  }
+
+  bool ok = false;
+  constexpr int dx[] = {0, 0, 1, -1, 1, 1, -1, -1};
+  constexpr int dy[] = {1, -1, 0, 0, 1, -1, -1, 1};
+  function<void(int, int)> dfs = [&](int x, int y) {
+    cout << x << ' ' << y << '\n';
+    if (x == ex and y == ey) {
+      ok = true;
+      return;
+    }
+    if (p == 0) {
+      return;
+    }
+    for (int i = 0; i < 4; i++) {
+      int xx = x + dx[i], yy = y + dy[i];
+      if (xx < 0 or yy < 0 or xx >= n or yy >= m or s[xx][yy] == 'w') {
+        continue;
+      }
+      if (s[xx][yy] == 'd') {
+        if (k and p) {
+          k -= 1;
+          p -= 1;
+          dfs(xx, yy);
+          k += 1;
+          p += 1;
+        }
+        else {
+          return;
+        }
+      }
+      else if (s[xx][yy] == 'r' or s[xx][yy] == 's' or s[xx][yy] == 'e') {
+        if (p) {
+          p -= 1;
+          dfs(xx, yy);
+          p += 1;
+        }
+        else {
+          return;
+        }
+      }
+    }
+  };
+  dfs(sx, sy);
+  cout << (ok ? "YES" : "NO");
+
+  return 0;
+}

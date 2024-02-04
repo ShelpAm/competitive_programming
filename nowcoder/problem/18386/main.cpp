@@ -1,0 +1,25 @@
+#include <bits/stdc++.h>
+using namespace std;
+int main()
+{
+  string s;
+  cin >> s;
+  size_t i{0}, j{0};
+  auto distinct_chars{0};
+  array<size_t, 26> num{};
+  auto m{0x3f3f3f3fUL};
+  while (j != s.size()) {
+    while (j != s.size() && distinct_chars != 26) {
+      if (++num[s[j++] - 'a'] == 1) {
+        ++distinct_chars;
+      }
+    }
+    while (distinct_chars == 26) {
+      if (--num[s[i++] - 'a'] == 0) {
+        --distinct_chars;
+      }
+    }
+    m = min(m, j - i + 1);
+  }
+  cout << m;
+}

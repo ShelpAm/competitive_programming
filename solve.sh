@@ -1,7 +1,7 @@
 #!/bin/bash
 source utils.sh
 
-cpp_start_point='168'
+cpp_start_point='196'
 
 function usage() {
   echo 'Usage: solve.sh [--usage] [path/to/problem/] [--force]'
@@ -19,10 +19,10 @@ mkdir ${problem} -p
 if [[ -e ${src} ]]; then
   cp ${src} ${src}.bak
   if [[ ${2-""} == "--force" ]]; then
-    cp code_templates/main.cpp ${src}
+    cp templates/main.cpp ${src}
   fi
-else  
-  cp code_templates/main.cpp ${src}
+else
+  cp templates/main.cpp ${src}
 fi
 nvim $src +${cpp_start_point}
 env_set problem ${problem}
