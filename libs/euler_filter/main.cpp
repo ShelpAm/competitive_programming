@@ -64,41 +64,41 @@ template<typename T> [[maybe_unused]] constexpr T mod{static_cast<T>(998244353UL
 template<typename T> [[maybe_unused]] constexpr T big{numeric_limits<T>::max() / 2};
 
 namespace impl {
-  template<typename value_type> using vec2 = std::vector<std::vector<value_type>>;
+template<typename value_type> using vec2 = std::vector<std::vector<value_type>>;
 #ifdef __cpp_concepts
-  template<typename T> concept pair = requires(T t) {
-    t.first;
-    t.second;
-  };
+template<typename T> concept pair = requires(T t) {
+  t.first;
+  t.second;
+};
 
-  template<typename> struct is_tuple_t : std::false_type {};
-  template<typename... T> struct is_tuple_t<std::tuple<T...>> : std::true_type {};
+template<typename> struct is_tuple_t : std::false_type {};
+template<typename... T> struct is_tuple_t<std::tuple<T...>> : std::true_type {};
 
-  template<typename... T> concept tuple = is_tuple_t<T...>::value;
-  template<typename T> concept c_str = std::same_as<char const*, std::remove_cvref_t<T>>;
-  template<typename T> concept string = std::same_as<string, std::remove_cvref_t<T>>;
-  template<typename T> concept string_view = std::same_as<string_view, std::remove_cvref_t<T>>;
-  template<typename T> concept string_like = string<T> || string_view<T> || c_str<T>;
+template<typename... T> concept tuple = is_tuple_t<T...>::value;
+template<typename T> concept c_str = std::same_as<char const*, std::remove_cvref_t<T>>;
+template<typename T> concept string = std::same_as<string, std::remove_cvref_t<T>>;
+template<typename T> concept string_view = std::same_as<string_view, std::remove_cvref_t<T>>;
+template<typename T> concept string_like = string<T> || string_view<T> || c_str<T>;
 #endif
-  class io_accelerator {
-  public:
-    io_accelerator()
-    {
-      std::ios::sync_with_stdio(false);
-      std::cin.tie(nullptr);
-      // The following line needn't to be executed because the above line actually had done this.
-      // std::cout.tie(nullptr);
-    }
-    io_accelerator(const io_accelerator&) = delete;
-    io_accelerator(io_accelerator&&) = delete;
-    io_accelerator& operator=(const io_accelerator&) = delete;
-    io_accelerator& operator=(io_accelerator&&) = delete;
-    ~io_accelerator()
-    {
-      std::ios::sync_with_stdio(true);
-      std::cin.tie(&std::cout);
-    }
-  };
+class io_accelerator {
+public:
+  io_accelerator()
+  {
+    std::ios::sync_with_stdio(false);
+    std::cin.tie(nullptr);
+    // The following line needn't to be executed because the above line actually had done this.
+    // std::cout.tie(nullptr);
+  }
+  io_accelerator(const io_accelerator&) = delete;
+  io_accelerator(io_accelerator&&) = delete;
+  io_accelerator& operator=(const io_accelerator&) = delete;
+  io_accelerator& operator=(io_accelerator&&) = delete;
+  ~io_accelerator()
+  {
+    std::ios::sync_with_stdio(true);
+    std::cin.tie(&std::cout);
+  }
+};
 } // namespace impl
 [[maybe_unused]] static inline constexpr bool check_max(auto&& value, auto&& other)
 {

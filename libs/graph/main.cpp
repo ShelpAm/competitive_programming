@@ -187,29 +187,6 @@ static inline constexpr void debug([[maybe_unused]] std::string_view s, [[maybe_
   std::cout << endl;
 #endif
 }
-auto read_graph(size_t const num_of_vertices, size_t const num_of_edges, bool const bidirectional,
-                bool const contains_w, bool const read_from_1 = true)
-{
-  vec2<puz> adj(num_of_vertices, 0);
-  for (size_t i{}; i != num_of_edges; ++i) {
-    size_t u, v, w;
-    cin >> u >> v;
-    if (contains_w) {
-      cin >> w;
-    }
-    else {
-      w = 1;
-    }
-    if (read_from_1) {
-      --u, --v;
-    }
-    adj[u].emplace_back(w, v);
-    if (bidirectional) {
-      adj[v].emplace_back(w, u);
-    }
-  }
-  return adj;
-}
 static inline auto solve_case()
 {
   return 0;

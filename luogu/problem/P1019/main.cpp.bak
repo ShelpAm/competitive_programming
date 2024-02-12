@@ -193,16 +193,17 @@ static inline constexpr void debug([[maybe_unused]] std::string_view s, [[maybe_
 }
 size_t begin_from(auto&& r, string_view s)
 {
-  size_t res{};
+  size_t res{s.size()};
   for (auto&& [next, cnt]: r) {
-    if (cnt != 0) {
-      for (size_t i{1}; i != s.size(); ++i) {
-        if (s.substr(s.size() - i) == next.substr(0, i)) {
-          --cnt;
-          check_max(res, s.size() - i + begin_from(r, next));
-          ++cnt;
-          break;
-        }
+    if (cnt == 0) {
+      continue;
+    }
+    for (size_t i{1}; i != s.size(); ++i) {
+      if (s.substr(s.size() - i) == next.substr(0, i)) {
+        --cnt;
+        check_max(res, s.size() - i + begin_from(r, next));
+        ++cnt;
+        break;
       }
     }
   }

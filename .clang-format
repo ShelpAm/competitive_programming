@@ -1,3 +1,5 @@
+---
+Language: Cpp
 AccessModifierOffset: -2
 AlignAfterOpenBracket: Align
 AlignConsecutiveAssignments: None
@@ -45,7 +47,7 @@ BreakBeforeTernaryOperators: true
 BreakConstructorInitializers: BeforeColon
 BreakInheritanceList: BeforeColon
 BreakStringLiterals: true
-ColumnLimit: 100
+ColumnLimit: 80
 CompactNamespaces: false
 Cpp11BracedListStyle: true
 DerivePointerAlignment: false
@@ -58,7 +60,7 @@ IndentRequiresClause: false
 IndentWidth: 2
 IndentWrappedFunctionNames: false
 KeepEmptyLinesAtTheStartOfBlocks: false
-NamespaceIndentation: All
+NamespaceIndentation: None
 PointerAlignment: Left
 SortUsingDeclarations: true
 SpaceAfterCStyleCast: false
