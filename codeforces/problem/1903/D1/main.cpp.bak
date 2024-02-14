@@ -5,6 +5,7 @@
 #include <cmath>
 #include <cstddef>
 #include <deque>
+#include <format>
 #include <iomanip>
 #include <iostream>
 #include <list>
@@ -414,13 +415,14 @@ static inline auto solve_case()
         }
         else if (((a[j] >> i) & 1) == 0) {
           cost += (1ULL << i) - (((1ULL << i) - 1) & a[j]);
-          if (cost > k) {
-            break;
-          }
+          cout << std::format("{} - {} = {}", (1ULL << i),
+                              (((1ULL << i) - 1) & a[j]),
+                              (1ULL << i) - (((1ULL << i) - 1) & a[j]));
           to_be_clear.emplace_back(j);
         }
       }
       if (cost <= k) {
+        cout << i << ' ' << cost << ' ' << k << '\n';
         k -= cost;
         for (auto const j: to_be_clear) {
           clear[j] = true;

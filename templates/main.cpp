@@ -23,14 +23,10 @@
 #include <ranges>
 #endif
 
-// configs
+using ::std::abs;
 using ::std::cin;
 using ::std::cout;
 using ::std::endl;
-using ::std::size_t;
-using ::std::string;
-using ::std::string_view;
-using ::std::operator""sv;
 using ::std::greater;
 using ::std::less;
 using ::std::map;
@@ -39,9 +35,13 @@ using ::std::pair;
 using ::std::priority_queue;
 using ::std::queue;
 using ::std::set;
+using ::std::size_t;
 using ::std::stack;
+using ::std::string;
+using ::std::string_view;
 using ::std::unordered_map;
 using ::std::unordered_set;
+using ::std::operator""sv;
 #ifdef __cpp_lib_ranges
 using ::std::ranges::max;
 using ::std::ranges::min;
@@ -56,7 +56,7 @@ using ::std::ranges::views::take;
 // TODO: Defines my own sort, etc.
 #endif
 template<typename T>
-[[maybe_unused]] constexpr T mod{static_cast<T>(998244353ULL)};
+[[maybe_unused]] constexpr T mod{static_cast<T>(998244353)};
 template<typename T>
 [[maybe_unused]] constexpr T inf{numeric_limits<T>::max() >> 16};
 namespace impl {
@@ -75,6 +75,8 @@ public:
 };
 
 #ifdef __cpp_concepts
+using ::std::remove_cvref_t;
+
 template<typename T> concept pair = requires(T t) {
   t.first;
   t.second;
@@ -85,33 +87,32 @@ template<typename... T> struct is_tuple_t<std::tuple<T...>> : std::true_type {};
 template<typename... T> concept tuple = is_tuple_t<T...>::value;
 
 template<typename T> concept c_str
-    = std::same_as<char const*, std::remove_cvref_t<T>>;
-template<typename T> concept string
-    = std::same_as<string, std::remove_cvref_t<T>>;
+    = std::same_as<char const*, remove_cvref_t<T>>;
+template<typename T> concept string = std::same_as<string, remove_cvref_t<T>>;
 template<typename T> concept string_view
-    = std::same_as<string_view, std::remove_cvref_t<T>>;
+    = std::same_as<string_view, remove_cvref_t<T>>;
 template<typename T> concept string_like
     = string<T> || string_view<T> || c_str<T>;
 #endif
 } // namespace impl
-using i64 = long long;
-// using i64 = ::std::ptrdiff_t;
-// using u64 = size_t;
+using i64 = ::std::ptrdiff_t;
+using u64 = ::std::size_t;
 using vi = std::vector<i64>;
 using vvi = std::vector<vi>;
 using vvvi = std::vector<vvi>;
 using vvvvi = std::vector<vvvi>;
+using vu = std::vector<u64>;
+using vvu = std::vector<vu>;
+using vvvu = std::vector<vvu>;
+using vvvvu = std::vector<vvvu>;
 using vb = std::vector<bool>;
 using vvb = std::vector<vb>;
 using pii = pair<i64, i64>;
-using puz = pair<size_t, size_t>;
-using pll = pair<long long, long long>;
+using puu = pair<u64, u64>;
+using triplei = std::tuple<i64, i64, i64>;
 template<size_t i, size_t j> using arr2uz = impl::arr2<i, j, size_t>;
 template<size_t i, size_t j> using arr2ll = impl::arr2<i, j, long long>;
 template<size_t i, size_t j> using arr2b = impl::arr2<i, j, bool>;
-using vec1uz = impl::vec1<size_t>;
-using vec1ll = impl::vec1<long long>;
-using vec1b = impl::vec1<bool>;
 using vec2uz = impl::vec2<size_t>;
 using vec2ll = impl::vec2<long long>;
 using vec2b = impl::vec2<bool>;
@@ -136,8 +137,7 @@ public:
   }
 };
 } // namespace impl
-[[maybe_unused]] static inline constexpr bool check_max(auto&& value,
-                                                        auto&& other)
+[[maybe_unused]] static constexpr bool check_max(auto& value, auto const& other)
 {
   if (value < other) {
     value = other;
@@ -145,8 +145,7 @@ public:
   }
   return false;
 }
-[[maybe_unused]] static inline constexpr bool check_min(auto&& value,
-                                                        auto&& other)
+[[maybe_unused]] static constexpr bool check_min(auto& value, auto const& other)
 {
   if (value > other) {
     value = other;
@@ -155,7 +154,6 @@ public:
   return false;
 }
 struct prime_fileter_result {
-  // prime_fileter_result(size_t const size): not_prime(size) {}
   vi primes;
   vb not_prime;
 };
@@ -181,13 +179,13 @@ auto prime_filter(size_t const upper_bound)
   return prime_fileter_result{primes, not_prime};
 }
 // namespace graph {
-auto read_graph(size_t const num_of_vertices, size_t const num_of_edges,
+auto read_graph(u64 const num_of_vertices, u64 const num_of_edges,
                 bool const bidirectional, bool const contains_w,
                 bool const read_from_1 = true)
 {
   impl::vec2<pii> adj(num_of_vertices, 0);
-  for (size_t i{}; i != num_of_edges; ++i) {
-    size_t u, v, w;
+  for (u64 i{}; i != num_of_edges; ++i) {
+    u64 u, v, w;
     cin >> u >> v;
     if (contains_w) {
       cin >> w;
@@ -206,53 +204,52 @@ auto read_graph(size_t const num_of_vertices, size_t const num_of_edges,
   return adj;
 }
 struct dijkstra_result {
-  // dijkstra_result(size_t const size): dis(size), prev(size){};
-  vi dis;
-  vi prev;
+  vi distance;
+  vi previous;
 };
 auto dijkstra(impl::vec2<pii> const& adjacent, size_t const source)
 {
-  vi dis(adjacent.size(), inf<i64>);
-  vi prev(adjacent.size());
-  dis[source] = 0;
+  vi distance(adjacent.size(), inf<i64>);
+  vi previous(adjacent.size());
+  distance[source] = 0;
 
   priority_queue<pii, impl::vec1<pii>, greater<>> q;
-  q.emplace(dis[source], source);
+  q.emplace(distance[source], source);
 
   while (!q.empty()) { // The main loop
-    auto const [_, u]{
-        q.top()}; // Extract closest vertex. (Get and remove best vertex)
+    auto const [_, u]{q.top()}; // Extract the closest vertex. (Get and remove
+                                // the best vertex)
     q.pop();
 
     for (auto const& [d, v]: adjacent[u]) {
-      if (auto const alt{dis[u] + d}; alt < dis[v]) {
-        dis[v] = alt;
-        prev[v] = u;
+      if (auto const alt{distance[u] + d}; alt < distance[v]) {
+        distance[v] = alt;
+        previous[v] = u;
         q.emplace(alt, v);
       }
     }
   }
 
-  return dijkstra_result{dis, prev};
+  return dijkstra_result{distance, previous};
 }
-auto floyd(impl::vec2<pii> const& adj)
+auto floyd(impl::vec2<pii> const& adjacent)
 {
-  auto const n{static_cast<i64>(adj.size())};
+  auto const n{adjacent.size()};
 
-  vvi f(adj.size(), vi(adj.size(), inf<i64>));
+  vvi f(adjacent.size(), vi(adjacent.size(), inf<i64>));
   // Initialize data
-  for (i64 u{}; u != n; ++u) {
+  for (u64 u{}; u != n; ++u) {
     f[u][u] = 0;
-    for (auto const& [w, v]: adj[u]) {
+    for (auto const& [w, v]: adjacent[u]) {
       f[u][v] = w;
     }
   }
 
-  for (i64 k{}; k != n; ++k) {
+  for (u64 k{}; k != n; ++k) {
     // In k-th round (At the end of the round), f[i][j] denotes the minimum
     // distance between i, j, concerning first k vertices.
-    for (i64 i{}; i != n; ++i) {
-      for (i64 j{}; j != n; ++j) {
+    for (u64 i{}; i != n; ++i) {
+      for (u64 j{}; j != n; ++j) {
         check_min(f[i][j], f[i][k] + f[k][j]);
       }
     }
@@ -263,19 +260,19 @@ auto floyd(impl::vec2<pii> const& adj)
 // } // namespace graph
 class disjoint_set_union {
 public:
-  disjoint_set_union(size_t size): parent_(size), size_(size, 1)
+  disjoint_set_union(u64 size): parent_(size), size_(size, 1)
   {
     std::iota(parent_.begin(), parent_.end(), 0);
   }
   // with path compression
-  size_t find(size_t const x)
+  size_t find(u64 const x)
   {
     return parent_[x] == x ? x : parent_[x] = find(parent_[x]);
   }
-  /// return:
-  /// false - if there has been pair x,y in the set
-  /// true  - successfully united
-  bool unite(size_t x, size_t y)
+  // @return:
+  // false - if there has been pair x,y in the set
+  // true  - successfully united
+  bool unite(u64 x, u64 y)
   {
     x = find(x);
     y = find(y);
@@ -321,7 +318,7 @@ public:
     }
     return sum;
   }
-  void update(size_t index, i64 const value)
+  void update(u64 index, i64 const value)
   {
     while (index < tree_.size()) {
       tree_[index] += value;
@@ -332,29 +329,28 @@ private:
   vi tree_;
 };
 class segment_tree {};
-static inline constexpr auto&& operator>>(auto&& is, auto&& t)
+static constexpr auto& operator>>(auto& istream, auto& t)
 {
   using T = std::remove_cvref_t<decltype(t)>;
 #ifdef __cpp_lib_ranges
   if constexpr (std::ranges::range<decltype(t)>) {
-    for (auto&& ele: t) {
-      is >> ele;
+    for (auto& ele: t) {
+      istream >> ele;
     }
-    return is;
+    return istream;
   }
 #endif
 #ifdef __cpp_concepts
   if constexpr (impl::pair<decltype(t)>) {
-    return is >> t.first >> t.second;
+    return istream >> t.first >> t.second;
   }
   else if constexpr (impl::tuple<T>) {
-    std::cout << "[operator>>] TODO: This is a tuple whose output method "
-                 "hasn't been implemented.\n";
+    std::cout << "[print] tuple: not implemented yet.\n";
   }
 #endif
-  return is >> t;
+  return istream >> t;
 }
-static inline constexpr void print(auto const& t)
+static constexpr void print(auto const& t)
 {
   using T = std::remove_cvref_t<decltype(t)>;
   if constexpr (impl::string_like<T>) {
@@ -365,7 +361,7 @@ static inline constexpr void print(auto const& t)
   }
 #ifdef __cpp_lib_ranges
   else if constexpr (std::ranges::range<T>) {
-    for (auto&& ele: t) {
+    for (auto const& ele: t) {
       print(ele);
     }
     std::cout << endl;
@@ -373,41 +369,41 @@ static inline constexpr void print(auto const& t)
 #endif
 #ifdef __cpp_concepts
   else if constexpr (impl::pair<T>) {
-    std::cout << t.first << ": " << t.second << ", ";
+    std::cout << "{ " << t.first << ", " << t.second << "}, ";
   }
   else if constexpr (impl::tuple<T>) {
-    std::cout << "[print] TODO: This is a tuple whose output method hasn't "
-                 "been implemented.\n";
+    std::cout << "[print] tuple: not implemented yet.\n";
   }
 #endif
   else {
     std::cout << t << ' ';
   }
 }
-static inline constexpr void debug([[maybe_unused]] std::string_view s,
-                                   [[maybe_unused]] auto&& t)
+static constexpr void debug(std::string_view s, auto const& t)
 {
 #ifdef DEBUG
   std::cout << "[debug] " << s << ":\n";
   print(t);
-  std::cout << endl;
 #endif
 }
-static inline auto solve_case()
+static auto solve_case()
 {
   return 0;
 }
-static inline constexpr void solve_all_cases(auto&& solve_case_f)
+static constexpr void solve_all_cases(auto solve_case_f)
 {
-  size_t t{1};
+  u64 t{1};
   // std::cin >> t;
-  for (size_t i{}; i != t; ++i) {
-    if constexpr (std::is_void_v<decltype(solve_case_f())>) {
+  for (u64 i{}; i != t; ++i) {
+    using return_type = decltype(solve_case_f());
+    if constexpr (std::same_as<return_type, void>) {
       solve_case_f();
+    }
+    else if constexpr (std::same_as<return_type, bool>) {
+      print(solve_case_f() ? "YES\n" : "NO\n");
     }
     else {
       print(solve_case_f());
-      cout << endl;
     }
   }
 }

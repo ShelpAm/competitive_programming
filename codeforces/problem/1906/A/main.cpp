@@ -56,7 +56,7 @@ using ::std::ranges::views::take;
 // TODO: Defines my own sort, etc.
 #endif
 template<typename T>
-[[maybe_unused]] constexpr T mod{static_cast<T>(998244353ULL)};
+[[maybe_unused]] constexpr T mod{static_cast<T>(998244353)};
 template<typename T>
 [[maybe_unused]] constexpr T inf{numeric_limits<T>::max() >> 16};
 namespace impl {
@@ -104,8 +104,7 @@ using vvvvi = std::vector<vvvi>;
 using vb = std::vector<bool>;
 using vvb = std::vector<vb>;
 using pii = pair<i64, i64>;
-using puz = pair<size_t, size_t>;
-using pll = pair<long long, long long>;
+using triplei = std::tuple<i64, i64, i64>;
 template<size_t i, size_t j> using arr2uz = impl::arr2<i, j, size_t>;
 template<size_t i, size_t j> using arr2ll = impl::arr2<i, j, long long>;
 template<size_t i, size_t j> using arr2b = impl::arr2<i, j, bool>;
@@ -155,7 +154,6 @@ public:
   return false;
 }
 struct prime_fileter_result {
-  // prime_fileter_result(size_t const size): not_prime(size) {}
   vi primes;
   vb not_prime;
 };
@@ -181,12 +179,12 @@ auto prime_filter(size_t const upper_bound)
   return prime_fileter_result{primes, not_prime};
 }
 // namespace graph {
-auto read_graph(size_t const num_of_vertices, size_t const num_of_edges,
+auto read_graph(i64 const num_of_vertices, i64 const num_of_edges,
                 bool const bidirectional, bool const contains_w,
                 bool const read_from_1 = true)
 {
   impl::vec2<pii> adj(num_of_vertices, 0);
-  for (size_t i{}; i != num_of_edges; ++i) {
+  for (i64 i{}; i != num_of_edges; ++i) {
     size_t u, v, w;
     cin >> u >> v;
     if (contains_w) {
@@ -206,7 +204,6 @@ auto read_graph(size_t const num_of_vertices, size_t const num_of_edges,
   return adj;
 }
 struct dijkstra_result {
-  // dijkstra_result(size_t const size): dis(size), prev(size){};
   vi dis;
   vi prev;
 };
@@ -272,9 +269,9 @@ public:
   {
     return parent_[x] == x ? x : parent_[x] = find(parent_[x]);
   }
-  /// return:
-  /// false - if there has been pair x,y in the set
-  /// true  - successfully united
+  // @return:
+  // false - if there has been pair x,y in the set
+  // true  - successfully united
   bool unite(size_t x, size_t y)
   {
     x = find(x);
@@ -393,43 +390,40 @@ static inline constexpr void debug([[maybe_unused]] std::string_view s,
   std::cout << endl;
 #endif
 }
+std::vector<pii> const dirs{{0, 1},  {0, -1}, {1, 1},  {1, 0},
+                            {1, -1}, {-1, 0}, {-1, 1}, {-1, -1}};
 static inline auto solve_case()
 {
-  i64 n, q;
-  cin >> n >> q;
-  vec1uz a(n);
-  cin >> a;
+  impl::vec2<char> v(3, 3);
+  cin >> v;
 
-  for (i64 qc{}; qc != q; ++qc) {
-    size_t k;
-    cin >> k;
-    size_t ans{};
-    vb clear(n);
-    for (i64 i{61}; i != -1; --i) {
-      size_t cost{};
-      vi to_be_clear;
-      for (i64 j{}; j != n; ++j) {
-        if (clear[j]) {
-          cost += 1ULL << i;
-        }
-        else if (((a[j] >> i) & 1) == 0) {
-          cost += (1ULL << i) - (((1ULL << i) - 1) & a[j]);
-          if (cost > k) {
-            break;
-          }
-          to_be_clear.emplace_back(j);
-        }
-      }
-      if (cost <= k) {
-        k -= cost;
-        for (auto const j: to_be_clear) {
-          clear[j] = true;
-        }
-        ans += 1ULL << i;
+  string ans{"DDD"};
+  vvi vis(3, vi(3));
+  auto dfs{[&](auto self, i64 const cur, pii const& pos, string const& s) {
+    if (cur == 3) {
+      check_min(ans, s);
+      return;
+    }
+
+    for (auto const [dx, dy]: dirs) {
+      pii const next{pos.first + dx, pos.second + dy};
+      if (next.first < 3 && next.first >= 0 && next.second < 3
+          && next.second >= 0 && !vis[next.first][next.second]) {
+        vis[next.first][next.second] = true;
+        self(self, cur + 1, next, s + v[next.first][next.second]);
+        vis[next.first][next.second] = false;
       }
     }
-    cout << ans << '\n';
+  }};
+
+  for (i64 i{}; i != 3; ++i) {
+    for (i64 j{}; j != 3; ++j) {
+      vis[i][j] = true;
+      dfs(dfs, 1, {i, j}, string{v[i][j]});
+      vis[i][j] = false;
+    }
   }
+  return ans;
 }
 static inline constexpr void solve_all_cases(auto&& solve_case_f)
 {
