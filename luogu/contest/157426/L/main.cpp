@@ -441,7 +441,24 @@ static constexpr void debug(std::string_view s, auto const& t)
 }
 static auto solve_case()
 {
-  // return 0;
+  string s;
+  cin >> s;
+
+  auto longest{[&s](u64 l, u64 r) {
+    unordered_set<char> vis;
+    while (l != -1 && r != s.size() && s[l] == s[r] && !vis.contains(s[l])) {
+      vis.emplace(s[l]);
+      --l, ++r;
+    }
+    return (r - l) / 2;
+  }};
+
+  u64 ans{};
+  for (u64 i{}; i != s.size(); ++i) {
+    ans += longest(i, i);
+    ans += longest(i, i + 1);
+  }
+  return ans;
 }
 static constexpr void solve_all_cases(auto solve_case_f)
 {

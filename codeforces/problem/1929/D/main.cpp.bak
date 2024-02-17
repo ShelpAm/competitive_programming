@@ -2,6 +2,7 @@
 #include <array>
 #include <bitset>
 #include <cassert>
+#include <cmath>
 #include <cstddef>
 #include <deque>
 #include <iomanip>
@@ -32,7 +33,6 @@ using ::std::map;
 using ::std::numeric_limits;
 using ::std::pair;
 using ::std::priority_queue;
-using ::std::ptrdiff_t;
 using ::std::queue;
 using ::std::set;
 using ::std::size_t;
@@ -43,13 +43,10 @@ using ::std::unordered_map;
 using ::std::unordered_set;
 using ::std::operator""sv;
 #ifdef __cpp_lib_ranges
-using ::std::ranges::binary_search;
-using ::std::ranges::lower_bound;
 using ::std::ranges::max;
 using ::std::ranges::min;
 using ::std::ranges::sort;
 using ::std::ranges::swap;
-using ::std::ranges::upper_bound;
 using ::std::ranges::views::drop;
 using ::std::ranges::views::iota;
 using ::std::ranges::views::reverse;
@@ -58,28 +55,10 @@ using ::std::ranges::views::take;
 #else
 // TODO: Defines my own sort, etc.
 #endif
-
-using i64 = ::std::ptrdiff_t;
-using u64 = ::std::size_t;
-using vi = ::std::vector<i64>;
-using vvi = ::std::vector<vi>;
-using vvvi = ::std::vector<vvi>;
-using vvvvi = ::std::vector<vvvi>;
-using vu = ::std::vector<u64>;
-using vvu = ::std::vector<vu>;
-using vvvu = ::std::vector<vvu>;
-using vvvvu = ::std::vector<vvvu>;
-using vb = ::std::vector<bool>;
-using vvb = ::std::vector<vb>;
-using pii = ::std::pair<i64, i64>;
-using puu = ::std::pair<u64, u64>;
-using triplei = ::std::tuple<i64, i64, i64>;
-
 template<typename T>
 [[maybe_unused]] constexpr T mod{static_cast<T>(998244353)};
 template<typename T>
-[[maybe_unused]] constexpr T inf{numeric_limits<T>::max() >> 2};
-
+[[maybe_unused]] constexpr T inf{numeric_limits<T>::max() >> 16};
 namespace impl {
 template<typename value_type> using vec2_placeholder
     = std::vector<std::vector<value_type>>;
@@ -95,7 +74,6 @@ public:
   {}
 };
 
-// Concepts.
 #ifdef __cpp_concepts
 using ::std::remove_cvref_t;
 
@@ -116,8 +94,29 @@ template<typename T> concept string_view
 template<typename T> concept string_like
     = string<T> || string_view<T> || c_str<T>;
 #endif
-
-/// @brief Turns off synchronization with stdio.
+} // namespace impl
+using i64 = ::std::ptrdiff_t;
+using u64 = ::std::size_t;
+using vi = std::vector<i64>;
+using vvi = std::vector<vi>;
+using vvvi = std::vector<vvi>;
+using vvvvi = std::vector<vvvi>;
+using vu = std::vector<u64>;
+using vvu = std::vector<vu>;
+using vvvu = std::vector<vvu>;
+using vvvvu = std::vector<vvvu>;
+using vb = std::vector<bool>;
+using vvb = std::vector<vb>;
+using pii = pair<i64, i64>;
+using puu = pair<u64, u64>;
+using triplei = std::tuple<i64, i64, i64>;
+template<size_t i, size_t j> using arr2uz = impl::arr2<i, j, size_t>;
+template<size_t i, size_t j> using arr2ll = impl::arr2<i, j, long long>;
+template<size_t i, size_t j> using arr2b = impl::arr2<i, j, bool>;
+using vec2uz = impl::vec2<size_t>;
+using vec2ll = impl::vec2<long long>;
+using vec2b = impl::vec2<bool>;
+namespace impl {
 class io_accelerator {
 public:
   io_accelerator()
@@ -138,7 +137,6 @@ public:
   }
 };
 } // namespace impl
-
 [[maybe_unused]] static constexpr bool check_max(auto& value, auto const& other)
 {
   if (value < other) {
@@ -155,29 +153,12 @@ public:
   }
   return false;
 }
-static constexpr auto sum(auto const& coll)
-{
-  using value_type = ::std::remove_cvref_t<decltype(coll.front())>;
-  return std::accumulate(coll.begin(), coll.end(), value_type{});
-}
-static constexpr auto pow(auto a, auto b, u64 const p)
-{
-  u64 res{1};
-  while (b != 0) {
-    if ((b & 1) == 1) {
-      res = res * a % p;
-    }
-    a = a * a % p;
-    b >>= 1;
-  }
-  return res;
-}
 struct prime_fileter_result {
   vi primes;
   vb not_prime;
 };
 // upper_bound The maximum number you would like to query.
-prime_fileter_result prime_filter(size_t const upper_bound)
+auto prime_filter(size_t const upper_bound)
 {
   vi primes(upper_bound + 1);
   vb not_prime(upper_bound + 1);
@@ -195,13 +176,14 @@ prime_fileter_result prime_filter(size_t const upper_bound)
       }
     }
   }
-  return {primes, not_prime};
+  return prime_fileter_result{primes, not_prime};
 }
-impl::vec2<puu> read_graph(u64 const num_of_vertices, u64 const num_of_edges,
-                           bool const bidirectional, bool const contains_w,
-                           bool const read_from_1 = true)
+// namespace graph {
+auto read_graph(u64 const num_of_vertices, u64 const num_of_edges,
+                bool const bidirectional, bool const contains_w,
+                bool const read_from_1 = true)
 {
-  impl::vec2<puu> adj(num_of_vertices, 0);
+  impl::vec2<pii> adj(num_of_vertices, 0);
   for (u64 i{}; i != num_of_edges; ++i) {
     u64 u, v, w;
     cin >> u >> v;
@@ -222,16 +204,16 @@ impl::vec2<puu> read_graph(u64 const num_of_vertices, u64 const num_of_edges,
   return adj;
 }
 struct dijkstra_result {
-  vu distance;
-  vu previous;
+  vi distance;
+  vi previous;
 };
-dijkstra_result dijkstra(impl::vec2<puu> const& adjacent, u64 const source)
+auto dijkstra(impl::vec2<pii> const& adjacent, size_t const source)
 {
-  vu distance(adjacent.size(), inf<i64>);
-  vu previous(adjacent.size());
+  vi distance(adjacent.size(), inf<i64>);
+  vi previous(adjacent.size());
   distance[source] = 0;
 
-  priority_queue<puu, impl::vec1<puu>, greater<>> q;
+  priority_queue<pii, impl::vec1<pii>, greater<>> q;
   q.emplace(distance[source], source);
 
   while (!q.empty()) { // The main loop
@@ -248,9 +230,9 @@ dijkstra_result dijkstra(impl::vec2<puu> const& adjacent, u64 const source)
     }
   }
 
-  return {distance, previous};
+  return dijkstra_result{distance, previous};
 }
-vvi floyd(impl::vec2<pii> const& adjacent)
+auto floyd(impl::vec2<pii> const& adjacent)
 {
   auto const n{adjacent.size()};
 
@@ -275,7 +257,7 @@ vvi floyd(impl::vec2<pii> const& adjacent)
 
   return f;
 }
-
+// } // namespace graph
 class disjoint_set_union {
 public:
   disjoint_set_union(u64 size): parent_(size), size_(size, 1)
@@ -287,9 +269,9 @@ public:
   {
     return parent_[x] == x ? x : parent_[x] = find(parent_[x]);
   }
-  /// @return:
-  /// false if there has been pair x,y in the set.
-  /// true successfully united
+  // @return:
+  // false - if there has been pair x,y in the set
+  // true  - successfully united
   bool unite(u64 x, u64 y)
   {
     x = find(x);
@@ -316,7 +298,7 @@ auto lsb(i64 const i)
 }
 class fenwick_tree {
 public:
-  fenwick_tree(u64 const size): tree_(size) {}
+  fenwick_tree(size_t const size): tree_(size) {}
   // The input array should start from the index 1.
   fenwick_tree(vi coll): tree_{std::move(coll)}
   {
@@ -379,34 +361,32 @@ private:
 // };
 static constexpr auto& operator>>(auto& istream, auto&& t)
 {
-  using T = ::std::remove_cvref_t<decltype(t)>;
+  using T = std::remove_cvref_t<decltype(t)>;
 #ifdef __cpp_lib_ranges
-  if constexpr (std::ranges::range<T>) {
+  if constexpr (std::ranges::range<decltype(t)>) {
     for (auto& ele: t) {
       istream >> ele;
     }
+    return istream;
   }
 #endif
 #ifdef __cpp_concepts
-  else if constexpr (impl::pair<T>) {
-    istream >> t.first >> t.second;
+  if constexpr (impl::pair<decltype(t)>) {
+    return istream >> t.first >> t.second;
   }
   else if constexpr (impl::tuple<T>) {
-    static_assert(!impl::tuple<T>, "[operator>>] tuple: not implemented yet.");
-  }
-  else {
-    istream >> t;
+    std::cout << "[print] tuple: not implemented yet.\n";
   }
 #endif
-  return istream;
+  return istream >> t;
 }
 static constexpr void print(auto const& t)
 {
-  using T = ::std::remove_cvref_t<decltype(t)>;
+  using T = std::remove_cvref_t<decltype(t)>;
   if constexpr (impl::string_like<T>) {
     cout << t;
   }
-  else if constexpr (::std::is_convertible_v<T, char const*>) {
+  else if constexpr (std::is_convertible_v<T, char const*>) {
     cout << static_cast<char const*>(t);
   }
 #ifdef __cpp_lib_ranges
@@ -422,7 +402,7 @@ static constexpr void print(auto const& t)
     std::cout << "{ " << t.first << ", " << t.second << "}, ";
   }
   else if constexpr (impl::tuple<T>) {
-    static_assert(!impl::tuple<T>, "[print] tuple: not implemented yet.\n");
+    std::cout << "[print] tuple: not implemented yet.\n";
   }
 #endif
   else {
@@ -432,21 +412,55 @@ static constexpr void print(auto const& t)
 static constexpr void debug(std::string_view s, auto const& t)
 {
 #ifdef DEBUG
-  std::cout << "[debug] " << s << ": ";
+  std::cout << "[debug] " << s << ":\n";
   print(t);
-  if (!std::ranges::range<decltype(t)>) {
-    cout << '\n';
-  }
 #endif
 }
 static auto solve_case()
 {
-  // return 0;
+  u64 n;
+  cin >> n;
+  vvu adj(n);
+  for (u64 i{}; i != n - 1; ++i) {
+    u64 u, v;
+    cin >> u >> v;
+    --u, --v;
+    adj[u].emplace_back(v);
+    adj[v].emplace_back(u);
+  }
+  vu f0(n, 1), f1(n), f2(n); // f1 is identical to the size of subtree
+  vu size(n);
+  auto dfs{[&](auto self, u64 u, u64 prev) -> void {
+    for (auto const v: adj[u]) {
+      if (v != prev) {
+        self(self, v, u);
+        size[u] += size[v];
+      }
+    }
+    size[u] += 1;
+
+    u64 subtree_kinds{1};
+    for (auto const v: adj[u]) {
+      subtree_kinds = subtree_kinds * (f1[v] + f0[v]) % mod<u64>;
+    }
+    f1[u] = subtree_kinds % mod<u64>;
+
+    for (auto const v: adj[u]) {
+      f2[u] = (f2[u] + f1[v] + f2[v]) % mod<u64>;
+    }
+  }};
+
+  u64 root{2};
+  dfs(dfs, root, -1);
+  // debug("f0", f0);
+  // debug("f1", f1);
+  // debug("f2", f2);
+  return f0[root] + f1[root] + f2[root];
 }
 static constexpr void solve_all_cases(auto solve_case_f)
 {
   u64 t{1};
-  // std::cin >> t;
+  std::cin >> t;
   for (u64 i{}; i != t; ++i) {
     using return_type = decltype(solve_case_f());
     if constexpr (std::same_as<return_type, void>) {

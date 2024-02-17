@@ -1,7 +1,7 @@
 #!/bin/bash
 source utils.sh
 
-cpp_start_point='391'
+cpp_start_point='444'
 
 function usage() {
   echo 'Usage: solve.sh [--usage] [path/to/problem/] [--force]'

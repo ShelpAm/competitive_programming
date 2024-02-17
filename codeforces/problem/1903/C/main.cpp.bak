@@ -394,17 +394,19 @@ static inline auto solve_case()
 {
   i64 n;
   cin >> n;
-  vi a(n + 1);
-  cin >> (a | drop(1));
-  vi f(n + 1, -inf<i64>);
-  f[0] = 0;
-  for (i64 i{1}; i != n + 1; ++i) {
-    for (i64 j{i}; j != 0; --j) {
-      f[j] = max(j != 1 || i == 1 ? f[j - 1] : -inf<i64>, f[j]) + j * a[i];
-    }
-    debug("f", f);
+  vi a(n);
+  cin >> a;
+  vi suf(n + 1);
+  for (i64 i{n - 1}; i != -1; --i) {
+    suf[i] = suf[i + 1] + a[i];
   }
-  return max(f | drop(1));
+  i64 ans{suf[0]};
+  for (auto const i: suf | drop(1)) {
+    if (i > 0) {
+      ans += i;
+    }
+  }
+  return ans;
 }
 static inline constexpr void solve_all_cases(auto&& solve_case_f)
 {

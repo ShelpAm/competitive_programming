@@ -437,11 +437,67 @@ static constexpr void debug(std::string_view s, auto const& t)
   if (!std::ranges::range<decltype(t)>) {
     cout << '\n';
   }
+  cout.flush();
 #endif
 }
 static auto solve_case()
 {
-  // return 0;
+  u64 n, m;
+  cin >> n >> m;
+  vu a(n);
+  cin >> a;
+  vvu adj(n), prev(n);
+  vu in(n);
+  vb conn(n);
+  for (u64 i{}; i != m; ++i) {
+    u64 u, v;
+    cin >> u >> v;
+    --u, --v;
+    adj[u].emplace_back(v);
+    prev[v].emplace_back(u);
+    ++in[v];
+    conn[u] = conn[v] = true;
+  }
+
+  queue<u64> q;
+  for (auto const i: iota(u64{}, n)) {
+    if (in[i] == 0) {
+      q.emplace(i);
+    }
+  }
+
+  auto cycled{[&]() {
+    while (!q.empty()) {
+      auto const u{q.front()};
+      q.pop();
+      for (auto const v: adj[u]) {
+        // adj[u].erase(v);
+        --in[v];
+        if (in[v] == 0) {
+          q.emplace(v);
+        }
+      }
+    }
+    return std::ranges::any_of(in, [](auto const& t) { return t != 0; });
+  }};
+
+  if (cycled()) {
+    return u64{};
+  }
+  vu costs, non;
+  for (auto const i: iota(u64{}, n)) {
+    if (conn[i]) {
+      costs.emplace_back(a[i]);
+    }
+    else {
+      non.emplace_back(a[i]);
+    }
+  }
+  sort(costs);
+  sort(non);
+  return min({costs[0] + costs[1],
+              non.size() >= 1 ? (costs[0] + non[0]) * 2 : inf<u64>,
+              non.size() >= 2 ? (non[0] + non[1]) * 2 : inf<u64>});
 }
 static constexpr void solve_all_cases(auto solve_case_f)
 {

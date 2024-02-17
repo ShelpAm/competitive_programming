@@ -79,7 +79,6 @@ template<typename T>
 [[maybe_unused]] constexpr T mod{static_cast<T>(998244353)};
 template<typename T>
 [[maybe_unused]] constexpr T inf{numeric_limits<T>::max() >> 2};
-
 namespace impl {
 template<typename value_type> using vec2_placeholder
     = std::vector<std::vector<value_type>>;
@@ -316,7 +315,7 @@ auto lsb(i64 const i)
 }
 class fenwick_tree {
 public:
-  fenwick_tree(u64 const size): tree_(size) {}
+  fenwick_tree(size_t const size): tree_(size) {}
   // The input array should start from the index 1.
   fenwick_tree(vi coll): tree_{std::move(coll)}
   {
@@ -441,12 +440,42 @@ static constexpr void debug(std::string_view s, auto const& t)
 }
 static auto solve_case()
 {
-  // return 0;
+  u64 n;
+  cin >> n;
+  vu a(n);
+  cin >> a;
+
+  u64 ans{};
+  for (u64 i{1}; i * i <= n; ++i) {
+    if (n % i == 0) {
+      {
+        u64 mx{}, mn{inf<u64>};
+        for (u64 j{}; j != n / i; ++j) {
+          auto const s{std::accumulate(a.begin() + j * i,
+                                       a.begin() + (j + 1) * i, u64{})};
+          check_max(mx, s);
+          check_min(mn, s);
+        }
+        check_max(ans, mx - mn);
+      }
+      {
+        u64 mx{}, mn{inf<u64>};
+        for (u64 j{}; j != i; ++j) {
+          auto const s{std::accumulate(a.begin() + j * n / i,
+                                       a.begin() + (j + 1) * n / i, u64{})};
+          check_max(mx, s);
+          check_min(mn, s);
+        }
+        check_max(ans, mx - mn);
+      }
+    }
+  }
+  return ans;
 }
 static constexpr void solve_all_cases(auto solve_case_f)
 {
   u64 t{1};
-  // std::cin >> t;
+  std::cin >> t;
   for (u64 i{}; i != t; ++i) {
     using return_type = decltype(solve_case_f());
     if constexpr (std::same_as<return_type, void>) {

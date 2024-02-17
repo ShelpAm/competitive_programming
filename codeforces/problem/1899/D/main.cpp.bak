@@ -79,7 +79,6 @@ template<typename T>
 [[maybe_unused]] constexpr T mod{static_cast<T>(998244353)};
 template<typename T>
 [[maybe_unused]] constexpr T inf{numeric_limits<T>::max() >> 2};
-
 namespace impl {
 template<typename value_type> using vec2_placeholder
     = std::vector<std::vector<value_type>>;
@@ -162,6 +161,7 @@ static constexpr auto sum(auto const& coll)
 }
 static constexpr auto pow(auto a, auto b, u64 const p)
 {
+  a %= p;
   u64 res{1};
   while (b != 0) {
     if ((b & 1) == 1) {
@@ -316,7 +316,7 @@ auto lsb(i64 const i)
 }
 class fenwick_tree {
 public:
-  fenwick_tree(u64 const size): tree_(size) {}
+  fenwick_tree(size_t const size): tree_(size) {}
   // The input array should start from the index 1.
   fenwick_tree(vi coll): tree_{std::move(coll)}
   {
@@ -419,7 +419,9 @@ static constexpr void print(auto const& t)
 #endif
 #ifdef __cpp_concepts
   else if constexpr (impl::pair<T>) {
-    std::cout << "{ " << t.first << ", " << t.second << "}, ";
+    std::cout << "{ ";
+    print(t.first);
+    cout << ", " << t.second << "}, ";
   }
   else if constexpr (impl::tuple<T>) {
     static_assert(!impl::tuple<T>, "[print] tuple: not implemented yet.\n");
@@ -441,12 +443,26 @@ static constexpr void debug(std::string_view s, auto const& t)
 }
 static auto solve_case()
 {
-  // return 0;
+  u64 n;
+  cin >> n;
+  vu a(n);
+  cin >> a;
+
+  auto calc{[](auto const x, u64 const p) {
+    return pow(2, x, p) * pow(x, p - 2, p) % p;
+  }};
+
+  map<u64, u64> cnt;
+  u64 ans{};
+  for (auto const i: a) {
+    ans += cnt[calc(i, 1e9 + 7)]++;
+  }
+  return ans;
 }
 static constexpr void solve_all_cases(auto solve_case_f)
 {
   u64 t{1};
-  // std::cin >> t;
+  std::cin >> t;
   for (u64 i{}; i != t; ++i) {
     using return_type = decltype(solve_case_f());
     if constexpr (std::same_as<return_type, void>) {

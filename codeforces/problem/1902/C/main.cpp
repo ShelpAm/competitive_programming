@@ -43,13 +43,10 @@ using ::std::unordered_map;
 using ::std::unordered_set;
 using ::std::operator""sv;
 #ifdef __cpp_lib_ranges
-using ::std::ranges::binary_search;
-using ::std::ranges::lower_bound;
 using ::std::ranges::max;
 using ::std::ranges::min;
 using ::std::ranges::sort;
 using ::std::ranges::swap;
-using ::std::ranges::upper_bound;
 using ::std::ranges::views::drop;
 using ::std::ranges::views::iota;
 using ::std::ranges::views::reverse;
@@ -79,7 +76,6 @@ template<typename T>
 [[maybe_unused]] constexpr T mod{static_cast<T>(998244353)};
 template<typename T>
 [[maybe_unused]] constexpr T inf{numeric_limits<T>::max() >> 2};
-
 namespace impl {
 template<typename value_type> using vec2_placeholder
     = std::vector<std::vector<value_type>>;
@@ -155,12 +151,7 @@ public:
   }
   return false;
 }
-static constexpr auto sum(auto const& coll)
-{
-  using value_type = ::std::remove_cvref_t<decltype(coll.front())>;
-  return std::accumulate(coll.begin(), coll.end(), value_type{});
-}
-static constexpr auto pow(auto a, auto b, u64 const p)
+[[maybe_unused]] static constexpr auto pow(auto a, auto b, u64 const p)
 {
   u64 res{1};
   while (b != 0) {
@@ -316,7 +307,7 @@ auto lsb(i64 const i)
 }
 class fenwick_tree {
 public:
-  fenwick_tree(u64 const size): tree_(size) {}
+  fenwick_tree(size_t const size): tree_(size) {}
   // The input array should start from the index 1.
   fenwick_tree(vi coll): tree_{std::move(coll)}
   {
@@ -432,21 +423,55 @@ static constexpr void print(auto const& t)
 static constexpr void debug(std::string_view s, auto const& t)
 {
 #ifdef DEBUG
-  std::cout << "[debug] " << s << ": ";
+  std::cout << "[debug] " << s << ":\n";
   print(t);
-  if (!std::ranges::range<decltype(t)>) {
-    cout << '\n';
-  }
+  cout << '\n';
 #endif
+}
+static constexpr auto sum(auto const& coll)
+{
+  using value_type = std::remove_cvref_t<decltype(coll)>::value_type;
+  return std::accumulate(coll.begin(), coll.end(), value_type{});
 }
 static auto solve_case()
 {
-  // return 0;
+  i64 n;
+  cin >> n;
+  vi a(n);
+  cin >> a;
+  if (n == 1) {
+    return u64{1};
+  }
+
+  sort(a);
+  vi diff(n - 1);
+  for (i64 i{}; i != n - 1; ++i) {
+    diff[i] = a[i + 1] - a[i];
+  }
+
+  auto x{diff.front()};
+  for (auto const i: diff) {
+    x = std::gcd(x, i);
+  }
+
+  assert(max(a) == a.back());
+
+  u64 exists_to_a{(a.size() * a.back() - sum(a)) / x};
+  u64 ans{inf<u64>};
+  for (i64 i{1}; i != n + 1; ++i) {
+    if (!std::ranges::binary_search(a, a.back() - i * x)) {
+      ans = min(exists_to_a + i, ans);
+    }
+  }
+  return ans;
+  // unreachable
+  assert(false);
+  return u64{};
 }
 static constexpr void solve_all_cases(auto solve_case_f)
 {
   u64 t{1};
-  // std::cin >> t;
+  std::cin >> t;
   for (u64 i{}; i != t; ++i) {
     using return_type = decltype(solve_case_f());
     if constexpr (std::same_as<return_type, void>) {

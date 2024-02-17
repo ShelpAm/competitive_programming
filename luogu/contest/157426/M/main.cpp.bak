@@ -441,7 +441,60 @@ static constexpr void debug(std::string_view s, auto const& t)
 }
 static auto solve_case()
 {
-  // return 0;
+  u64 n, l, r;
+  cin >> n >> l >> r;
+  vu a(n);
+  cin >> a;
+
+  unordered_set<u64> nums;
+  for (auto const i: a) {
+    if (nums.contains(i)) {
+      return u64{0};
+    }
+    nums.emplace(i);
+  }
+
+  u64 ans{};
+  if (auto const mx{max(a)}; r > mx) {
+    ans += r - mx;
+    r = mx;
+  }
+
+  auto check{[&](auto const i) {
+    vb vis(i);
+    for (auto const e: a) {
+      if (vis[e % i]) {
+        debug("visited! ", e);
+        return 2;
+      }
+      vis[e % i] = true;
+    }
+    debug("ok! ", i);
+    return 1;
+  }};
+
+  // 0 - unknown  1 - ok  2 - bad
+  vu state(r + 1);
+  debug("r", r);
+  for (u64 i{1}; i != r + 1; ++i) {
+    debug("i", i);
+    debug("state[i]", state[i]);
+    if (state[i] != 0) {
+      continue;
+    }
+    state[i] = check(i);
+    if (state[i] == 1) {
+      for (u64 j{1}; i * j <= r; ++j) {
+        state[i * j] = state[i];
+      }
+    }
+  }
+  for (auto const i: iota(l, r + 1)) {
+    if (state[i] == 1) {
+      ++ans;
+    }
+  }
+  return ans;
 }
 static constexpr void solve_all_cases(auto solve_case_f)
 {

@@ -441,7 +441,17 @@ static constexpr void debug(std::string_view s, auto const& t)
 }
 static auto solve_case()
 {
-  // return 0;
+  string s;
+  cin >> s;
+  vu size;
+  for (auto sub: s | split('0')) {
+    size.emplace_back(sub.size());
+  }
+  u64 ans{};
+  for (auto sub: size | split(0)) {
+    ans += min(sub);
+  }
+  return ans;
 }
 static constexpr void solve_all_cases(auto solve_case_f)
 {

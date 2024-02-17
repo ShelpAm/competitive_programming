@@ -2,6 +2,7 @@
 #include <array>
 #include <bitset>
 #include <cassert>
+#include <cmath>
 #include <cstddef>
 #include <deque>
 #include <iomanip>
@@ -79,7 +80,6 @@ template<typename T>
 [[maybe_unused]] constexpr T mod{static_cast<T>(998244353)};
 template<typename T>
 [[maybe_unused]] constexpr T inf{numeric_limits<T>::max() >> 2};
-
 namespace impl {
 template<typename value_type> using vec2_placeholder
     = std::vector<std::vector<value_type>>;
@@ -316,7 +316,7 @@ auto lsb(i64 const i)
 }
 class fenwick_tree {
 public:
-  fenwick_tree(u64 const size): tree_(size) {}
+  fenwick_tree(size_t const size): tree_(size) {}
   // The input array should start from the index 1.
   fenwick_tree(vi coll): tree_{std::move(coll)}
   {
@@ -441,12 +441,51 @@ static constexpr void debug(std::string_view s, auto const& t)
 }
 static auto solve_case()
 {
-  // return 0;
+  u64 n, q;
+  cin >> n >> q;
+  vvu adj(n);
+  for (u64 i{}; i != n - 1; ++i) {
+    u64 u, v;
+    cin >> u >> v;
+    --u, --v;
+    adj[u].emplace_back(v);
+    adj[v].emplace_back(u);
+  }
+
+  vu permutation(n), position(n);
+  cin >> permutation;
+  for (u64 i{}; i != n; ++i) {
+    position[permutation[i]] = i;
+  }
+
+  impl::vec1<set<u64>> son_positions(n);
+  auto dfs{[&](auto self, u64 const u, u64 const prev) -> void {
+    son_positions[u].emplace(position[u]);
+    for (auto const v: adj[u]) {
+      if (v != prev) {
+        self(self, v, u);
+        son_positions[u].merge(son_positions[v]);
+      }
+    }
+  }};
+  dfs(dfs, 0, 0);
+
+  for (u64 i{}; i != q; ++i) {
+    u64 l, r, x;
+    cin >> l >> r >> x;
+    --l, --r, --x;
+    auto const k{static_cast<u64>(std::log2(r - l + 1))};
+    cout << (f[l][k].contains(x) || f[r - (1ULL << k) + 1][k].contains(x)
+                 ? "YES"
+                 : "NO")
+         << '\n';
+  }
+  cout << '\n';
 }
 static constexpr void solve_all_cases(auto solve_case_f)
 {
   u64 t{1};
-  // std::cin >> t;
+  std::cin >> t;
   for (u64 i{}; i != t; ++i) {
     using return_type = decltype(solve_case_f());
     if constexpr (std::same_as<return_type, void>) {

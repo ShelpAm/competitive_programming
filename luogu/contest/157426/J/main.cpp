@@ -434,14 +434,87 @@ static constexpr void debug(std::string_view s, auto const& t)
 #ifdef DEBUG
   std::cout << "[debug] " << s << ": ";
   print(t);
-  if (!std::ranges::range<decltype(t)>) {
+  if (!std::ranges::range<decltype(t)> || impl::string_like<decltype(t)>) {
     cout << '\n';
   }
 #endif
 }
 static auto solve_case()
 {
-  // return 0;
+  string s;
+  cin >> s;
+  auto const n{s.size()};
+  s.insert(s.begin(), '0');
+  vu op;
+  auto operate_on{[&](u64 const i) {
+    op.emplace_back(i);
+    s[i] ^= 1;
+    s[i + 1] ^= 1;
+    debug("s", s);
+  }};
+  auto push_right{[&]() {
+    for (u64 i{1}; i != n; ++i) {
+      if (s[i] == '1' && s[i + 1] == '0' && s[i + 2] == '1') {
+        operate_on(i + 1);
+        operate_on(i);
+      }
+      if (s[i] == '1' && s[i + 1] == '1') {
+        operate_on(i);
+      }
+      if (s[i] == '1' && s[i + 1] == '0') {
+        operate_on(i);
+      }
+    }
+  }};
+  // massive
+  // for (u64 i{n - 1}; i != (n - 1) / 2; --i) {
+  //   if (s[i] == '0' && s[i + 1] == '0') {
+  //     op.emplace_back(i);
+  //     s[i] = s[i + 1] = '1';
+  //   }
+  // }
+  // for (u64 i{1}; i != (n + 1) / 2; ++i) {
+  //   if (s[i] == '1' && s[i + 1] == '1') {
+  //     op.emplace_back(i);
+  //     s[i] = s[i + 1] = '0';
+  //   }
+  // }
+  // //
+  // for (u64 i{n - 2}; i >= (n + 1) / 2; --i) {
+  //   if (s[i] == '0' && s[i + 1] == '1' && s[i + 2] == '0') {
+  //     op.emplace_back(i + 1);
+  //     op.emplace_back(i);
+  //     s[i] = s[i + 1] = s[i + 2] = '1';
+  //   }
+  //   if (s[i] == '1' && s[i + 1] == '0') {
+  //     operate_on(i);
+  //   }
+  // }
+  // for (u64 i{1}; i != (n - 1) / 2; ++i) {
+  // }
+  // if (s[(n + 1) / 2 + 1] == '0') {
+  //   operate_on((n + 1) / 2);
+  // }
+  // else if (s[n / 2 - 1] == '1') {
+  //   operate_on(n / 2 - 1);
+  // }
+  push_right();
+  for (u64 i{n - 1 - (s.back() == '1')}; i > (n - (s.back() == '1') + 1) / 2;
+       --i) {
+    if (s[i] == '0' && s[i + 1] == '0') {
+      operate_on(i);
+    }
+  }
+
+  s.erase(s.begin());
+  debug("s", s);
+  i64 const cnt1{std::ranges::count(s, '1')};
+  i64 const cnt0 = n - cnt1;
+  assert(abs(cnt1 - cnt0) <= 2);
+  // cout << "FUCKLJK" << cnt0 << ' ' << cnt1 << '\n';
+  cout << cnt0 * cnt1 << '\n';
+  cout << op.size() << '\n';
+  print(op);
 }
 static constexpr void solve_all_cases(auto solve_case_f)
 {
@@ -467,3 +540,4 @@ int main()
   solve_all_cases(solve_case);
   return 0;
 }
+
