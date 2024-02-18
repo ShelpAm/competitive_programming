@@ -1,7 +1,7 @@
 #!/bin/bash
 source utils.sh
 
-cpp_start_point='432'
+cpp_start_point='447'
 
 problem=$(env_get problem)
 src="${problem}/main.cpp"

@@ -455,31 +455,52 @@ static auto solve_case()
   vu permutation(n), position(n);
   cin >> permutation;
   for (u64 i{}; i != n; ++i) {
-    position[permutation[i]] = i;
+    position[permutation[i] - 1] = i;
   }
 
-  impl::vec1<set<u64>> son_positions(n);
+  std::vector<std::vector<triplei>> queries(n);
+  vb ans(q);
+  for (u64 i{}; i != q; ++i) {
+    u64 l, r, x;
+    cin >> l >> r >> x;
+    --l, --r, --x;
+    queries[x].emplace_back(i, l, r);
+  }
+
+  auto merge{[](set<u64>& a, set<u64>& b) {
+    if (b.size() > a.size()) {
+      swap(a, b);
+    }
+    a.merge(b);
+  }};
+
+  std::vector<set<u64>> son_positions(n);
   auto dfs{[&](auto self, u64 const u, u64 const prev) -> void {
     son_positions[u].emplace(position[u]);
     for (auto const v: adj[u]) {
       if (v != prev) {
         self(self, v, u);
-        son_positions[u].merge(son_positions[v]);
+        merge(son_positions[u], son_positions[v]);
       }
     }
+    // for (auto const& [i, l, r]: queries[u]) {
+    //   auto const it{son_positions[u].lower_bound(l)};
+    //   ans[i] = it != son_positions[u].end() && *it <= r;
+    // }
   }};
   dfs(dfs, 0, 0);
 
-  for (u64 i{}; i != q; ++i) {
-    u64 l, r, x;
-    cin >> l >> r >> x;
-    --l, --r, --x;
-    auto const k{static_cast<u64>(std::log2(r - l + 1))};
-    cout << (f[l][k].contains(x) || f[r - (1ULL << k) + 1][k].contains(x)
-                 ? "YES"
-                 : "NO")
-         << '\n';
+  for (u64 u{}; u != n; ++u) {
+    for (auto const& [i, l, r]: queries[u]) {
+      auto const it{son_positions[u].lower_bound(l)};
+      ans[i] = it != son_positions[u].end() && *it <= r;
+    }
   }
+
+  for (auto const ok: ans) {
+    cout << (ok ? "YES\n" : "NO\n");
+  }
+
   cout << '\n';
 }
 static constexpr void solve_all_cases(auto solve_case_f)
