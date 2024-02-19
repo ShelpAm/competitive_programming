@@ -12,17 +12,18 @@ if [[ ${1-""} == "--usage" ]]; then
   exit 0
 fi
 
+template_dir="templates"
 problem="${1:-$(env_get problem)}"
-src=${problem}/main.cpp
+src="${problem}/main.cpp"
 
 mkdir ${problem} -p
 if [[ -e ${src} ]]; then
   cp ${src} ${src}.bak
   if [[ ${2-""} == "--force" ]]; then
-    cp templates/main.cpp ${src}
+    cp "${template_dir}"/main.cpp ${src}
   fi
 else
-  cp templates/main.cpp ${src}
+  cp "${template_dir}"/main.cpp ${src}
 fi
 nvim ${src} +${cpp_start_point}
 env_set problem ${problem}
