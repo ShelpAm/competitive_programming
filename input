@@ -2,4 +2,4 @@
 
 echo '' > build/input
 nvim build/input
-./run.sh
+./run

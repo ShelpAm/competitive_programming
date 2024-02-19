@@ -59,6 +59,7 @@ using ::std::ranges::views::take;
 // TODO: Defines my own sort, etc.
 #endif
 
+namespace {
 using i64 = ::std::ptrdiff_t;
 using u64 = ::std::size_t;
 using vi = ::std::vector<i64>;
@@ -75,10 +76,8 @@ using pii = ::std::pair<i64, i64>;
 using puu = ::std::pair<u64, u64>;
 using triplei = ::std::tuple<i64, i64, i64>;
 
-template<typename T>
-[[maybe_unused]] constexpr T mod{static_cast<T>(998244353)};
-template<typename T>
-[[maybe_unused]] constexpr T inf{numeric_limits<T>::max() >> 2};
+template<typename T> constexpr T mod{static_cast<T>(998244353)};
+template<typename T> constexpr T inf{numeric_limits<T>::max() >> 2};
 
 namespace impl {
 template<typename value_type> using vec2_placeholder
@@ -139,7 +138,7 @@ public:
 };
 } // namespace impl
 
-[[maybe_unused]] static constexpr bool check_max(auto& value, auto const& other)
+constexpr bool check_max(auto& value, auto const& other)
 {
   if (value < other) {
     value = other;
@@ -147,7 +146,7 @@ public:
   }
   return false;
 }
-[[maybe_unused]] static constexpr bool check_min(auto& value, auto const& other)
+constexpr bool check_min(auto& value, auto const& other)
 {
   if (value > other) {
     value = other;
@@ -155,12 +154,12 @@ public:
   }
   return false;
 }
-static constexpr auto sum(auto const& coll)
+constexpr auto sum(auto const& coll)
 {
   using value_type = ::std::remove_cvref_t<decltype(coll.front())>;
   return std::accumulate(coll.begin(), coll.end(), value_type{});
 }
-static constexpr auto pow(auto a, auto b, u64 const p)
+constexpr auto pow(auto a, auto b, u64 const p)
 {
   u64 res{1};
   while (b != 0) {
@@ -177,7 +176,7 @@ struct prime_fileter_result {
   vb not_prime;
 };
 // upper_bound The maximum number you would like to query.
-prime_fileter_result prime_filter(size_t const upper_bound)
+[[maybe_unused]] prime_fileter_result prime_filter(size_t const upper_bound)
 {
   vi primes(upper_bound + 1);
   vb not_prime(upper_bound + 1);
@@ -197,9 +196,11 @@ prime_fileter_result prime_filter(size_t const upper_bound)
   }
   return {primes, not_prime};
 }
-impl::vec2<puu> read_graph(u64 const num_of_vertices, u64 const num_of_edges,
-                           bool const bidirectional, bool const contains_w,
-                           bool const read_from_1 = true)
+[[maybe_unused]] impl::vec2<puu> read_graph(u64 const num_of_vertices,
+                                            u64 const num_of_edges,
+                                            bool const bidirectional,
+                                            bool const contains_w,
+                                            bool const read_from_1 = true)
 {
   impl::vec2<puu> adj(num_of_vertices, 0);
   for (u64 i{}; i != num_of_edges; ++i) {
@@ -225,7 +226,8 @@ struct dijkstra_result {
   vu distance;
   vu previous;
 };
-dijkstra_result dijkstra(impl::vec2<puu> const& adjacent, u64 const source)
+[[maybe_unused]] dijkstra_result dijkstra(impl::vec2<puu> const& adjacent,
+                                          u64 const source)
 {
   vu distance(adjacent.size(), inf<i64>);
   vu previous(adjacent.size());
@@ -250,7 +252,7 @@ dijkstra_result dijkstra(impl::vec2<puu> const& adjacent, u64 const source)
 
   return {distance, previous};
 }
-vvi floyd(impl::vec2<pii> const& adjacent)
+[[maybe_unused]] vvi floyd(impl::vec2<pii> const& adjacent)
 {
   auto const n{adjacent.size()};
 
@@ -377,7 +379,7 @@ private:
 //   static constexpr u64 alphabet_size{26};
 //   vvu next_{1, vu(alphabet_size, -1UZ)};
 // };
-static constexpr auto& operator>>(auto& istream, auto&& t)
+constexpr auto& operator>>(auto& istream, auto&& t)
 {
   using T = ::std::remove_cvref_t<decltype(t)>;
 #ifdef __cpp_lib_ranges
@@ -400,7 +402,7 @@ static constexpr auto& operator>>(auto& istream, auto&& t)
 #endif
   return istream;
 }
-static constexpr void print(auto const& t)
+constexpr void print(auto const& t)
 {
   using T = ::std::remove_cvref_t<decltype(t)>;
   if constexpr (impl::string_like<T>) {
@@ -429,7 +431,8 @@ static constexpr void print(auto const& t)
     std::cout << t << ' ';
   }
 }
-static constexpr void debug(std::string_view s, auto const& t)
+constexpr void debug([[maybe_unused]] std::string_view s,
+                     [[maybe_unused]] auto const& t)
 {
 #ifdef DEBUG
   std::cout << "[debug] " << s << ": ";
@@ -439,19 +442,53 @@ static constexpr void debug(std::string_view s, auto const& t)
   }
 #endif
 }
-static auto solve_case()
+auto const p{mod<u64>};
+u64 const n = 4e5 + 1;
+vu fac(n, 1), inv(n, 1), pinv(n, 1);
+bool init{};
+u64 factorial(u64 const i)
 {
-  u64 n;
-  cin >> n;
-  vu a(n);
-  cin >> a;
-
-  std::multiset<u64> s;
-  for (u64 i{}; i != n; ++i) {
-    s.emplace(a[i] + i);
+  if (!init) {
+    for (u64 i{2}; i != fac.size(); ++i) {
+      fac[i] = fac[i - 1] * i % p;
+      inv[i] = (p - p / i) * inv[p % i] % p;
+      pinv[i] = pinv[i - 1] * inv[i] % p;
+    }
+    init = true;
   }
+  return fac[i];
 }
-static constexpr void solve_all_cases(auto solve_case_f)
+
+auto solve_case()
+{
+  string s;
+  cin >> s;
+
+  char prev{};
+  vu nums;
+  for (auto const ch: s) {
+    if (ch == prev) {
+      ++nums.back();
+    }
+    else {
+      nums.push_back(1);
+    }
+    prev = ch;
+  }
+
+  debug("nums", nums);
+
+  u64 number_of_operations{}, kinds_of_different_operations{1};
+  for (auto const i: nums) {
+    number_of_operations += i - 1;
+    kinds_of_different_operations
+        = kinds_of_different_operations * i % mod<u64>;
+  }
+  kinds_of_different_operations = kinds_of_different_operations
+                                  * factorial(number_of_operations) % mod<u64>;
+  cout << number_of_operations << ' ' << kinds_of_different_operations << '\n';
+}
+constexpr void solve_all_cases(auto solve_case_f)
 {
   u64 t{1};
   std::cin >> t;
@@ -469,6 +506,8 @@ static constexpr void solve_all_cases(auto solve_case_f)
     }
   }
 }
+} // namespace
+
 int main()
 {
   impl::io_accelerator accelerator;

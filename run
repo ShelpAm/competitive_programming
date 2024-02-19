@@ -1,8 +1,6 @@
 #!/bin/bash
 source utils.sh
 
-cpp_start_point='447'
-
 problem=$(env_get problem)
 src="${problem}/main.cpp"
 out=./build/a.out
@@ -24,5 +22,5 @@ if [ -e ${out} ]; then
 else
     echo 'Compilation failed. Retrying...'
     read -n 1 -r -s -p $'Press any key to continue...'
-    nvim ${src} +${cpp_start_point}
+    ./solve ${problem}
 fi

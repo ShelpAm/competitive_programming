@@ -24,5 +24,5 @@ if [[ -e ${src} ]]; then
 else
   cp templates/main.cpp ${src}
 fi
-nvim $src +${cpp_start_point}
+nvim ${src} +${cpp_start_point}
 env_set problem ${problem}
