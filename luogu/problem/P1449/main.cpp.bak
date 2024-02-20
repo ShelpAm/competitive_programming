@@ -194,6 +194,7 @@ static inline auto solve_case()
 
   char c;
   stack<long long> s;
+  long long n = 0;
   while (cin >> c && c != '@') {
     if (op.contains(c)) {
       auto rhs{s.top()};
@@ -203,14 +204,11 @@ static inline auto solve_case()
       s.push(op[c](lhs, rhs));
     }
     else if (isdigit(c) != 0) {
-      if (!s.empty()) {
-        auto buf{s.top() * 10 + c - '0'};
-        s.pop();
-        s.push(buf);
-      }
-      else {
-        s.push(c - '0');
-      }
+      n = n * 10 + c - '0';
+    }
+    else {
+      s.push(n);
+      n = 0;
     }
   }
   cout << s.top();

@@ -458,8 +458,21 @@ auto solve_case()
   for (u64 i{1}; i != n + 1; ++i) {
     d[i] += d[i - 1];
   }
+  std::vector<puu> points;
+  points.reserve(n);
+  for (u64 i{}; i != n; ++i) {
+    points[i] = {d[i], i};
+  }
 
   sort(interval, [](auto const a, auto const b) { return a.first < b.first; });
+  sort(points, [](auto const a, auto const b) { return a.first > b.first; });
+
+  for (auto const [pts, idx]: points) {
+    if (!vis[idx]) {
+      visit(idx);
+      cnt += pts;
+    }
+  }
 
   u64 cnt{};
   u64 j{};

@@ -18,10 +18,6 @@
 #include <unordered_set>
 #include <utility>
 #include <vector>
-#ifdef __cpp_concepts
-#include <ranges>
-#endif
-
 using ::std::abs;
 using ::std::cin;
 using ::std::cout;
@@ -42,7 +38,9 @@ using ::std::string_view;
 using ::std::unordered_map;
 using ::std::unordered_set;
 using ::std::operator""sv;
+
 #ifdef __cpp_lib_ranges
+#include <ranges>
 using ::std::ranges::binary_search;
 using ::std::ranges::lower_bound;
 using ::std::ranges::max;
@@ -72,6 +70,8 @@ using vvvu = ::std::vector<vvu>;
 using vvvvu = ::std::vector<vvvu>;
 using vb = ::std::vector<bool>;
 using vvb = ::std::vector<vb>;
+using vc = std::vector<char>;
+using vvc = std::vector<vc>;
 using pii = ::std::pair<i64, i64>;
 using puu = ::std::pair<u64, u64>;
 using triplei = ::std::tuple<i64, i64, i64>;
@@ -402,7 +402,9 @@ constexpr auto& operator>>(auto& istream, auto&& t)
 #endif
   return istream;
 }
-constexpr void print(auto const& t)
+/// @warning Do not put string literals in this functions, because we hasn't
+/// (can't) inplement checking-string-literals functions.
+constexpr void print(auto const& t, u64 const depth = 0)
 {
   using T = ::std::remove_cvref_t<decltype(t)>;
   if constexpr (impl::string_like<T>) {
@@ -414,14 +416,16 @@ constexpr void print(auto const& t)
 #ifdef __cpp_lib_ranges
   else if constexpr (std::ranges::range<T>) {
     for (auto const& ele: t) {
-      print(ele);
+      print(ele, depth + 1);
     }
-    std::cout << endl;
+    if (depth != 0) {
+      cout << '\n';
+    }
   }
 #endif
 #ifdef __cpp_concepts
   else if constexpr (impl::pair<T>) {
-    std::cout << "{ " << t.first << ", " << t.second << "}, ";
+    std::cout << "{ " << t.first << ", " << t.second << " } ";
   }
   else if constexpr (impl::tuple<T>) {
     static_assert(!impl::tuple<T>, "[print] tuple: not implemented yet.\n");
@@ -430,6 +434,10 @@ constexpr void print(auto const& t)
   else {
     std::cout << t << ' ';
   }
+
+  if (depth == 0) {
+    cout << '\n';
+  }
 }
 constexpr void debug([[maybe_unused]] std::string_view s,
                      [[maybe_unused]] auto const& t)
@@ -437,11 +445,10 @@ constexpr void debug([[maybe_unused]] std::string_view s,
 #ifdef DEBUG
   std::cout << "[debug] " << s << ": ";
   print(t);
-  if (!std::ranges::range<decltype(t)>) {
-    cout << '\n';
-  }
+  cout.flush();
 #endif
 }
+// #define debug(t) impl::debug({#t}, t);
 auto solve_case()
 {
   // return 0;
@@ -456,11 +463,10 @@ constexpr void solve_all_cases(auto solve_case_f)
       solve_case_f();
     }
     else if constexpr (std::same_as<return_type, bool>) {
-      print(solve_case_f() ? "YES\n" : "NO\n");
+      print(solve_case_f() ? "YES" : "NO");
     }
     else {
       print(solve_case_f());
-      cout << '\n';
     }
   }
 }
