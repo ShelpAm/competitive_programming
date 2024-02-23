@@ -57,6 +57,7 @@ using ::std::ranges::views::take;
 // TODO: Defines my own sort, etc.
 #endif
 
+namespace {
 using i64 = ::std::ptrdiff_t;
 using u64 = ::std::size_t;
 using vi = ::std::vector<i64>;
@@ -74,12 +75,9 @@ using vvc = std::vector<vc>;
 using pii = ::std::pair<i64, i64>;
 using puu = ::std::pair<u64, u64>;
 using triplei = ::std::tuple<i64, i64, i64>;
-using tripleu = ::std::tuple<u64, u64, u64>;
 
-namespace {
 template<typename T> constexpr T mod{static_cast<T>(998244353)};
 template<typename T> constexpr T inf{numeric_limits<T>::max() >> 2};
-[[maybe_unused]] constexpr double eps{1e-6};
 
 namespace impl {
 template<typename value_type> using vec2_placeholder
@@ -174,13 +172,13 @@ constexpr auto pow(auto a, auto b, u64 const p)
   return res;
 }
 struct prime_fileter_result {
-  vu primes;
+  vi primes;
   vb not_prime;
 };
 // upper_bound The maximum number you would like to query.
 [[maybe_unused]] prime_fileter_result prime_filter(size_t const upper_bound)
 {
-  vu primes;
+  vi primes;
   vb not_prime(upper_bound + 1);
   for (size_t i{2}; i != upper_bound + 1; ++i) {
     if (!not_prime[i]) {
@@ -314,7 +312,7 @@ private:
   std::vector<size_t> size_;
 };
 using dsu = disjoint_set_union;
-constexpr auto lsb(i64 const i)
+auto lsb(i64 const i)
 {
   return i & (-i);
 }
@@ -381,7 +379,7 @@ private:
 //   static constexpr u64 alphabet_size{26};
 //   vvu next_{1, vu(alphabet_size, -1UZ)};
 // };
-auto& operator>>(auto& istream, auto&& t)
+constexpr auto& operator>>(auto& istream, auto&& t)
 {
   using T = ::std::remove_cvref_t<decltype(t)>;
 #ifdef __cpp_lib_ranges
@@ -406,7 +404,7 @@ auto& operator>>(auto& istream, auto&& t)
 }
 /// @warning Do not put string literals in this functions, because we hasn't
 /// (can't) inplement checking-string-literals functions.
-void print(auto const& t, u64 const depth = 0)
+constexpr void print(auto const& t, u64 const depth = 0)
 {
   using T = ::std::remove_cvref_t<decltype(t)>;
   if constexpr (impl::string_like<T>) {
@@ -441,7 +439,8 @@ void print(auto const& t, u64 const depth = 0)
     cout << '\n';
   }
 }
-void debug([[maybe_unused]] std::string_view s, [[maybe_unused]] auto const& t)
+constexpr void debug([[maybe_unused]] std::string_view s,
+                     [[maybe_unused]] auto const& t)
 {
 #ifdef DEBUG
   std::cout << "[debug] " << s << ": ";
@@ -452,9 +451,63 @@ void debug([[maybe_unused]] std::string_view s, [[maybe_unused]] auto const& t)
 // #define debug(t) impl::debug({#t}, t);
 auto solve_case()
 {
-  // return 0;
+  u64 n;
+  cin >> n;
+
+  auto [primes, not_prime]{prime_filter(2 * n)};
+
+  vu ans(n + 1);
+  for (u64 i{n}; i != 0; --i) {
+    auto const j{*upper_bound(primes, i)};
+    for (u64 k{i}; k >= j - i; --k) {
+      ans[k] = j - k;
+    }
+    i = j - i;
+  }
+
+  print(ans | drop(1));
+
+  // std::vector<unordered_set<u64>> options(n);
+  // for (u64 i{}; i != n; ++i) {
+  //   for (auto it{std::ranges::upper_bound(primes, i + 1)}; it !=
+  //   primes.end();
+  //        ++it) {
+  //     if (*it - (i + 1) > n) {
+  //       break;
+  //     }
+  //     options[i].insert(*it - (i + 1));
+  //   }
+  // }
+  //
+  // debug("options", options);
+  //
+  // vu ans(n);
+  //
+  // auto less{[&options](auto const l, auto const r) {
+  //   return options[l].size() < options[r].size();
+  // }};
+  // vu avail(n);
+  // std::iota(avail.begin(), avail.end(), 0);
+  // while (!avail.empty()) {
+  //   auto const it{std::ranges::min_element(avail, less)};
+  //
+  //   if (options[*it].empty()) {
+  //     cout << -1 << '\n';
+  //     return;
+  //   }
+  //   auto const choice{*options[*it].begin()};
+  //   for (auto& ops: options) {
+  //     ops.erase(choice);
+  //   }
+  //   ans[*it] = choice;
+  //
+  //   avail.erase(it);
+  //   // debug("Now avail", avail);
+  // }
+  //
+  // print(ans);
 }
-void solve_all_cases(auto solve_case_f)
+constexpr void solve_all_cases(auto solve_case_f)
 {
   u64 t{1};
   // std::cin >> t;

@@ -446,45 +446,31 @@ auto solve_case()
 {
   u64 n, m;
   cin >> n >> m;
-  std::vector<puu> interval(m);
-  cin >> interval;
-
-  vu d(n + 2);
-  for (auto const& [l, r]: interval) {
-    ++d[l];
-    --d[r + 1];
+  std::vector<puu> intervals(m);
+  cin >> intervals;
+  vvu left_bounds(n + 1);
+  vu cnt_neo_intervals(n + 1);
+  for (auto const& [l, r]: intervals) {
+    left_bounds[r].push_back(l);
+    ++cnt_neo_intervals[l];
   }
 
+  u64 cnt_intervals{}, left_most{};
+  vu f(n + 1);
   for (u64 i{1}; i != n + 1; ++i) {
-    d[i] += d[i - 1];
-  }
-  std::vector<puu> points;
-  points.reserve(n);
-  for (u64 i{}; i != n; ++i) {
-    points[i] = {d[i], i};
-  }
+    cnt_intervals += cnt_neo_intervals[i];
+    f[i] = max(f[i - 1],
+               (left_most != 0 ? f[left_most - 1] : 0) + cnt_intervals);
 
-  sort(interval, [](auto const a, auto const b) { return a.first < b.first; });
-  sort(points, [](auto const a, auto const b) { return a.first > b.first; });
-
-  for (auto const [pts, idx]: points) {
-    if (!vis[idx]) {
-      visit(idx);
-      cnt += pts;
+    for (auto const l: left_bounds[i]) {
+      --cnt_neo_intervals[l];
+      --cnt_intervals;
+    }
+    while (cnt_neo_intervals[left_most] == 0 && left_most != i + 1) {
+      ++left_most;
     }
   }
-
-  u64 cnt{};
-  u64 j{};
-  for (u64 i{1}; i != n + 1; ++i) {
-    while (j != m && interval[j].first <= i) {
-      if (interval[j].second >= i) {
-        ++cnt;
-      }
-      ++j;
-    }
-  }
-  return cnt;
+  return f[n];
 }
 constexpr void solve_all_cases(auto solve_case_f)
 {

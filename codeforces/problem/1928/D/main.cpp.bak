@@ -452,12 +452,52 @@ void debug([[maybe_unused]] std::string_view s, [[maybe_unused]] auto const& t)
 // #define debug(t) impl::debug({#t}, t);
 auto solve_case()
 {
-  // return 0;
+  u64 n, b, x;
+  cin >> n >> b >> x;
+  vu a(n);
+  cin >> a;
+
+  auto f{[&](u64 const k) {
+    i64 res{-static_cast<i64>((k - 1) * x)};
+    for (auto const e: a) {
+      u64 contribution{};
+      auto const d{e / k};
+      auto const r{e % k};
+      contribution += k * d * d * (k - 1) / 2 * b;
+      contribution += r * (r - 1) / 2 * b;
+      contribution += r * (k - 1) * d * b;
+      res += contribution;
+      // debug("e", e);
+      // debug("k", k);
+      // debug("contribution", contribution);
+    }
+    return res;
+  }};
+
+  u64 lo{1}, hi{static_cast<u64>(2e5)};
+  while (lo < hi) {
+    auto const lo_third{lo + (hi - lo) / 3}, hi_third{hi - (hi - lo) / 3};
+    debug("lo_third", lo_third);
+    debug("hi_third", hi_third);
+    // debug("f(lo_third)", f(lo_third));
+    // debug("f(hi_third)", f(hi_third));
+    if (f(lo_third) >= f(hi_third)) {
+      hi = hi_third;
+    }
+    else {
+      lo = lo_third + 1;
+    }
+  }
+  // debug("lo", lo);
+  // for (auto const i: iota(1, 4)) {
+  //   debug(string{"f("} + std::to_string(i) + ")", f(i));
+  // }
+  return f(lo);
 }
 void solve_all_cases(auto solve_case_f)
 {
   u64 t{1};
-  // std::cin >> t;
+  std::cin >> t;
   for (u64 i{}; i != t; ++i) {
     using return_type = decltype(solve_case_f());
     if constexpr (std::same_as<return_type, void>) {

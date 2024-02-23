@@ -452,7 +452,36 @@ void debug([[maybe_unused]] std::string_view s, [[maybe_unused]] auto const& t)
 // #define debug(t) impl::debug({#t}, t);
 auto solve_case()
 {
-  // return 0;
+  u64 q;
+  cin >> q;
+  vu x(q);
+  cin >> x;
+
+  vu fib{0, 1};
+  while (fib.back() < 1e9) {
+    fib.push_back(fib.back() + fib[fib.size() - 2]);
+  }
+
+  map<u64, std::array<u64, 3>> mp;
+  for (auto const i: fib) {
+    for (auto const j: fib) {
+      for (auto const k: fib) {
+        mp.insert({i + j + k, {i, j, k}});
+      }
+    }
+  }
+
+  for (auto const i: x) {
+    if (mp.contains(i)) {
+      for (auto const e: mp[i]) {
+        cout << e << ' ';
+      }
+    }
+    else {
+      cout << -1;
+    }
+    cout << '\n';
+  }
 }
 void solve_all_cases(auto solve_case_f)
 {

@@ -452,7 +452,16 @@ void debug([[maybe_unused]] std::string_view s, [[maybe_unused]] auto const& t)
 // #define debug(t) impl::debug({#t}, t);
 auto solve_case()
 {
-  // return 0;
+  auto const [primes, not_prime]{prime_filter(100)};
+  for (u64 i{}; i != 20; ++i) {
+    for (u64 j{i + 1}; j != 20; ++j) {
+      for (u64 k{j + 1}; k != 20; ++k) {
+        if (primes[i] * primes[j] * primes[k] <= 100) {
+          cout << primes[i] * primes[j] * primes[k] << '\n';
+        }
+      }
+    }
+  }
 }
 void solve_all_cases(auto solve_case_f)
 {

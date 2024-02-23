@@ -452,7 +452,38 @@ void debug([[maybe_unused]] std::string_view s, [[maybe_unused]] auto const& t)
 // #define debug(t) impl::debug({#t}, t);
 auto solve_case()
 {
-  // return 0;
+  u64 n, m;
+  cin >> n >> m;
+  vi s(n), t(m);
+  cin >> s >> t;
+
+  auto calc{[&](vi const& a) {
+    i64 mn{inf<i64>}, mx{-inf<i64>};
+
+    i64 sum_min{}, sum_max{};
+    for (auto const e: a) {
+      sum_min += e;
+      sum_max += e;
+      check_min(mn, sum_min);
+      check_max(mx, sum_max);
+      if (sum_max < 0) {
+        sum_max = 0;
+      }
+      if (sum_min > 0) {
+        sum_min = 0;
+      }
+    }
+
+    return vi{mn, mx};
+  }};
+
+  i64 ans{-inf<i64>};
+  for (auto const i: calc(s)) {
+    for (auto const j: calc(t)) {
+      check_max(ans, i * j);
+    }
+  }
+  cout << ans;
 }
 void solve_all_cases(auto solve_case_f)
 {

@@ -302,7 +302,7 @@ public:
       return false;
     }
     if (size_[x] < size_[y]) {
-      std::ranges::swap(x, y);
+      std::swap(x, y);
     }
     parent_[y] = x;
     size_[x] += size_[y];
@@ -452,7 +452,67 @@ void debug([[maybe_unused]] std::string_view s, [[maybe_unused]] auto const& t)
 // #define debug(t) impl::debug({#t}, t);
 auto solve_case()
 {
-  // return 0;
+  auto const [primes, not_prime]{prime_filter(1e6)};
+  u64 q;
+  cin >> q;
+
+  for (u64 qi{}; qi != q; ++qi) {
+    u64 n;
+    cin >> n;
+    vu a(n);
+    cin >> a;
+
+    dsu dsu(1e6 + 1);
+    for (auto const k: a) {
+      // auto const k{e};
+      auto i{k};
+      vu factors;
+      for (auto const p: primes) {
+        if (i < p) {
+          break;
+        }
+        while (i % p == 0) {
+          i /= p;
+          if (factors.empty() || factors.back() != p) {
+            factors.push_back(p);
+          }
+        }
+      }
+      factors.push_back(k);
+      for (u64 j{}; j != factors.size() - 1; ++j) {
+        dsu.unite(factors[j], factors[j + 1]);
+      }
+    }
+
+    // for (auto const i: iota(1, 1e2 + 1)) {
+    //   cout << i << ' ' << dsu.find(i) << '\n';
+    // }
+
+    u64 b_root{dsu.find(a.front())};
+    vu b, c;
+    for (auto const i: a) {
+      if (dsu.find(i) == b_root) {
+        b.push_back(i);
+      }
+      else {
+        c.push_back(i);
+      }
+    }
+
+    if (c.empty()) {
+      cout << "-1 -1\n";
+      continue;
+    }
+    cout << b.size() << ' ' << c.size() << '\n';
+    for (auto const i: b) {
+      cout << i << ' ';
+    }
+    cout << '\n';
+    for (auto const i: c) {
+      cout << i << ' ';
+    }
+    cout << '\n';
+  }
 }
 void solve_all_cases(auto solve_case_f)
 {

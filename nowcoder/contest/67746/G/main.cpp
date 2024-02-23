@@ -302,7 +302,7 @@ public:
       return false;
     }
     if (size_[x] < size_[y]) {
-      std::ranges::swap(x, y);
+      swap(x, y);
     }
     parent_[y] = x;
     size_[x] += size_[y];
@@ -450,9 +450,79 @@ void debug([[maybe_unused]] std::string_view s, [[maybe_unused]] auto const& t)
 #endif
 }
 // #define debug(t) impl::debug({#t}, t);
+using LL = long long;
+LL e_gcd(LL a, LL b, LL& x, LL& y)
+{
+  if (b == 0) {
+    x = 1;
+    y = 0;
+    return a;
+  }
+  LL ans = e_gcd(b, a % b, x, y);
+  LL temp = x;
+  x = y;
+  y = temp - a / b * y;
+  return ans;
+}
+
+LL cal(LL a, LL b, LL c)
+{
+  LL x, y;
+  LL gcd = e_gcd(a, b, x, y);
+  if (c % gcd != 0)
+    return -1;
+  x *= c / gcd;
+  b /= gcd;
+  if (b < 0)
+    b = -b;
+  LL ans = x % b;
+  if (ans <= 0)
+    ans += b;
+  return ans;
+}
 auto solve_case()
 {
-  // return 0;
+  u64 t;
+  cin >> t;
+  for (u64 tc{}; tc != t; ++tc) {
+    u64 n, s, k;
+    cin >> n >> s >> k;
+
+    if (n + k + 1 > s || 2 * k + 1 > n) {
+      cout << -1 << '\n';
+      continue;
+    }
+
+    if (n - 2 * k - 1 >= 1) {
+      for (u64 i{}; i != 2 * k + 1; ++i) {
+        cout << (i % 2 == 0 ? 2 : 1) << ' ';
+      }
+      cout << s - n - k << ' ';
+      for (u64 i{2 * k + 2}; i != n; ++i) {
+        cout << "1 ";
+      }
+    }
+    else {
+      if (s < 2 * k + 1) {
+        cout << -1 << '\n';
+      }
+      else {
+        auto x{cal(k, k + 1, s)};
+        auto h{(s - x * k) / (k + 1)};
+        cout << "k" << k << "x" << x << "h" << h << '\n';
+        if (x == -1) {
+          cout << -1 << '\n';
+        }
+        else {
+          for (u64 i{}; i != 2 * k + 1; ++i) {
+            cout << (i % 2 == 0 ? h : x) << ' ';
+          }
+        }
+      }
+    }
+
+    cout << '\n';
+  }
 }
 void solve_all_cases(auto solve_case_f)
 {

@@ -178,7 +178,8 @@ struct prime_fileter_result {
   vb not_prime;
 };
 // upper_bound The maximum number you would like to query.
-[[maybe_unused]] prime_fileter_result prime_filter(size_t const upper_bound)
+[[maybe_unused]] constexpr prime_fileter_result
+prime_filter(size_t const upper_bound)
 {
   vu primes;
   vb not_prime(upper_bound + 1);
@@ -452,12 +453,24 @@ void debug([[maybe_unused]] std::string_view s, [[maybe_unused]] auto const& t)
 // #define debug(t) impl::debug({#t}, t);
 auto solve_case()
 {
-  // return 0;
+  u64 n;
+  cin >> n;
+  vi a(n);
+  cin >> a;
+
+  i64 k{};
+  for (u64 i{}; i != n - (n % 2 + 1); ++i) {
+    check_max(k, a[i] - a[i + 1]);
+  }
+  if (n % 2 == 1) {
+    return a[n - 2] + k * (n - 1) <= a[n - 1] ? k : -1;
+  }
+  return k;
 }
 void solve_all_cases(auto solve_case_f)
 {
   u64 t{1};
-  // std::cin >> t;
+  std::cin >> t;
   for (u64 i{}; i != t; ++i) {
     using return_type = decltype(solve_case_f());
     if constexpr (std::same_as<return_type, void>) {

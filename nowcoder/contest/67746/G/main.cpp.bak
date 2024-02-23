@@ -302,7 +302,7 @@ public:
       return false;
     }
     if (size_[x] < size_[y]) {
-      std::ranges::swap(x, y);
+      swap(x, y);
     }
     parent_[y] = x;
     size_[x] += size_[y];
@@ -452,7 +452,28 @@ void debug([[maybe_unused]] std::string_view s, [[maybe_unused]] auto const& t)
 // #define debug(t) impl::debug({#t}, t);
 auto solve_case()
 {
-  // return 0;
+  u64 t;
+  cin >> t;
+  for (u64 tc{}; tc != t; ++tc) {
+    u64 n, s, k;
+    cin >> n >> s >> k;
+
+    s -= n;
+    if (s - 1 < k || k > (n - 1) / 2) {
+      cout << -1 << '\n';
+      continue;
+    }
+    cout << s - k << ' ';
+    for (u64 i{1}; i != n; ++i) {
+      if (i % 2 == 0) {
+        cout << 2 << ' ';
+      }
+      else {
+        cout << 1 << ' ';
+      }
+    }
+    cout << '\n';
+  }
 }
 void solve_all_cases(auto solve_case_f)
 {

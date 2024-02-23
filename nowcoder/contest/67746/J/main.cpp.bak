@@ -452,7 +452,92 @@ void debug([[maybe_unused]] std::string_view s, [[maybe_unused]] auto const& t)
 // #define debug(t) impl::debug({#t}, t);
 auto solve_case()
 {
-  // return 0;
+  u64 n;
+  cin >> n;
+  string s;
+  cin >> s;
+  vvu adj(n);
+  for (u64 i{1}; i != n; ++i) {
+    u64 a;
+    cin >> a;
+    adj[a - 1].push_back(i);
+  }
+
+  // R - 0  W - 1, 2
+  vu color(n);
+  vu cnt_white(n);
+  auto send{[&](auto send, u64 const u, u64 const val) -> void {
+    if (cnt_white[u] % 2 == 1) {
+      color[u] = val;
+      u64 i{};
+      for (auto const v: adj[u]) {
+        if (s[v] == 'W') {
+          send(send, v, i % 2 == 0 ? 1 : 2);
+          ++i;
+        }
+      }
+    }
+    else {
+      u64 i{};
+      color[u] = val == 1 ? 2 : 1;
+      for (auto const v: adj[u]) {
+        if (s[v] == 'W') {
+          if (i == 0) {
+            send(send, v, val == 1 ? 2 : 1);
+          }
+          else {
+            send(send, v, i % 2 == 0 ? 1 : 2);
+          }
+          ++i;
+        }
+      }
+    }
+  }};
+  for (u64 u{n - 1}; u != -1; --u) {
+    if (s[u] == 'W') {
+      ++cnt_white[u];
+    }
+    for (auto const v: adj[u]) {
+      if (s[v] == 'W') {
+        ++cnt_white[u];
+      }
+    }
+
+    if (s[u] == 'R') {
+      if (cnt_white[u] == 0) {
+        cout << -1;
+        return;
+      }
+      color[u] = 2;
+
+      if (cnt_white[u] % 2 == 1) {
+        u64 i{};
+        for (auto const v: adj[u]) {
+          if (s[v] == 'W') {
+            send(send, v, i % 2 == 0 ? 1 : 2);
+            ++i;
+          }
+        }
+      }
+      else /* if (cnt_white[u] % 2 == 0) */ {
+        u64 i{};
+        for (auto const v: adj[u]) {
+          if (s[v] == 'W') {
+            if (i < 2) {
+              send(send, v, 2);
+            }
+            else {
+              send(send, v, i % 2 == 1 ? 2 : 1);
+            }
+            ++i;
+          }
+        }
+      }
+    }
+  }
+  for (auto const i: color) {
+    cout << i;
+  }
 }
 void solve_all_cases(auto solve_case_f)
 {

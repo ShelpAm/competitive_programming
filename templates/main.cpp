@@ -21,7 +21,6 @@
 using ::std::abs;
 using ::std::cin;
 using ::std::cout;
-using ::std::endl;
 using ::std::greater;
 using ::std::less;
 using ::std::map;
@@ -55,9 +54,9 @@ using ::std::ranges::views::split;
 using ::std::ranges::views::take;
 #else
 // TODO: Defines my own sort, etc.
+using ::std::swap;
 #endif
 
-namespace {
 using i64 = ::std::ptrdiff_t;
 using u64 = ::std::size_t;
 using vi = ::std::vector<i64>;
@@ -75,9 +74,12 @@ using vvc = std::vector<vc>;
 using pii = ::std::pair<i64, i64>;
 using puu = ::std::pair<u64, u64>;
 using triplei = ::std::tuple<i64, i64, i64>;
+using tripleu = ::std::tuple<u64, u64, u64>;
 
+namespace {
 template<typename T> constexpr T mod{static_cast<T>(998244353)};
 template<typename T> constexpr T inf{numeric_limits<T>::max() >> 2};
+[[maybe_unused]] constexpr double eps{1e-6};
 
 namespace impl {
 template<typename value_type> using vec2_placeholder
@@ -138,6 +140,7 @@ public:
 };
 } // namespace impl
 
+#ifdef __cpp_concepts
 constexpr bool check_max(auto& value, auto const& other)
 {
   if (value < other) {
@@ -146,7 +149,12 @@ constexpr bool check_max(auto& value, auto const& other)
   }
   return false;
 }
+#endif
+#ifdef __cpp_concepts
 constexpr bool check_min(auto& value, auto const& other)
+#else
+template<typename T> constexpr bool check_min(T& value, T const& other)
+#endif
 {
   if (value > other) {
     value = other;
@@ -154,6 +162,7 @@ constexpr bool check_min(auto& value, auto const& other)
   }
   return false;
 }
+#ifdef __cpp_concepts
 constexpr auto sum(auto const& coll)
 {
   using value_type = ::std::remove_cvref_t<decltype(coll.front())>;
@@ -171,14 +180,15 @@ constexpr auto pow(auto a, auto b, u64 const p)
   }
   return res;
 }
+#endif
 struct prime_fileter_result {
-  vi primes;
+  vu primes;
   vb not_prime;
 };
 // upper_bound The maximum number you would like to query.
 [[maybe_unused]] prime_fileter_result prime_filter(size_t const upper_bound)
 {
-  vi primes(upper_bound + 1);
+  vu primes;
   vb not_prime(upper_bound + 1);
   for (size_t i{2}; i != upper_bound + 1; ++i) {
     if (!not_prime[i]) {
@@ -278,9 +288,9 @@ struct dijkstra_result {
   return f;
 }
 
-class disjoint_set_union {
+class disjoint_set {
 public:
-  disjoint_set_union(u64 size): parent_(size), size_(size, 1)
+  disjoint_set(u64 size): parent_(size), size_(size, 1)
   {
     std::iota(parent_.begin(), parent_.end(), 0);
   }
@@ -300,7 +310,7 @@ public:
       return false;
     }
     if (size_[x] < size_[y]) {
-      std::ranges::swap(x, y);
+      swap(x, y);
     }
     parent_[y] = x;
     size_[x] += size_[y];
@@ -311,8 +321,8 @@ private:
   std::vector<size_t> parent_;
   std::vector<size_t> size_;
 };
-using dsu = disjoint_set_union;
-auto lsb(i64 const i)
+using ds = disjoint_set;
+constexpr auto lsb(i64 const i)
 {
   return i & (-i);
 }
@@ -379,7 +389,8 @@ private:
 //   static constexpr u64 alphabet_size{26};
 //   vvu next_{1, vu(alphabet_size, -1UZ)};
 // };
-constexpr auto& operator>>(auto& istream, auto&& t)
+#ifdef __cpp_concepts
+auto& operator>>(auto& istream, auto&& t)
 {
   using T = ::std::remove_cvref_t<decltype(t)>;
 #ifdef __cpp_lib_ranges
@@ -389,7 +400,6 @@ constexpr auto& operator>>(auto& istream, auto&& t)
     }
   }
 #endif
-#ifdef __cpp_concepts
   else if constexpr (impl::pair<T>) {
     istream >> t.first >> t.second;
   }
@@ -399,12 +409,11 @@ constexpr auto& operator>>(auto& istream, auto&& t)
   else {
     istream >> t;
   }
-#endif
   return istream;
 }
-/// @warning Do not put string literals in this functions, because we hasn't
+/// @warning Do not put string literals in this function, because we hasn't
 /// (can't) inplement checking-string-literals functions.
-constexpr void print(auto const& t, u64 const depth = 0)
+void print(auto const& t, u64 const depth = 0)
 {
   using T = ::std::remove_cvref_t<decltype(t)>;
   if constexpr (impl::string_like<T>) {
@@ -423,14 +432,12 @@ constexpr void print(auto const& t, u64 const depth = 0)
     }
   }
 #endif
-#ifdef __cpp_concepts
   else if constexpr (impl::pair<T>) {
     std::cout << "{ " << t.first << ", " << t.second << " } ";
   }
   else if constexpr (impl::tuple<T>) {
     static_assert(!impl::tuple<T>, "[print] tuple: not implemented yet.\n");
   }
-#endif
   else {
     std::cout << t << ' ';
   }
@@ -439,8 +446,7 @@ constexpr void print(auto const& t, u64 const depth = 0)
     cout << '\n';
   }
 }
-constexpr void debug([[maybe_unused]] std::string_view s,
-                     [[maybe_unused]] auto const& t)
+void debug([[maybe_unused]] std::string_view s, [[maybe_unused]] auto const& t)
 {
 #ifdef DEBUG
   std::cout << "[debug] " << s << ": ";
@@ -449,11 +455,9 @@ constexpr void debug([[maybe_unused]] std::string_view s,
 #endif
 }
 // #define debug(t) impl::debug({#t}, t);
-auto solve_case()
-{
-  // return 0;
-}
-constexpr void solve_all_cases(auto solve_case_f)
+#endif
+#ifdef __cpp_concepts
+void solve_all_cases(auto solve_case_f)
 {
   u64 t{1};
   // std::cin >> t;
@@ -470,7 +474,23 @@ constexpr void solve_all_cases(auto solve_case_f)
     }
   }
 }
+#else
+using solve_case_f = void();
+void solve_all_cases(solve_case_f f)
+{
+  u64 t{1};
+  // std::cin >> t;
+  for (u64 i{}; i != t; ++i) {
+    f();
+  }
+}
+#endif
 } // namespace
+
+auto solve_case()
+{
+  // return 0;
+}
 
 int main()
 {

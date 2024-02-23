@@ -452,7 +452,32 @@ void debug([[maybe_unused]] std::string_view s, [[maybe_unused]] auto const& t)
 // #define debug(t) impl::debug({#t}, t);
 auto solve_case()
 {
-  // return 0;
+  char c;
+  u64 rounds{};
+  cin >> c >> c >> rounds;
+  string s;
+  cin >> s;
+
+  u64 r{}, p{};
+  u64 i{};
+  for (auto const ch: s) {
+    if (ch == 'R') {
+      ++r;
+    }
+    else {
+      ++p;
+    }
+    if (r == (rounds + 1) / 2) {
+      cout << "kou!\n" << i;
+      return;
+    }
+    if (p == (rounds + 1) / 2) {
+      cout << "yukari!\n" << i;
+      return;
+    }
+    ++i;
+  }
+  cout << "to be continued.\n" << i;
 }
 void solve_all_cases(auto solve_case_f)
 {
