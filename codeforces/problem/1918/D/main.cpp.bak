@@ -21,7 +21,6 @@
 using ::std::abs;
 using ::std::cin;
 using ::std::cout;
-using ::std::endl;
 using ::std::greater;
 using ::std::less;
 using ::std::map;
@@ -38,6 +37,8 @@ using ::std::string_view;
 using ::std::unordered_map;
 using ::std::unordered_set;
 using ::std::operator""sv;
+using ::std::multimap;
+using ::std::multiset;
 
 #ifdef __cpp_lib_ranges
 #include <ranges>
@@ -55,6 +56,7 @@ using ::std::ranges::views::split;
 using ::std::ranges::views::take;
 #else
 // TODO: Defines my own sort, etc.
+using ::std::swap;
 #endif
 
 using i64 = ::std::ptrdiff_t;
@@ -140,6 +142,7 @@ public:
 };
 } // namespace impl
 
+#ifdef __cpp_concepts
 constexpr bool check_max(auto& value, auto const& other)
 {
   if (value < other) {
@@ -148,7 +151,12 @@ constexpr bool check_max(auto& value, auto const& other)
   }
   return false;
 }
+#endif
+#ifdef __cpp_concepts
 constexpr bool check_min(auto& value, auto const& other)
+#else
+template<typename T> constexpr bool check_min(T& value, T const& other)
+#endif
 {
   if (value > other) {
     value = other;
@@ -156,6 +164,7 @@ constexpr bool check_min(auto& value, auto const& other)
   }
   return false;
 }
+#ifdef __cpp_concepts
 constexpr auto sum(auto const& coll)
 {
   using value_type = ::std::remove_cvref_t<decltype(coll.front())>;
@@ -173,6 +182,7 @@ constexpr auto pow(auto a, auto b, u64 const p)
   }
   return res;
 }
+#endif
 struct prime_fileter_result {
   vu primes;
   vb not_prime;
@@ -280,9 +290,9 @@ struct dijkstra_result {
   return f;
 }
 
-class disjoint_set_union {
+class disjoint_set {
 public:
-  disjoint_set_union(u64 size): parent_(size), size_(size, 1)
+  disjoint_set(u64 size): parent_(size), size_(size, 1)
   {
     std::iota(parent_.begin(), parent_.end(), 0);
   }
@@ -302,7 +312,7 @@ public:
       return false;
     }
     if (size_[x] < size_[y]) {
-      std::ranges::swap(x, y);
+      swap(x, y);
     }
     parent_[y] = x;
     size_[x] += size_[y];
@@ -313,7 +323,7 @@ private:
   std::vector<size_t> parent_;
   std::vector<size_t> size_;
 };
-using dsu = disjoint_set_union;
+using ds = disjoint_set;
 constexpr auto lsb(i64 const i)
 {
   return i & (-i);
@@ -381,6 +391,7 @@ private:
 //   static constexpr u64 alphabet_size{26};
 //   vvu next_{1, vu(alphabet_size, -1UZ)};
 // };
+#ifdef __cpp_concepts
 auto& operator>>(auto& istream, auto&& t)
 {
   using T = ::std::remove_cvref_t<decltype(t)>;
@@ -391,7 +402,6 @@ auto& operator>>(auto& istream, auto&& t)
     }
   }
 #endif
-#ifdef __cpp_concepts
   else if constexpr (impl::pair<T>) {
     istream >> t.first >> t.second;
   }
@@ -401,10 +411,9 @@ auto& operator>>(auto& istream, auto&& t)
   else {
     istream >> t;
   }
-#endif
   return istream;
 }
-/// @warning Do not put string literals in this functions, because we hasn't
+/// @warning Do not put string literals in this function, because we hasn't
 /// (can't) inplement checking-string-literals functions.
 void print(auto const& t, u64 const depth = 0)
 {
@@ -425,14 +434,12 @@ void print(auto const& t, u64 const depth = 0)
     }
   }
 #endif
-#ifdef __cpp_concepts
   else if constexpr (impl::pair<T>) {
     std::cout << "{ " << t.first << ", " << t.second << " } ";
   }
   else if constexpr (impl::tuple<T>) {
     static_assert(!impl::tuple<T>, "[print] tuple: not implemented yet.\n");
   }
-#endif
   else {
     std::cout << t << ' ';
   }
@@ -450,14 +457,12 @@ void debug([[maybe_unused]] std::string_view s, [[maybe_unused]] auto const& t)
 #endif
 }
 // #define debug(t) impl::debug({#t}, t);
-auto solve_case()
-{
-  // return 0;
-}
+#endif
+#ifdef __cpp_concepts
 void solve_all_cases(auto solve_case_f)
 {
   u64 t{1};
-  // std::cin >> t;
+  std::cin >> t;
   for (u64 i{}; i != t; ++i) {
     using return_type = decltype(solve_case_f());
     if constexpr (std::same_as<return_type, void>) {
@@ -471,7 +476,70 @@ void solve_all_cases(auto solve_case_f)
     }
   }
 }
+#else
+using solve_case_f = void();
+void solve_all_cases(solve_case_f f)
+{
+  u64 t{1};
+  // std::cin >> t;
+  for (u64 i{}; i != t; ++i) {
+    f();
+  }
+}
+#endif
 } // namespace
+
+auto solve_case()
+{
+  u64 n;
+  cin >> n;
+  vu a(n);
+  cin >> a;
+  a.insert(a.begin(), 0);
+  a.push_back(0);
+
+  vu prefix(n + 2);
+  for (u64 i{1}; i != n + 2; ++i) {
+    prefix[i] = prefix[i - 1] + a[i];
+  }
+
+  auto check{[&](u64 const max_cost) {
+    // debug("checking", max_cost);
+    vu f(n + 2); // f[i] denotes the cost of blocked elemnets when i is blocked.
+    std::deque<u64> q;
+    q.push_back(0);
+    for (u64 r{1}, l{1}; r != n + 2; ++r) {
+      while (prefix[r - 1] - prefix[l - 1] > max_cost) {
+        if (q.front() == f[l - 1]) {
+          q.pop_front();
+        }
+        if (++l == r) {
+          return false;
+        }
+      }
+      f[r] = q.front() + a[r];
+      while (!q.empty() && q.back() > f[r]) {
+        q.pop_back();
+      }
+      q.push_back(f[r]);
+      debug("< q >", puu{q.front(), q.back()});
+      debug("f", f);
+    }
+    return f[n + 1] <= max_cost;
+  }};
+
+  i64 lo{}, hi{inf<i64>};
+  while (lo < hi) {
+    i64 const mid{(lo + hi) / 2};
+    if (check(mid)) {
+      hi = mid;
+    }
+    else {
+      lo = mid + 1;
+    }
+  }
+  return lo;
+}
 
 int main()
 {
