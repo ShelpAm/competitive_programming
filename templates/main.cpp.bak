@@ -2,6 +2,7 @@
 #include <array>
 #include <bitset>
 #include <cassert>
+#include <climits>
 #include <cmath>
 #include <cstddef>
 #include <deque>
@@ -87,15 +88,12 @@ using tripleu = ::std::tuple<u64, u64, u64>;
 namespace {
 template<typename T> [[maybe_unused]]
 constexpr T mod{static_cast<T>(998244353)};
-template<typename T>
-[[maybe_unused]] constexpr T inf{numeric_limits<T>::max() >> 2};
+template<typename T> [[maybe_unused]] constexpr T inf{numeric_limits<T>::max() >> 2};
 [[maybe_unused]] constexpr double eps{1e-6};
 
 namespace impl {
-template<typename value_type> using vec2_placeholder
-    = std::vector<std::vector<value_type>>;
-template<typename value_type, size_t size> using arr1
-    = ::std::array<value_type, size>;
+template<typename value_type> using vec2_placeholder = std::vector<std::vector<value_type>>;
+template<typename value_type, size_t size> using arr1 = ::std::array<value_type, size>;
 template<size_t i, size_t j, typename value_type> using arr2
     = std::array<std::array<value_type, j>, i>;
 template<typename value_type> using vec1 = ::std::vector<value_type>;
@@ -119,13 +117,10 @@ template<typename> struct is_tuple_t : std::false_type {};
 template<typename... T> struct is_tuple_t<std::tuple<T...>> : std::true_type {};
 template<typename... T> concept tuple = is_tuple_t<T...>::value;
 
-template<typename T> concept c_str
-    = std::same_as<char const*, remove_cvref_t<T>>;
+template<typename T> concept c_str = std::same_as<char const*, remove_cvref_t<T>>;
 template<typename T> concept string = std::same_as<string, remove_cvref_t<T>>;
-template<typename T> concept string_view
-    = std::same_as<string_view, remove_cvref_t<T>>;
-template<typename T> concept string_like
-    = string<T> || string_view<T> || c_str<T>;
+template<typename T> concept string_view = std::same_as<string_view, remove_cvref_t<T>>;
+template<typename T> concept string_like = string<T> || string_view<T> || c_str<T>;
 #endif
 
 /// @brief Turns off synchronization with stdio.
@@ -151,6 +146,71 @@ class io_accelerator {
 } // namespace impl
 
 #ifdef __cpp_concepts
+auto& operator>>(auto& istream, auto&& t)
+{
+    using T = ::std::remove_cvref_t<decltype(t)>;
+#ifdef __cpp_lib_ranges
+    if constexpr (std::ranges::range<T>) {
+        for (auto& ele: t) {
+            istream >> ele;
+        }
+    }
+#endif
+    else if constexpr (impl::pair<T>) {
+        istream >> t.first >> t.second;
+    }
+    else if constexpr (impl::tuple<T>) {
+        static_assert(!impl::tuple<T>, "[operator>>] tuple: not implemented yet.");
+    }
+    else {
+        istream >> t;
+    }
+    return istream;
+}
+/// @warning Do not put string literals in this function, because we hasn't
+/// (can't) inplement checking-string-literals functions.
+void print(auto const& t, u64 const depth = 0)
+{
+    using T = ::std::remove_cvref_t<decltype(t)>;
+    if constexpr (impl::string_like<T>) {
+        cout << t;
+    }
+    else if constexpr (::std::is_convertible_v<T, char const*>) {
+        cout << static_cast<char const*>(t);
+    }
+#ifdef __cpp_lib_ranges
+    else if constexpr (std::ranges::range<T>) {
+        for (auto const& ele: t) {
+            print(ele, depth + 1);
+        }
+        if (depth != 0) {
+            cout << '\n';
+        }
+    }
+#endif
+    else if constexpr (impl::pair<T>) {
+        std::cout << "{ " << t.first << ", " << t.second << " } ";
+    }
+    else if constexpr (impl::tuple<T>) {
+        static_assert(!impl::tuple<T>, "[print] tuple: not implemented yet.\n");
+    }
+    else {
+        std::cout << t << ' ';
+    }
+
+    if (depth == 0) {
+        cout << '\n';
+    }
+}
+void debug([[maybe_unused]] std::string_view s, [[maybe_unused]] auto const& t)
+{
+#ifdef DEBUG
+    std::cout << "[debug] " << s << ": ";
+    print(t);
+    cout.flush();
+#endif
+}
+// #define debug(t) impl::debug({#t}, t);
 constexpr bool check_max(auto& value, auto const& other)
 #else
 template<typename T> constexpr bool check_max(T& value, T const& other)
@@ -233,10 +293,9 @@ struct sieve {
     vu min_factor;
 };
 using graph = impl::vec2<puu>;
-[[maybe_unused]] graph read_graph(u64 const num_of_vertices,
-                                  u64 const num_of_edges,
-                                  bool const bidirectional,
-                                  bool const contains_w, bool const read_from_1)
+[[maybe_unused]] graph read_graph(u64 const num_of_vertices, u64 const num_of_edges,
+                                  bool const bidirectional, bool const contains_w,
+                                  bool const read_from_1)
 {
     graph adj(num_of_vertices, 0);
     for (u64 i{}; i != num_of_edges; ++i) {
@@ -262,8 +321,7 @@ struct dijkstra_result {
     vu distance;
     vu previous;
 };
-[[maybe_unused]] dijkstra_result dijkstra(graph const& adjacent,
-                                          u64 const source)
+[[maybe_unused]] dijkstra_result dijkstra(graph const& adjacent, u64 const source)
 {
     vu distance(adjacent.size(), inf<u64>);
     vu previous(adjacent.size());
@@ -321,10 +379,7 @@ class disjoint_set {
         std::iota(parent_.begin(), parent_.end(), 0);
     }
     // with path compression
-    size_t find(u64 const x)
-    {
-        return parent_[x] == x ? x : parent_[x] = find(parent_[x]);
-    }
+    size_t find(u64 const x) { return parent_[x] == x ? x : parent_[x] = find(parent_[x]); }
     /// @return:
     /// false if there has been pair x,y in the set.
     /// true successfully united
@@ -352,6 +407,11 @@ using ds = disjoint_set;
 constexpr auto lsb(i64 const i)
 {
     return i & (-i);
+}
+// i mustn't be 0
+[[maybe_unused]] constexpr auto msb(u64 const i)
+{
+    return sizeof(u64) * CHAR_BIT - 1 - __builtin_clzll(i | 1);
 }
 class fenwick_tree {
   public:
@@ -385,8 +445,171 @@ class fenwick_tree {
   private:
     vi tree_;
 };
+template<typename info_type, typename tag_type> class segment_tree {
+  public:
+    segment_tree(u64 n);
+    // The input array should start from the index 0.
+    segment_tree(std::vector<i64> const& raw);
+
+    [[deprecated("unimplemented")]] void modify_range(u64 a, u64 b, u64 x)
+    {
+        modify_range_impl(1, 0, n_, a, b, x);
+    }
+    void apply_range(u64 a, u64 b, tag_type const& tag) { apply_range_impl(1, 0, n_, a, b, tag); }
+    info_type query_range(u64 a, u64 b) { return query_range_impl(1, 0, n_, a, b); }
+  private:
+    // pull info from subtree(s)
+    void pull(u64 p);
+
+    // push tag into subtree(s)
+    void push(u64 p, u64 l, u64 r);
+
+    // apply tag on node `p`
+    void apply(u64 p, tag_type const& tag);
+
+    void modify_range_impl(u64 p, u64 l, u64 r, u64 a, u64 b, i64 x);
+    void apply_range_impl(u64 p, u64 l, u64 r, u64 a, u64 b, tag_type const& tag);
+    info_type query_range_impl(u64 p, u64 l, u64 r, u64 a, u64 b);
+
+    [[deprecated]] void add_on_segment_impl(u64 a, u64 b, i64 d, u64 l, u64 r, u64 x)
+    {
+        if (a <= l && r <= b) {
+            info_[x].tag += d;
+            return;
+        }
+
+        push(l, r, x);
+        u64 const mid = (l + r) / 2;
+        if (a <= mid) {
+            add_on_segment_impl(a, b, d, l, mid, x * 2);
+        }
+        if (mid < b) {
+            add_on_segment_impl(a, b, d, mid + 1, r, x * 2 + 1);
+        }
+        pull(x);
+    }
+
+    u64 n_;
+    std::vector<info_type> info_;
+    std::vector<tag_type> tags_;
+};
+template<typename info_type, typename tag_type>
+segment_tree<info_type, tag_type>::segment_tree(u64 const n)
+    : n_(n), info_(4ULL << msb(n_), info_type{0, 0, 0, 0}), tags_(4ULL << msb(n_))
+{}
+template<typename info_type, typename tag_type>
+segment_tree<info_type, tag_type>::segment_tree(std::vector<i64> const& raw)
+    : segment_tree(raw.size())
+{
+    auto build = [this, &raw](auto build, u64 p, u64 l, u64 r) {
+        // if we don't change the structure of the tree, we won't save info of internal
+        // nodes, since it can be calculated at runtime.
+        if (r - l == 1) {
+            info_[p] = raw[l];
+            return;
+        }
+
+        u64 const m = (l + r) / 2;
+        build(build, p * 2, l, m);
+        build(build, p * 2 + 1, m, r);
+        pull(p);
+    };
+    build(build, 1, n_, 1);
+}
+template<typename info_type, typename tag_type> void segment_tree<info_type, tag_type>::pull(u64 p)
+{
+    info_[p] = info_[p * 2] + info_[p * 2 + 1];
+}
+template<typename info_type, typename tag_type>
+void segment_tree<info_type, tag_type>::push(u64 p, u64 l, u64 r)
+{
+    if (r - l == 1) {
+        return;
+    }
+
+    apply(p * 2, tags_[p]);
+    apply(p * 2 + 1, tags_[p]);
+    tags_[p] = tag_type{};
+}
+template<typename info_type, typename tag_type>
+void segment_tree<info_type, tag_type>::apply(u64 p, tag_type const& tag)
+{
+    info_[p].apply(tag);
+    tags_[p].apply(tag);
+}
+template<typename info_type, typename tag_type>
+void segment_tree<info_type, tag_type>::modify_range_impl([[maybe_unused]] u64 p, u64 l, u64 r,
+                                                          u64 a, u64 b, [[maybe_unused]] i64 x)
+{
+    // ranges not intersecting
+    if (b <= l || r <= a) {
+        return;
+    }
+}
+template<typename info_type, typename tag_type>
+void segment_tree<info_type, tag_type>::apply_range_impl(u64 p, u64 l, u64 r, u64 a, u64 b,
+                                                         tag_type const& tag)
+{
+    // ranges not intersecting
+    if (b <= l || r <= a) {
+        return;
+    }
+
+    // range fully included in [a, b)
+    if (a <= l && r <= b) {
+        apply(p, tag);
+        return;
+    }
+
+    push(p, l, r);
+    u64 const m = (l + r) / 2;
+    apply_range_impl(p * 2, l, m, a, b, tag);
+    apply_range_impl(p * 2 + 1, m, r, a, b, tag);
+    pull(p);
+}
+template<typename info_type, typename tag_type>
+info_type segment_tree<info_type, tag_type>::query_range_impl(u64 p, u64 l, u64 r, u64 a, u64 b)
+{
+    // ranges not intersecting
+    if (b <= l || r <= a) {
+        return info_type{};
+    }
+
+    // range fully included in [a, b)
+    if (a <= l && r <= b) {
+        return info_[p];
+    }
+
+    push(l, r, p);
+    u64 const m = (l + r) / 2;
+    return query_range_impl(p * 2, l, m, a, b) + query_range_impl(p * 2 + 1, m, r, a, b);
+}
+
+struct tag {
+    void apply(tag const& tag) { add += tag.add; }
+    i64 add;
+};
+struct info {
+    info operator+(info const& rhs) const
+    {
+        return info{.min = ::min(this->min, rhs.min),
+                    .max = ::max(this->max, rhs.max),
+                    .sum = this->sum + rhs.sum,
+                    .act = this->act + rhs.act};
+    }
+    void apply(tag const& tag)
+    {
+        min += tag.add;
+        max += tag.add;
+        sum += act * tag.add;
+    }
+    i64 min = inf<i64>;
+    i64 max = -inf<i64>;
+    i64 sum = 0;
+    i64 act = 0;
+};
+using segtree = segment_tree<info, tag>;
 // TODO: to be implemented
-// class segment_tree {};
 // class trie {
 // public:
 //   [[nodiscard]] bool find(string_view s) const
@@ -416,74 +639,6 @@ class fenwick_tree {
 //   static constexpr u64 alphabet_size{26};
 //   vvu next_{1, vu(alphabet_size, -1UZ)};
 // };
-#ifdef __cpp_concepts
-auto& operator>>(auto& istream, auto&& t)
-{
-    using T = ::std::remove_cvref_t<decltype(t)>;
-#ifdef __cpp_lib_ranges
-    if constexpr (std::ranges::range<T>) {
-        for (auto& ele: t) {
-            istream >> ele;
-        }
-    }
-#endif
-    else if constexpr (impl::pair<T>) {
-        istream >> t.first >> t.second;
-    }
-    else if constexpr (impl::tuple<T>) {
-        static_assert(!impl::tuple<T>,
-                      "[operator>>] tuple: not implemented yet.");
-    }
-    else {
-        istream >> t;
-    }
-    return istream;
-}
-/// @warning Do not put string literals in this function, because we hasn't
-/// (can't) inplement checking-string-literals functions.
-void print(auto const& t, u64 const depth = 0)
-{
-    using T = ::std::remove_cvref_t<decltype(t)>;
-    if constexpr (impl::string_like<T>) {
-        cout << t;
-    }
-    else if constexpr (::std::is_convertible_v<T, char const*>) {
-        cout << static_cast<char const*>(t);
-    }
-#ifdef __cpp_lib_ranges
-    else if constexpr (std::ranges::range<T>) {
-        for (auto const& ele: t) {
-            print(ele, depth + 1);
-        }
-        if (depth != 0) {
-            cout << '\n';
-        }
-    }
-#endif
-    else if constexpr (impl::pair<T>) {
-        std::cout << "{ " << t.first << ", " << t.second << " } ";
-    }
-    else if constexpr (impl::tuple<T>) {
-        static_assert(!impl::tuple<T>, "[print] tuple: not implemented yet.\n");
-    }
-    else {
-        std::cout << t << ' ';
-    }
-
-    if (depth == 0) {
-        cout << '\n';
-    }
-}
-void debug([[maybe_unused]] std::string_view s, [[maybe_unused]] auto const& t)
-{
-#ifdef DEBUG
-    std::cout << "[debug] " << s << ": ";
-    print(t);
-    cout.flush();
-#endif
-}
-// #define debug(t) impl::debug({#t}, t);
-#endif
 #ifdef __cpp_concepts
 void solve_all_cases(auto solve_case)
 {

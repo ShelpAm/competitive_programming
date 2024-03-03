@@ -510,6 +510,28 @@ auto solve_case()
     cin >> c;
     vvu a(n, vu(m));
     cin >> a;
+
+    impl::vec2<puu> adj(3 * n, 0);
+    for (u64 x = 0; x != m; ++x) {
+        vu idx(n);
+        for (u64 i = 0; i != n; ++i) {
+            idx[i] = i;
+        }
+        sort(idx, [&](u64 l, u64 r) { return a[l][x] < a[r][x]; });
+        for (u64 i = 1; i != n; ++i) {
+            adj[n + idx[i - 1]].push_back({a[idx[i]][x] - a[idx[i - 1]][x], n + idx[i]});
+            adj[2 * n + idx[i]].push_back({0, idx[i - 1]});
+        }
+        for (u64 i = 0; i != n; ++i) {
+            adj[n + i].push_back({0, 2 * n + i});
+            adj[i].push_back({c[i], n + i});
+            adj[2 * n + i].push_back({0, i});
+        }
+    }
+
+    auto const [dis, prev] = dijkstra(adj, n - 1);
+    debug("dis", dis);
+    return dis[n + 0];
 }
 
 int main()

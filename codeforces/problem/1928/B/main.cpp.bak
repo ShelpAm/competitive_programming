@@ -407,7 +407,7 @@ static inline auto solve_case()
     while (a[i] - a[j] >= n) {
       ++j;
     }
-    cout << "FUCK " << a[i] << ' ' << a[j] << '\n';
+    // cout << "FUCK " << a[i] << ' ' << a[j] << '\n';
     check_max(ans, i - j + 1);
   }
   return ans;

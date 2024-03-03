@@ -2,7 +2,6 @@
 #include <array>
 #include <bitset>
 #include <cassert>
-#include <climits>
 #include <cmath>
 #include <cstddef>
 #include <deque>
@@ -408,11 +407,6 @@ constexpr auto lsb(i64 const i)
 {
     return i & (-i);
 }
-// i mustn't be 0
-constexpr auto msb(u64 const i)
-{
-    return sizeof(u64) * CHAR_BIT - 1 - __builtin_clzll(i | 1);
-}
 class fenwick_tree {
   public:
     fenwick_tree(u64 const size): tree_(size) {}
@@ -445,37 +439,60 @@ class fenwick_tree {
   private:
     vi tree_;
 };
-template<typename info_type, typename tag_type> class segment_tree {
+class segment_tree {
+    using operation = decltype([](auto l, auto r) { return max(l, r); });
   public:
-    segment_tree(u64 n);
+    segment_tree(u64 const size): segment_tree(vi(size + 1)) {}
     // The input array should start from the index 1.
-    segment_tree(std::vector<info_type> const& init);
-
-    void modify_range(u64 a, u64 b, u64 x) { modify_range_impl(1, 0, n_, a, b, x); }
-    void apply_range(u64 a, u64 b, tag_type const& tag) { apply_range_impl(1, 0, n_, a, b, tag); }
-    info_type query_range(u64 a, u64 b) { return query_range_impl(1, 0, n_, a, b); }
-  private:
-    // pull info from subtree(s)
-    void pull(u64 p);
-
-    // push tag into subtree(s)
-    void push(u64 p, u64 l, u64 r);
-
-    // apply tag on node `p`
-    void apply(u64 p, tag_type const& tag);
-
-    void modify_range_impl(u64 p, u64 l, u64 r, u64 a, u64 b, i64 x);
-    void apply_range_impl(u64 p, u64 l, u64 r, u64 a, u64 b, tag_type const& tag);
-    info_type query_range_impl(u64 p, u64 l, u64 r, u64 a, u64 b);
-
-    [[deprecated]] void add_on_segment_impl(u64 a, u64 b, i64 d, u64 l, u64 r, u64 x)
+    segment_tree(vi const& a): nodes_(4 * (a.size() - 1) + 1), n_(a.size() - 1)
     {
-        if (a <= l && r <= b) {
-            info_[x].tag += d;
+        build(1, n_, 1, a);
+    }
+
+    void xor_on_segment(u64 l, u64 r, i64 d)
+    {
+        add_on_segment_impl(l, r, d, 1, n_, 1);
+        update(1);
+    }
+    i64 sum_on_segment(u64 l, u64 r) { return query_impl(l, r, 1, n_, 1); }
+  private:
+    void build(u64 l, u64 r, u64 x, vi const& a)
+    {
+        // if we don't change the structure of the tree, we won't save info of internal nodes,
+        // since it can be calculated at runtime.
+        if (l == r) {
+            nodes_[x].value = a[l];
             return;
         }
 
-        push(l, r, x);
+        u64 const mid = (l + r) / 2;
+        build(l, mid, x * 2, a);
+        build(mid + 1, r, x * 2 + 1, a);
+        update(x);
+    }
+    void update(u64 x) { nodes_[x].value = nodes_[x * 2].value + nodes_[x * 2 + 1].value; }
+    void spread_lazy_tag(u64 l, u64 r, u64 x)
+    {
+        if (l == r) {
+            return;
+        }
+
+        nodes_[x * 2].tag ^= nodes_[x].tag;
+        nodes_[x * 2].value += nodes_[x].tag);
+        nodes_[x * 2 + 1].tag ^= nodes_[x].tag;
+        nodes_[x * 2 + 1].value
+            = op_(nodes_[x * 2 + 1].value, nodes_[x * 2 + 1].value + nodes_[x].tag);
+        nodes_[x].tag = 0;
+    }
+    void add_on_segment_impl(u64 a, u64 b, i64 d, u64 l, u64 r, u64 x)
+    {
+        if (a <= l && r <= b) {
+            nodes_[x].value = ;
+            nodes_[x].tag ^= d;
+            return;
+        }
+
+        spread_lazy_tag(l, r, x);
         u64 const mid = (l + r) / 2;
         if (a <= mid) {
             add_on_segment_impl(a, b, d, l, mid, x * 2);
@@ -483,123 +500,32 @@ template<typename info_type, typename tag_type> class segment_tree {
         if (mid < b) {
             add_on_segment_impl(a, b, d, mid + 1, r, x * 2 + 1);
         }
-        pull(x);
+        update(x);
     }
-
-    u64 n_;
-    std::vector<info_type> info_;
-    std::vector<tag_type> tags_;
-};
-template<typename info_type, typename tag_type>
-segment_tree<info_type, tag_type>::segment_tree(u64 const n)
-    : n_(n), info_(4ULL << msb(n_)), tags_(4ULL << msb(n_))
-{}
-template<typename info_type, typename tag_type>
-segment_tree<info_type, tag_type>::segment_tree(std::vector<info_type> const& init)
-    : segment_tree(init.size())
-{
-    auto build = [this, &init](auto build, u64 p, u64 l, u64 r) {
-        // if we don't change the structure of the tree, we won't save info of internal
-        // nodes, since it can be calculated at runtime.
-        if (r - l == 1) {
-            info_[p] = init[l];
-            return;
+    i64 query_impl(u64 a, u64 b, u64 l, u64 r, u64 x)
+    {
+        if (a <= l && r <= b) {
+            return nodes_[x].value;
         }
 
-        u64 const m = (l + r) / 2;
-        build(build, p * 2, l, m);
-        build(build, p * 2 + 1, m, r);
-        pull(p);
+        spread_lazy_tag(l, r, x);
+        i64 res = 0;
+        u64 const mid = (l + r) / 2;
+        if (a <= mid) {
+            res += query_impl(a, b, l, mid, x * 2);
+        }
+        if (mid < b) {
+            res += query_impl(a, b, mid + 1, r, x * 2 + 1);
+        }
+        return res;
+    }
+    struct node {
+        i64 tag;
+        i64 value;
     };
-    build(build, 1, n_, 1);
-}
-template<typename info_type, typename tag_type> void segment_tree<info_type, tag_type>::pull(u64 p)
-{
-    info_[p] = info_[p * 2] + info_[p * 2 + 1];
-}
-template<typename info_type, typename tag_type>
-void segment_tree<info_type, tag_type>::push(u64 p, u64 l, u64 r)
-{
-    if (r - l == 1) {
-        return;
-    }
-
-    apply(p * 2, tags_[p]);
-    apply(p * 2 + 1, tags_[p]);
-    tags_[p] = tag_type{};
-}
-template<typename info_type, typename tag_type>
-void segment_tree<info_type, tag_type>::apply(u64 p, tag_type const& tag)
-{
-    info_[p].apply(tag);
-    tags_[p].apply(tag);
-}
-template<typename info_type, typename tag_type>
-void segment_tree<info_type, tag_type>::modify_range_impl(u64 p, u64 l, u64 r, u64 a, u64 b, i64 x)
-{}
-template<typename info_type, typename tag_type>
-void segment_tree<info_type, tag_type>::apply_range_impl(u64 p, u64 l, u64 r, u64 a, u64 b,
-                                                         tag_type const& tag)
-{
-    // ranges not intersecting
-    if (b <= l || r <= a) {
-        return;
-    }
-
-    // range fully included in [a, b)
-    if (a <= l && r <= b) {
-        apply(p, tag);
-        return;
-    }
-
-    push(p, l, r);
-    u64 const m = (l + r) / 2;
-    apply_range_impl(p * 2, l, m, a, b, tag);
-    apply_range_impl(p * 2 + 1, m, r, a, b, tag);
-    pull(p);
-}
-template<typename info_type, typename tag_type>
-info_type segment_tree<info_type, tag_type>::query_range_impl(u64 p, u64 l, u64 r, u64 a, u64 b)
-{
-    // ranges not intersecting
-    if (b <= l || r <= a) {
-        return info_type{};
-    }
-
-    // range fully included in [a, b)
-    if (a <= l && r <= b) {
-        return info_[p];
-    }
-
-    push(l, r, p);
-    u64 const m = (l + r) / 2;
-    return query_range_impl(l, m, p * 2, a, b) + query_range_impl(m, r, p * 2 + 1, a, b);
-}
-
-struct tag {
-    void apply(tag const& tag) { add += tag.add; }
-    i64 add;
+    std::vector<node> nodes_;
+    u64 n_;
 };
-struct info {
-    info operator+(info const& rhs) const
-    {
-        return info{.min = ::min(this->min, rhs.min),
-                    .max = ::max(this->max, rhs.max),
-                    .sum = this->sum + rhs.sum,
-                    .act = this->act + rhs.act};
-    }
-    void apply(tag const& tag)
-    {
-        min += tag.add;
-        max += tag.add;
-        sum += act * tag.add;
-    }
-    i64 min = inf<i64>;
-    i64 max = -inf<i64>;
-    i64 sum = 0;
-    i64 act = 0;
-};
-using segtree = segment_tree<info, tag>;
 // TODO: to be implemented
 // class trie {
 // public:
@@ -662,43 +588,27 @@ template<typename T> void solve_all_cases(T solve_case)
 
 auto solve_case()
 {
-    u64 n, m;
-    cin >> n >> m;
-    std::vector<std::vector<u64>> adj(n);
-    std::vector<bool> is_gamer(n, false), is_food(n, false);
+    u64 n;
+    cin >> n;
+    vi a(n + 1);
+    cin >> (a | drop(1));
+    segment_tree st(a);
+    u64 m;
+    cin >> m;
     for (u64 i = 0; i != m; ++i) {
-        u64 u, v;
-        cin >> u >> v;
-        is_gamer[u - 1] = true;
-        is_food[v - 1] = true;
-        adj[v - 1].push_back(u - 1);
-    }
-    vu f(n);
-    for (u64 i = 0; i != n; ++i) {
-        if (!is_food[i]) {
-            f[i] = 1;
+        u64 t;
+        cin >> t;
+        if (t == 1) {
+            u64 l, r;
+            cin >> l >> r;
+            cout << st.sum_on_segment(l, r) << '\n';
+        }
+        else if (t == 2) {
+            u64 l, r, x;
+            cin >> l >> r >> x;
+            st.xor_on_segment(l, r, x);
         }
     }
-    auto dfs = [&](auto self, u64 u, u64 p) -> void {
-        if (f[u] != 0) {
-            return;
-        }
-        for (u64 v: adj[u]) {
-            if (v != p) {
-                self(self, v, u);
-                f[u] += f[v];
-                f[u] %= 80112002;
-            }
-        }
-    };
-    u64 ans = 0;
-    for (u64 i = 0; i != n; ++i) {
-        if (!is_gamer[i]) {
-            dfs(dfs, i, -1);
-            ans = (ans + f[i]) % 80112002;
-        }
-    }
-    return ans;
 }
 
 int main()
