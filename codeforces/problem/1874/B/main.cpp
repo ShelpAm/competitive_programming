@@ -93,8 +93,7 @@ template<typename T> [[maybe_unused]] constexpr T inf{numeric_limits<T>::max() >
 namespace impl {
 template<typename value_type> using vec2_placeholder = std::vector<std::vector<value_type>>;
 template<typename value_type, size_t size> using arr1 = ::std::array<value_type, size>;
-template<size_t i, size_t j, typename value_type> using arr2
-    = std::array<std::array<value_type, j>, i>;
+template<size_t i, size_t j, typename value_type> using arr2 = std::array<std::array<value_type, j>, i>;
 template<typename value_type> using vec1 = ::std::vector<value_type>;
 template<typename value_type> class vec2 : public vec2_placeholder<value_type> {
   public:
@@ -227,8 +226,7 @@ struct sieve {
     vu min_factor;
 };
 using graph = impl::vec2<puu>;
-[[maybe_unused]] graph read_graph(u64 const num_of_vertices, u64 const num_of_edges,
-                                  bool const bidirectional, bool const contains_w,
+[[maybe_unused]] graph read_graph(u64 const num_of_vertices, u64 const num_of_edges, bool const bidirectional, bool const contains_w,
                                   bool const read_from_1)
 {
     graph adj(num_of_vertices, 0);
@@ -308,10 +306,7 @@ struct dijkstra_result {
 
 class disjoint_set {
   public:
-    disjoint_set(u64 size): parent_(size), size_(size, 1)
-    {
-        std::iota(parent_.begin(), parent_.end(), 0);
-    }
+    disjoint_set(u64 size): parent_(size), size_(size, 1) { std::iota(parent_.begin(), parent_.end(), 0); }
     // with path compression
     size_t find(u64 const x) { return parent_[x] == x ? x : parent_[x] = find(parent_[x]); }
     /// @return:
@@ -507,19 +502,23 @@ auto solve_case()
     u64 a, b, c, d, m;
     cin >> a >> b >> c >> d >> m;
 
-    auto ok = [](u64 a, u64 b, u64 c, u64 d, u64 m) {
-        if (m == 1) {
-            return true;
+    std::unordered_map<puu, u64> dis;
+    auto dfs = [&](auto self, u64 x, u64 y, u64 steps) {
+        if (dis.contains({x, y}) && steps >= dis[{x, y}]) {
+            return;
         }
-        return (a == b && b == c && c == d && a == 0) || a != 0 || b != 0;
+        dis[{x, y}] = steps;
+        self(self, x & y, y, steps + 1);
+        self(self, x | y, y, steps + 1);
+        self(self, x, y ^ x, steps + 1);
+        self(self, x, y ^ m, steps + 1);
     };
-
-    int ans = 0;
-    for (u64 i = 0; i != 32; ++i) {
-        if (!ok(a & (1 << i), b & (1 << i), c & (1 << i), d & (1 << i), m & (1 << i))) {
-            return -1;
-        }
-    }
+    dfs(dfs, a, b, 0);
+    debug("dis.size()", dis.size());
+    // for (auto [dest, d]: dis) {
+    //     cout << "DEST DIS: " << dest.first << ' ' << dest.second << ' ' << d << '\n';
+    // }
+    return dis.contains({c, d}) ? static_cast<i64>(dis[{c, d}]) : -1;
 }
 
 int main()

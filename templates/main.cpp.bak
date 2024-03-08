@@ -53,12 +53,13 @@ using ::std::ranges::find;
 using ::std::ranges::lower_bound;
 using ::std::ranges::max;
 using ::std::ranges::min;
+using ::std::ranges::reverse;
+using ::std::ranges::reverse_view;
 using ::std::ranges::sort;
 using ::std::ranges::swap;
 using ::std::ranges::upper_bound;
 using ::std::ranges::views::drop;
 using ::std::ranges::views::iota;
-using ::std::ranges::views::reverse;
 using ::std::ranges::views::split;
 using ::std::ranges::views::take;
 #else
@@ -94,8 +95,7 @@ template<typename T> [[maybe_unused]] constexpr T inf{numeric_limits<T>::max() >
 namespace impl {
 template<typename value_type> using vec2_placeholder = std::vector<std::vector<value_type>>;
 template<typename value_type, size_t size> using arr1 = ::std::array<value_type, size>;
-template<size_t i, size_t j, typename value_type> using arr2
-    = std::array<std::array<value_type, j>, i>;
+template<size_t i, size_t j, typename value_type> using arr2 = std::array<std::array<value_type, j>, i>;
 template<typename value_type> using vec1 = ::std::vector<value_type>;
 template<typename value_type> class vec2 : public vec2_placeholder<value_type> {
   public:
@@ -235,12 +235,12 @@ template<typename T> constexpr bool check_min(T& value, T const& other)
     return false;
 }
 #ifdef __cpp_concepts
-constexpr auto sum(auto const& coll)
+[[maybe_unused]] constexpr auto sum(auto const& coll) noexcept
 {
     using value_type = ::std::remove_cvref_t<decltype(coll.front())>;
     return std::accumulate(coll.begin(), coll.end(), value_type{});
 }
-constexpr auto pow(auto a, auto b, u64 const p)
+[[maybe_unused]] constexpr auto pow(auto a, auto b, u64 const p) noexcept
 {
     u64 res{1};
     while (b != 0) {
@@ -253,6 +253,19 @@ constexpr auto pow(auto a, auto b, u64 const p)
     return res;
 }
 #endif
+[[maybe_unused]] constexpr u64 gcd(u64 a, u64 b) noexcept
+{
+    while (b != 0) {
+        auto t = b;
+        b = a % b;
+        a = t;
+    }
+    return a;
+}
+[[maybe_unused]] constexpr u64 lcm(u64 a, u64 b) noexcept
+{
+    return a * b / gcd(a, b);
+}
 struct sieve {
     sieve(u64 const upper_bound): min_factor(upper_bound + 1, 0)
     {
@@ -292,12 +305,17 @@ struct sieve {
     vu primes;
     vu min_factor;
 };
-using graph = impl::vec2<puu>;
-[[maybe_unused]] graph read_graph(u64 const num_of_vertices, u64 const num_of_edges,
-                                  bool const bidirectional, bool const contains_w,
+struct graph {
+  public:
+    graph(u64 max_num_of_vertices): adjacent(max_num_of_vertices, 0) {}
+    void add_edge(u64 u, u64 v, u64 w) { adjacent[u].emplace_back(w, v); }
+    [[nodiscard]] std::vector<puu> const& edges_of(u64 u) const { return adjacent[u]; }
+    impl::vec2<puu> adjacent;
+};
+[[maybe_unused]] graph read_graph(u64 const num_of_vertices, u64 const num_of_edges, bool const bidirectional, bool const contains_w,
                                   bool const read_from_1)
 {
-    graph adj(num_of_vertices, 0);
+    graph g(num_of_vertices);
     for (u64 i{}; i != num_of_edges; ++i) {
         u64 u, v, w;
         cin >> u >> v;
@@ -310,33 +328,39 @@ using graph = impl::vec2<puu>;
         if (read_from_1) {
             --u, --v;
         }
-        adj[u].emplace_back(w, v);
+        g.add_edge(u, v, w);
         if (bidirectional) {
-            adj[v].emplace_back(w, u);
+            g.add_edge(v, u, w);
         }
     }
-    return adj;
+    return g;
 }
 struct dijkstra_result {
     vu distance;
     vu previous;
 };
-[[maybe_unused]] dijkstra_result dijkstra(graph const& adjacent, u64 const source)
+[[maybe_unused]] dijkstra_result dijkstra(graph const& graph, u64 const source)
 {
-    vu distance(adjacent.size(), inf<u64>);
-    vu previous(adjacent.size());
+    vu distance(graph.adjacent.size(), inf<u64>);
+    vu previous(graph.adjacent.size());
     distance[source] = 0;
 
-    priority_queue<puu, impl::vec1<puu>, greater<>> q;
+    vb visited(graph.adjacent.size()); // `visited[u]` is true means u has been a start point, and it shouldn't be start point once more.
+
+    priority_queue<puu, std::vector<puu>, greater<>> q;
     q.emplace(distance[source], source);
 
     while (!q.empty()) { // The main loop
-        auto const [_, u]{q.top()}; // Extract the closest vertex. (Get and
-                                    // remove the best vertex)
+        auto const [_, u]{q.top()}; // Extract the closest vertex. (Get and remove the best vertex)
         q.pop();
 
-        for (auto const& [d, v]: adjacent[u]) {
-            if (auto const alt{distance[u] + d}; alt < distance[v]) {
+        if (visited[u]) {
+            continue;
+        }
+        visited[u];
+
+        for (auto const& [w, v]: graph.edges_of(u)) {
+            if (auto const alt{distance[u] + w}; alt < distance[v]) {
                 distance[v] = alt;
                 previous[v] = u;
                 q.emplace(alt, v);
@@ -374,10 +398,7 @@ struct dijkstra_result {
 
 class disjoint_set {
   public:
-    disjoint_set(u64 size): parent_(size), size_(size, 1)
-    {
-        std::iota(parent_.begin(), parent_.end(), 0);
-    }
+    disjoint_set(u64 size): parent_(size), size_(size, 1) { std::iota(parent_.begin(), parent_.end(), 0); }
     // with path compression
     size_t find(u64 const x) { return parent_[x] == x ? x : parent_[x] = find(parent_[x]); }
     /// @return:
@@ -445,170 +466,171 @@ class fenwick_tree {
   private:
     vi tree_;
 };
-template<typename info_type, typename tag_type> class segment_tree {
-  public:
-    segment_tree(u64 n);
-    // The input array should start from the index 0.
-    segment_tree(std::vector<i64> const& raw);
-
-    [[deprecated("unimplemented")]] void modify_range(u64 a, u64 b, u64 x)
-    {
-        modify_range_impl(1, 0, n_, a, b, x);
-    }
-    void apply_range(u64 a, u64 b, tag_type const& tag) { apply_range_impl(1, 0, n_, a, b, tag); }
-    info_type query_range(u64 a, u64 b) { return query_range_impl(1, 0, n_, a, b); }
-  private:
-    // pull info from subtree(s)
-    void pull(u64 p);
-
-    // push tag into subtree(s)
-    void push(u64 p, u64 l, u64 r);
-
-    // apply tag on node `p`
-    void apply(u64 p, tag_type const& tag);
-
-    void modify_range_impl(u64 p, u64 l, u64 r, u64 a, u64 b, i64 x);
-    void apply_range_impl(u64 p, u64 l, u64 r, u64 a, u64 b, tag_type const& tag);
-    info_type query_range_impl(u64 p, u64 l, u64 r, u64 a, u64 b);
-
-    [[deprecated]] void add_on_segment_impl(u64 a, u64 b, i64 d, u64 l, u64 r, u64 x)
-    {
-        if (a <= l && r <= b) {
-            info_[x].tag += d;
-            return;
-        }
-
-        push(l, r, x);
-        u64 const mid = (l + r) / 2;
-        if (a <= mid) {
-            add_on_segment_impl(a, b, d, l, mid, x * 2);
-        }
-        if (mid < b) {
-            add_on_segment_impl(a, b, d, mid + 1, r, x * 2 + 1);
-        }
-        pull(x);
-    }
-
-    u64 n_;
-    std::vector<info_type> info_;
-    std::vector<tag_type> tags_;
-};
-template<typename info_type, typename tag_type>
-segment_tree<info_type, tag_type>::segment_tree(u64 const n)
-    : n_(n), info_(4ULL << msb(n_), info_type{0, 0, 0, 0}), tags_(4ULL << msb(n_))
-{}
-template<typename info_type, typename tag_type>
-segment_tree<info_type, tag_type>::segment_tree(std::vector<i64> const& raw)
-    : segment_tree(raw.size())
-{
-    auto build = [this, &raw](auto build, u64 p, u64 l, u64 r) {
-        // if we don't change the structure of the tree, we won't save info of internal
-        // nodes, since it can be calculated at runtime.
-        if (r - l == 1) {
-            info_[p] = raw[l];
-            return;
-        }
-
-        u64 const m = (l + r) / 2;
-        build(build, p * 2, l, m);
-        build(build, p * 2 + 1, m, r);
-        pull(p);
-    };
-    build(build, 1, n_, 1);
-}
-template<typename info_type, typename tag_type> void segment_tree<info_type, tag_type>::pull(u64 p)
-{
-    info_[p] = info_[p * 2] + info_[p * 2 + 1];
-}
-template<typename info_type, typename tag_type>
-void segment_tree<info_type, tag_type>::push(u64 p, u64 l, u64 r)
-{
-    if (r - l == 1) {
-        return;
-    }
-
-    apply(p * 2, tags_[p]);
-    apply(p * 2 + 1, tags_[p]);
-    tags_[p] = tag_type{};
-}
-template<typename info_type, typename tag_type>
-void segment_tree<info_type, tag_type>::apply(u64 p, tag_type const& tag)
-{
-    info_[p].apply(tag);
-    tags_[p].apply(tag);
-}
-template<typename info_type, typename tag_type>
-void segment_tree<info_type, tag_type>::modify_range_impl([[maybe_unused]] u64 p, u64 l, u64 r,
-                                                          u64 a, u64 b, [[maybe_unused]] i64 x)
-{
-    // ranges not intersecting
-    if (b <= l || r <= a) {
-        return;
-    }
-}
-template<typename info_type, typename tag_type>
-void segment_tree<info_type, tag_type>::apply_range_impl(u64 p, u64 l, u64 r, u64 a, u64 b,
-                                                         tag_type const& tag)
-{
-    // ranges not intersecting
-    if (b <= l || r <= a) {
-        return;
-    }
-
-    // range fully included in [a, b)
-    if (a <= l && r <= b) {
-        apply(p, tag);
-        return;
-    }
-
-    push(p, l, r);
-    u64 const m = (l + r) / 2;
-    apply_range_impl(p * 2, l, m, a, b, tag);
-    apply_range_impl(p * 2 + 1, m, r, a, b, tag);
-    pull(p);
-}
-template<typename info_type, typename tag_type>
-info_type segment_tree<info_type, tag_type>::query_range_impl(u64 p, u64 l, u64 r, u64 a, u64 b)
-{
-    // ranges not intersecting
-    if (b <= l || r <= a) {
-        return info_type{};
-    }
-
-    // range fully included in [a, b)
-    if (a <= l && r <= b) {
-        return info_[p];
-    }
-
-    push(l, r, p);
-    u64 const m = (l + r) / 2;
-    return query_range_impl(p * 2, l, m, a, b) + query_range_impl(p * 2 + 1, m, r, a, b);
-}
-
-struct tag {
-    void apply(tag const& tag) { add += tag.add; }
-    i64 add;
-};
-struct info {
-    info operator+(info const& rhs) const
-    {
-        return info{.min = ::min(this->min, rhs.min),
-                    .max = ::max(this->max, rhs.max),
-                    .sum = this->sum + rhs.sum,
-                    .act = this->act + rhs.act};
-    }
-    void apply(tag const& tag)
-    {
-        min += tag.add;
-        max += tag.add;
-        sum += act * tag.add;
-    }
-    i64 min = inf<i64>;
-    i64 max = -inf<i64>;
-    i64 sum = 0;
-    i64 act = 0;
-};
-using segtree = segment_tree<info, tag>;
+// template<typename info_type, typename tag_type> class segment_tree {
+//   public:
+//     segment_tree(u64 n);
+//     // The input array should start from the index 0.
+//     segment_tree(std::vector<i64> const& raw);
+//
+//     [[deprecated("unimplemented")]] void modify_range(u64 a, u64 b, u64 x)
+//     {
+//         modify_range_impl(1, 0, n_, a, b, x);
+//     }
+//     void apply_range(u64 a, u64 b, tag_type const& tag) { apply_range_impl(1, 0, n_, a, b, tag);
+//     } info_type query_range(u64 a, u64 b) { return query_range_impl(1, 0, n_, a, b); }
+//   private:
+//     // pull info from subtree(s)
+//     void pull(u64 p);
+//
+//     // push tag into subtree(s)
+//     void push(u64 p, u64 l, u64 r);
+//
+//     // apply tag on node `p`
+//     void apply(u64 p, tag_type const& tag);
+//
+//     void modify_range_impl(u64 p, u64 l, u64 r, u64 a, u64 b, i64 x);
+//     void apply_range_impl(u64 p, u64 l, u64 r, u64 a, u64 b, tag_type const& tag);
+//     info_type query_range_impl(u64 p, u64 l, u64 r, u64 a, u64 b);
+//
+//     [[deprecated]] void add_on_segment_impl(u64 a, u64 b, i64 d, u64 l, u64 r, u64 x)
+//     {
+//         if (a <= l && r <= b) {
+//             info_[x].tag += d;
+//             return;
+//         }
+//
+//         push(l, r, x);
+//         u64 const mid = (l + r) / 2;
+//         if (a <= mid) {
+//             add_on_segment_impl(a, b, d, l, mid, x * 2);
+//         }
+//         if (mid < b) {
+//             add_on_segment_impl(a, b, d, mid + 1, r, x * 2 + 1);
+//         }
+//         pull(x);
+//     }
+//
+//     u64 n_;
+//     std::vector<info_type> info_;
+//     std::vector<tag_type> tags_;
+// };
+// template<typename info_type, typename tag_type>
+// segment_tree<info_type, tag_type>::segment_tree(u64 const n)
+//     : n_(n), info_(4ULL << msb(n_), info_type{0, 0, 0, 0}), tags_(4ULL << msb(n_))
+// {}
+// template<typename info_type, typename tag_type>
+// segment_tree<info_type, tag_type>::segment_tree(std::vector<i64> const& raw)
+//     : segment_tree(raw.size())
+// {
+//     auto build = [this, &raw](auto build, u64 p, u64 l, u64 r) {
+//         // if we don't change the structure of the tree, we won't save info of internal
+//         // nodes, since it can be calculated at runtime.
+//         if (r - l == 1) {
+//             info_[p] = raw[l];
+//             return;
+//         }
+//
+//         u64 const m = (l + r) / 2;
+//         build(build, p * 2, l, m);
+//         build(build, p * 2 + 1, m, r);
+//         pull(p);
+//     };
+//     build(build, 1, n_, 1);
+// }
+// template<typename info_type, typename tag_type> void segment_tree<info_type, tag_type>::pull(u64
+// p)
+// {
+//     info_[p] = info_[p * 2] + info_[p * 2 + 1];
+// }
+// template<typename info_type, typename tag_type>
+// void segment_tree<info_type, tag_type>::push(u64 p, u64 l, u64 r)
+// {
+//     if (r - l == 1) {
+//         return;
+//     }
+//
+//     apply(p * 2, tags_[p]);
+//     apply(p * 2 + 1, tags_[p]);
+//     tags_[p] = tag_type{};
+// }
+// template<typename info_type, typename tag_type>
+// void segment_tree<info_type, tag_type>::apply(u64 p, tag_type const& tag)
+// {
+//     info_[p].apply(tag);
+//     tags_[p].apply(tag);
+// }
+// template<typename info_type, typename tag_type>
+// void segment_tree<info_type, tag_type>::modify_range_impl([[maybe_unused]] u64 p, u64 l, u64 r,
+//                                                           u64 a, u64 b, [[maybe_unused]] i64 x)
+// {
+//     // ranges not intersecting
+//     if (b <= l || r <= a) {
+//         return;
+//     }
+// }
+// template<typename info_type, typename tag_type>
+// void segment_tree<info_type, tag_type>::apply_range_impl(u64 p, u64 l, u64 r, u64 a, u64 b,
+//                                                          tag_type const& tag)
+// {
+//     // ranges not intersecting
+//     if (b <= l || r <= a) {
+//         return;
+//     }
+//
+//     // range fully included in [a, b)
+//     if (a <= l && r <= b) {
+//         apply(p, tag);
+//         return;
+//     }
+//
+//     push(p, l, r);
+//     u64 const m = (l + r) / 2;
+//     apply_range_impl(p * 2, l, m, a, b, tag);
+//     apply_range_impl(p * 2 + 1, m, r, a, b, tag);
+//     pull(p);
+// }
+// template<typename info_type, typename tag_type>
+// info_type segment_tree<info_type, tag_type>::query_range_impl(u64 p, u64 l, u64 r, u64 a, u64 b)
+// {
+//     // ranges not intersecting
+//     if (b <= l || r <= a) {
+//         return info_type{};
+//     }
+//
+//     // range fully included in [a, b)
+//     if (a <= l && r <= b) {
+//         return info_[p];
+//     }
+//
+//     push(l, r, p);
+//     u64 const m = (l + r) / 2;
+//     return query_range_impl(p * 2, l, m, a, b) + query_range_impl(p * 2 + 1, m, r, a, b);
+// }
+//
+// struct tag {
+//     void apply(tag const& tag) { add += tag.add; }
+//     i64 add;
+// };
+// struct info {
+//     info operator+(info const& rhs) const
+//     {
+//         return info{.min = ::min(this->min, rhs.min),
+//                     .max = ::max(this->max, rhs.max),
+//                     .sum = this->sum + rhs.sum,
+//                     .act = this->act + rhs.act};
+//     }
+//     void apply(tag const& tag)
+//     {
+//         min += tag.add;
+//         max += tag.add;
+//         sum += act * tag.add;
+//     }
+//     i64 min = inf<i64>;
+//     i64 max = -inf<i64>;
+//     i64 sum = 0;
+//     i64 act = 0;
+// };
+// using segtree = segment_tree<info, tag>;
 // TODO: to be implemented
 // class trie {
 // public:

@@ -53,13 +53,12 @@ using ::std::ranges::find;
 using ::std::ranges::lower_bound;
 using ::std::ranges::max;
 using ::std::ranges::min;
-using ::std::ranges::reverse;
-using ::std::ranges::reverse_view;
 using ::std::ranges::sort;
 using ::std::ranges::swap;
 using ::std::ranges::upper_bound;
 using ::std::ranges::views::drop;
 using ::std::ranges::views::iota;
+using ::std::ranges::views::reverse;
 using ::std::ranges::views::split;
 using ::std::ranges::views::take;
 #else
@@ -95,7 +94,8 @@ template<typename T> [[maybe_unused]] constexpr T inf{numeric_limits<T>::max() >
 namespace impl {
 template<typename value_type> using vec2_placeholder = std::vector<std::vector<value_type>>;
 template<typename value_type, size_t size> using arr1 = ::std::array<value_type, size>;
-template<size_t i, size_t j, typename value_type> using arr2 = std::array<std::array<value_type, j>, i>;
+template<size_t i, size_t j, typename value_type> using arr2
+    = std::array<std::array<value_type, j>, i>;
 template<typename value_type> using vec1 = ::std::vector<value_type>;
 template<typename value_type> class vec2 : public vec2_placeholder<value_type> {
   public:
@@ -235,12 +235,12 @@ template<typename T> constexpr bool check_min(T& value, T const& other)
     return false;
 }
 #ifdef __cpp_concepts
-[[maybe_unused]] constexpr auto sum(auto const& coll) noexcept
+constexpr auto sum(auto const& coll)
 {
     using value_type = ::std::remove_cvref_t<decltype(coll.front())>;
     return std::accumulate(coll.begin(), coll.end(), value_type{});
 }
-[[maybe_unused]] constexpr auto pow(auto a, auto b, u64 const p) noexcept
+constexpr auto pow(auto a, auto b, u64 const p)
 {
     u64 res{1};
     while (b != 0) {
@@ -253,19 +253,6 @@ template<typename T> constexpr bool check_min(T& value, T const& other)
     return res;
 }
 #endif
-[[maybe_unused]] constexpr u64 gcd(u64 a, u64 b) noexcept
-{
-    while (b != 0) {
-        auto t = b;
-        b = a % b;
-        a = t;
-    }
-    return a;
-}
-[[maybe_unused]] constexpr u64 lcm(u64 a, u64 b) noexcept
-{
-    return a * b / gcd(a, b);
-}
 struct sieve {
     sieve(u64 const upper_bound): min_factor(upper_bound + 1, 0)
     {
@@ -305,17 +292,12 @@ struct sieve {
     vu primes;
     vu min_factor;
 };
-struct graph {
-  public:
-    graph(u64 max_num_of_vertices): adjacent(max_num_of_vertices, 0) {}
-    void add_edge(u64 u, u64 v, u64 w) { adjacent[u].emplace_back(w, v); }
-    [[nodiscard]] std::vector<puu> const& edges_of(u64 u) const { return adjacent[u]; }
-    impl::vec2<puu> adjacent;
-};
-[[maybe_unused]] graph read_graph(u64 const num_of_vertices, u64 const num_of_edges, bool const bidirectional, bool const contains_w,
+using graph = impl::vec2<puu>;
+[[maybe_unused]] graph read_graph(u64 const num_of_vertices, u64 const num_of_edges,
+                                  bool const bidirectional, bool const contains_w,
                                   bool const read_from_1)
 {
-    graph g(num_of_vertices);
+    graph adj(num_of_vertices, 0);
     for (u64 i{}; i != num_of_edges; ++i) {
         u64 u, v, w;
         cin >> u >> v;
@@ -328,39 +310,33 @@ struct graph {
         if (read_from_1) {
             --u, --v;
         }
-        g.add_edge(u, v, w);
+        adj[u].emplace_back(w, v);
         if (bidirectional) {
-            g.add_edge(v, u, w);
+            adj[v].emplace_back(w, u);
         }
     }
-    return g;
+    return adj;
 }
 struct dijkstra_result {
     vu distance;
     vu previous;
 };
-[[maybe_unused]] dijkstra_result dijkstra(graph const& graph, u64 const source)
+[[maybe_unused]] dijkstra_result dijkstra(graph const& adjacent, u64 const source)
 {
-    vu distance(graph.adjacent.size(), inf<u64>);
-    vu previous(graph.adjacent.size());
+    vu distance(adjacent.size(), inf<u64>);
+    vu previous(adjacent.size());
     distance[source] = 0;
 
-    vb visited(graph.adjacent.size()); // `visited[u]` is true means u has been a start point, and it shouldn't be start point once more.
-
-    priority_queue<puu, std::vector<puu>, greater<>> q;
+    priority_queue<puu, impl::vec1<puu>, greater<>> q;
     q.emplace(distance[source], source);
 
     while (!q.empty()) { // The main loop
-        auto const [_, u]{q.top()}; // Extract the closest vertex. (Get and remove the best vertex)
+        auto const [_, u]{q.top()}; // Extract the closest vertex. (Get and
+                                    // remove the best vertex)
         q.pop();
 
-        if (visited[u]) {
-            continue;
-        }
-        visited[u];
-
-        for (auto const& [w, v]: graph.edges_of(u)) {
-            if (auto const alt{distance[u] + w}; alt < distance[v]) {
+        for (auto const& [d, v]: adjacent[u]) {
+            if (auto const alt{distance[u] + d}; alt < distance[v]) {
                 distance[v] = alt;
                 previous[v] = u;
                 q.emplace(alt, v);
@@ -398,7 +374,10 @@ struct dijkstra_result {
 
 class disjoint_set {
   public:
-    disjoint_set(u64 size): parent_(size), size_(size, 1) { std::iota(parent_.begin(), parent_.end(), 0); }
+    disjoint_set(u64 size): parent_(size), size_(size, 1)
+    {
+        std::iota(parent_.begin(), parent_.end(), 0);
+    }
     // with path compression
     size_t find(u64 const x) { return parent_[x] == x ? x : parent_[x] = find(parent_[x]); }
     /// @return:
@@ -691,10 +670,7 @@ template<typename T> void solve_all_cases(T solve_case)
 #endif
 } // namespace
 
-auto solve_case()
-{
-    // return 0;
-}
+auto solve_case() {}
 
 int main()
 {

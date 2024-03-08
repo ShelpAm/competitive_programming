@@ -309,7 +309,7 @@ struct graph {
   public:
     graph(u64 max_num_of_vertices): adjacent(max_num_of_vertices, 0) {}
     void add_edge(u64 u, u64 v, u64 w) { adjacent[u].emplace_back(w, v); }
-    [[nodiscard]] std::vector<puu> const& edges_of(u64 u) const { return adjacent[u]; }
+    [[nodiscard]] std::vector<puu> edges_of(u64 u) const { return adjacent[u]; }
     impl::vec2<puu> adjacent;
 };
 [[maybe_unused]] graph read_graph(u64 const num_of_vertices, u64 const num_of_edges, bool const bidirectional, bool const contains_w,
@@ -345,19 +345,13 @@ struct dijkstra_result {
     vu previous(graph.adjacent.size());
     distance[source] = 0;
 
-    vb visited(graph.adjacent.size()); // `visited[u]` is true means u has been a start point, and it shouldn't be start point once more.
-
     priority_queue<puu, std::vector<puu>, greater<>> q;
     q.emplace(distance[source], source);
 
     while (!q.empty()) { // The main loop
-        auto const [_, u]{q.top()}; // Extract the closest vertex. (Get and remove the best vertex)
+        auto const [_, u]{q.top()}; // Extract the closest vertex. (Get and
+                                    // remove the best vertex)
         q.pop();
-
-        if (visited[u]) {
-            continue;
-        }
-        visited[u];
 
         for (auto const& [w, v]: graph.edges_of(u)) {
             if (auto const alt{distance[u] + w}; alt < distance[v]) {
@@ -693,7 +687,72 @@ template<typename T> void solve_all_cases(T solve_case)
 
 auto solve_case()
 {
-    // return 0;
+    u64 n;
+    cin >> n;
+    vu a(n), b(n);
+    cin >> a >> b;
+    a.insert(a.begin(), 0);
+    b.insert(b.begin(), 0);
+
+    vu f(n + 1, inf<u64>), prev(n + 1);
+    f[n] = 0;
+    // u64 topest = n;
+    // priority_queue<puu, std::vector<puu>, greater<>> q;
+    // q.push({n - a[n], n});
+    // while (!q.empty()) {
+    //     auto [hi, u] = q.top();
+    //     q.pop();
+    //
+    //     for (u64 i = hi; i < topest; ++i) {
+    //         if (f[i] > f[u] + 1) {
+    //             prev[i] = u;
+    //             f[i] = f[u] + 1;
+    //             q.push({i + b[i] - a[i + b[i]], i});
+    //         }
+    //     }
+    // }
+    //     check_min(topest, hi);
+
+    u64 topest = n;
+    u64 hi = n - a[n];
+    u64 steps = 0;
+    u64 j = n;
+    while (true) {
+        ++steps;
+        u64 neo_hi = hi;
+        u64 neo_j = j;
+        for (u64 i = hi; i < topest; ++i) {
+            if (f[i] > steps) {
+                u64 next = i + b[i] - a[i + b[i]];
+                prev[i] = j;
+                f[i] = steps;
+                if (neo_hi > next) {
+                    neo_hi = next;
+                    neo_j = i;
+                }
+            }
+        }
+        if (!check_min(topest, hi)) {
+            break;
+        }
+        hi = neo_hi;
+        j = neo_j;
+    }
+
+    debug("f", f);
+
+    if (f[0] == inf<u64>) {
+        cout << -1;
+        return;
+    }
+
+    vu path;
+    path.push_back(0);
+    while (path.back() != n) {
+        path.push_back(prev[path.back()]);
+    }
+    cout << path.size() - 1 << '\n';
+    print(reverse_view{path} | drop(1));
 }
 
 int main()

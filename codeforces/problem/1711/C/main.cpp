@@ -53,13 +53,12 @@ using ::std::ranges::find;
 using ::std::ranges::lower_bound;
 using ::std::ranges::max;
 using ::std::ranges::min;
-using ::std::ranges::reverse;
-using ::std::ranges::reverse_view;
 using ::std::ranges::sort;
 using ::std::ranges::swap;
 using ::std::ranges::upper_bound;
 using ::std::ranges::views::drop;
 using ::std::ranges::views::iota;
+using ::std::ranges::views::reverse;
 using ::std::ranges::views::split;
 using ::std::ranges::views::take;
 #else
@@ -309,7 +308,7 @@ struct graph {
   public:
     graph(u64 max_num_of_vertices): adjacent(max_num_of_vertices, 0) {}
     void add_edge(u64 u, u64 v, u64 w) { adjacent[u].emplace_back(w, v); }
-    [[nodiscard]] std::vector<puu> const& edges_of(u64 u) const { return adjacent[u]; }
+    [[nodiscard]] std::vector<puu> edges_of(u64 u) const { return adjacent[u]; }
     impl::vec2<puu> adjacent;
 };
 [[maybe_unused]] graph read_graph(u64 const num_of_vertices, u64 const num_of_edges, bool const bidirectional, bool const contains_w,
@@ -345,19 +344,13 @@ struct dijkstra_result {
     vu previous(graph.adjacent.size());
     distance[source] = 0;
 
-    vb visited(graph.adjacent.size()); // `visited[u]` is true means u has been a start point, and it shouldn't be start point once more.
-
     priority_queue<puu, std::vector<puu>, greater<>> q;
     q.emplace(distance[source], source);
 
     while (!q.empty()) { // The main loop
-        auto const [_, u]{q.top()}; // Extract the closest vertex. (Get and remove the best vertex)
+        auto const [_, u]{q.top()}; // Extract the closest vertex. (Get and
+                                    // remove the best vertex)
         q.pop();
-
-        if (visited[u]) {
-            continue;
-        }
-        visited[u];
 
         for (auto const& [w, v]: graph.edges_of(u)) {
             if (auto const alt{distance[u] + w}; alt < distance[v]) {
@@ -665,7 +658,7 @@ class fenwick_tree {
 void solve_all_cases(auto solve_case)
 {
     u64 t{1};
-    // std::cin >> t;
+    std::cin >> t;
     using return_type = decltype(solve_case());
     for (u64 i{}; i != t; ++i) {
         if constexpr (std::same_as<return_type, void>) {
@@ -693,7 +686,47 @@ template<typename T> void solve_all_cases(T solve_case)
 
 auto solve_case()
 {
-    // return 0;
+    u64 n, m, k;
+    cin >> n >> m >> k;
+    vu a(k);
+    cin >> a;
+
+    // auto check_color = [&](u64 h, u64 w, u64 cnt) { return cnt + ((w - 3) / 2) * (n / 3 * 2) <= h * w; };
+    auto check = [&](u64 n, u64 m) {
+        // u64 cnt_col = 0;
+        // for (auto e: a) {
+        //     u64 lo = 0, hi = inf<u64>;
+        //     while (lo < hi) {
+        //         u64 const mid = (lo + hi + 1) / 2;
+        //         if (check_color(n, mid, e)) {
+        //             lo = mid;
+        //         }
+        //         else {
+        //             hi = mid - 1;
+        //         }
+        //     }
+        //     cnt_col += lo;
+        // }
+        // return cnt_col >= m;
+
+        bool has_three_or_more = false;
+        u64 cnt_col = 0;
+        for (auto e: a) {
+            cnt_col += (e / n >= 2 ? e / n : 0);
+            if (e / n >= 3) {
+                has_three_or_more = true;
+            }
+        }
+        if (has_three_or_more) {
+            return cnt_col >= m;
+        }
+        return cnt_col >= m && m % 2 == 0;
+    };
+
+    bool ok = check(n, m);
+    swap(n, m);
+    ok |= check(n, m);
+    return ok;
 }
 
 int main()

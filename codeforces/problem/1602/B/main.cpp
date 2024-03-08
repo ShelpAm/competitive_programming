@@ -309,7 +309,7 @@ struct graph {
   public:
     graph(u64 max_num_of_vertices): adjacent(max_num_of_vertices, 0) {}
     void add_edge(u64 u, u64 v, u64 w) { adjacent[u].emplace_back(w, v); }
-    [[nodiscard]] std::vector<puu> const& edges_of(u64 u) const { return adjacent[u]; }
+    [[nodiscard]] std::vector<puu> edges_of(u64 u) const { return adjacent[u]; }
     impl::vec2<puu> adjacent;
 };
 [[maybe_unused]] graph read_graph(u64 const num_of_vertices, u64 const num_of_edges, bool const bidirectional, bool const contains_w,
@@ -345,19 +345,13 @@ struct dijkstra_result {
     vu previous(graph.adjacent.size());
     distance[source] = 0;
 
-    vb visited(graph.adjacent.size()); // `visited[u]` is true means u has been a start point, and it shouldn't be start point once more.
-
     priority_queue<puu, std::vector<puu>, greater<>> q;
     q.emplace(distance[source], source);
 
     while (!q.empty()) { // The main loop
-        auto const [_, u]{q.top()}; // Extract the closest vertex. (Get and remove the best vertex)
+        auto const [_, u]{q.top()}; // Extract the closest vertex. (Get and
+                                    // remove the best vertex)
         q.pop();
-
-        if (visited[u]) {
-            continue;
-        }
-        visited[u];
 
         for (auto const& [w, v]: graph.edges_of(u)) {
             if (auto const alt{distance[u] + w}; alt < distance[v]) {
@@ -665,7 +659,7 @@ class fenwick_tree {
 void solve_all_cases(auto solve_case)
 {
     u64 t{1};
-    // std::cin >> t;
+    std::cin >> t;
     using return_type = decltype(solve_case());
     for (u64 i{}; i != t; ++i) {
         if constexpr (std::same_as<return_type, void>) {
@@ -693,7 +687,39 @@ template<typename T> void solve_all_cases(T solve_case)
 
 auto solve_case()
 {
-    // return 0;
+    u64 n;
+    cin >> n;
+    vvu a(1, vu(n + 1));
+    for (u64 i = 0; i != n; ++i) {
+        cin >> a[0][i + 1];
+    }
+    u64 q;
+    cin >> q;
+    std::vector<puu> queries(q);
+    cin >> queries;
+
+    for (u64 k = 1;; ++k) {
+        if (k != 1 && a[k - 1] == a[k - 2]) {
+            break;
+        }
+        vu cnt(n + 1);
+        for (u64 i = 1; i != n + 1; ++i) {
+            ++cnt[a[k - 1][i]];
+        }
+        a.push_back(vu(n + 1));
+        for (u64 i = 1; i != n + 1; ++i) {
+            a[k][i] = cnt[a[k - 1][i]];
+        }
+    }
+
+    debug("a", a);
+
+    for (auto [x, k]: queries) {
+        if (k >= a.size()) {
+            k = a.size() - 1;
+        }
+        print(a[k][x]);
+    }
 }
 
 int main()

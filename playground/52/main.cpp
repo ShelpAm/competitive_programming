@@ -269,6 +269,7 @@ template<typename T> constexpr bool check_min(T& value, T const& other)
 struct sieve {
     sieve(u64 const upper_bound): min_factor(upper_bound + 1, 0)
     {
+        auto pre = std::chrono::steady_clock::now();
         for (u64 i{2}; i != min_factor.size(); ++i) {
             if (min_factor[i] == 0) {
                 primes.push_back(i);
@@ -281,6 +282,8 @@ struct sieve {
                 min_factor[i * p] = p;
             }
         }
+        auto now = std::chrono::steady_clock::now();
+        std::cout << "Time difference: " << std::chrono::duration_cast<std::chrono::milliseconds>(now - pre).count() << " milliseconds\n";
     }
 
     [[nodiscard]] std::map<u64, u64> factorize(u64 x) const
@@ -668,6 +671,7 @@ void solve_all_cases(auto solve_case)
     // std::cin >> t;
     using return_type = decltype(solve_case());
     for (u64 i{}; i != t; ++i) {
+        auto pre = std::chrono::steady_clock::now();
         if constexpr (std::same_as<return_type, void>) {
             solve_case();
         }
@@ -677,6 +681,8 @@ void solve_all_cases(auto solve_case)
         else {
             print(solve_case());
         }
+        auto now = std::chrono::steady_clock::now();
+        std::cout << "Time difference: " << std::chrono::duration_cast<std::chrono::milliseconds>(now - pre).count() << " milliseconds\n";
     }
 }
 #else
@@ -693,7 +699,28 @@ template<typename T> void solve_all_cases(T solve_case)
 
 auto solve_case()
 {
-    // return 0;
+    u64 n;
+    cin >> n;
+
+    sieve sieve(n);
+    auto check = [&](u64 x) {
+        for (auto p: sieve.primes) {
+            if (p * 2 > x) {
+                break;
+            }
+            if (sieve.min_factor[x - p] == x - p) {
+                return true;
+            }
+        }
+        return false;
+    };
+
+    for (u64 i = 4; i <= n; i += 2) {
+        if (!check(i)) {
+            return false;
+        }
+    }
+    return true;
 }
 
 int main()
