@@ -357,7 +357,7 @@ struct dijkstra_result {
         if (visited[u]) {
             continue;
         }
-        visited[u];
+        visited[u] = true;
 
         for (auto const& [w, v]: graph.edges_of(u)) {
             if (auto const alt{distance[u] + w}; alt < distance[v]) {
@@ -665,7 +665,7 @@ class fenwick_tree {
 void solve_all_cases(auto solve_case)
 {
     u64 t{1};
-    // std::cin >> t;
+    std::cin >> t;
     using return_type = decltype(solve_case());
     for (u64 i{}; i != t; ++i) {
         if constexpr (std::same_as<return_type, void>) {
@@ -683,69 +683,42 @@ void solve_all_cases(auto solve_case)
 template<typename T> void solve_all_cases(T solve_case)
 {
     u64 t{1};
-    // std::cin >> t;
+    std::cin >> t;
     for (u64 i{}; i != t; ++i) {
         solve_case();
     }
 }
 #endif
 } // namespace
-
+bool ok(triplei const& l, triplei const& r)
+{
+    auto const& [a, b, c] = l;
+    auto const& [x, y, z] = r;
+    auto dx = a - x, dy = b - y;
+    return dx * dx + dy * dy <= (c + z) * (c + z);
+}
 auto solve_case()
 {
-    vu a;
-    u64 e;
-    while (cin >> e) {
-        a.push_back(e);
+    i64 xc, yc;
+    cin >> xc >> yc;
+    u64 n;
+    cin >> n;
+    disjoint_set ds(n + 2);
+    std::vector<triplei> points(n + 2);
+    points[0] = {0, 0, 0};
+    points[n + 1] = {xc, yc, 0};
+    for (u64 i = 1; i != n + 1; ++i) {
+        auto& [x, y, r] = points[i];
+        cin >> x >> y >> r;
     }
-
-    vu cnt_height(a.size() + 1);
-    cnt_height[0] = inf<u64>;
-    for (auto e: a) {
-        u64 lo = 0, hi = a.size();
-        while (lo < hi) {
-            u64 const mid = (lo + hi + 1) / 2;
-            if (cnt_height[mid] >= e) {
-                lo = mid;
+    for (u64 i = 0; i != n + 2; ++i) {
+        for (u64 j = 0; j != i; ++j) {
+            if (ok(points[i], points[j])) {
+                ds.unite(i, j);
             }
-            else {
-                hi = mid - 1;
-            }
-        }
-        debug("lo", lo);
-        cnt_height[lo + 1] = e;
-    }
-    debug("cntheight", cnt_height);
-    // get answer 1
-    for (u64 i = cnt_height.size() - 1; i != -1; --i) {
-        if (cnt_height[i] > 0) {
-            cout << i << '\n';
-            break;
         }
     }
-
-    auto check = [&](u64 num) {
-        set<u64> h;
-        for (auto e: a) {
-            if (auto it = h.lower_bound(e); it != h.end()) {
-                h.extract(it);
-            }
-            h.insert(e);
-        }
-        return h.size() <= num;
-    };
-
-    u64 lo = 1, hi = inf<u64>;
-    while (lo < hi) {
-        u64 const mid = (lo + hi) / 2;
-        if (check(mid)) {
-            hi = mid;
-        }
-        else {
-            lo = mid + 1;
-        }
-    }
-    cout << lo << '\n';
+    cout << (ds.united(0, n + 1) ? "YES\n" : "NO\n");
 }
 
 int main()

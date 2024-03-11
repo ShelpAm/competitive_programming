@@ -357,7 +357,7 @@ struct dijkstra_result {
         if (visited[u]) {
             continue;
         }
-        visited[u];
+        visited[u] = true;
 
         for (auto const& [w, v]: graph.edges_of(u)) {
             if (auto const alt{distance[u] + w}; alt < distance[v]) {
@@ -665,7 +665,7 @@ class fenwick_tree {
 void solve_all_cases(auto solve_case)
 {
     u64 t{1};
-    // std::cin >> t;
+    std::cin >> t;
     using return_type = decltype(solve_case());
     for (u64 i{}; i != t; ++i) {
         if constexpr (std::same_as<return_type, void>) {
@@ -693,59 +693,52 @@ template<typename T> void solve_all_cases(T solve_case)
 
 auto solve_case()
 {
-    vu a;
-    u64 e;
-    while (cin >> e) {
-        a.push_back(e);
+    u64 n;
+    cin >> n;
+
+    // std::multimap<multiset<u64>, u64> rev;
+    // std::map<multiset<u64>, u64> cnt;
+    // for (u64 i = 1; i != -1; ++i) {
+    //     auto square = std::to_string(i * i);
+    //     if (square.size() == n) {
+    //         multiset<u64> s;
+    //         for (auto ch: square) {
+    //             s.insert(ch - '0');
+    //         }
+    //         rev.insert({s, i * i});
+    //         ++cnt[s];
+    //     }
+    //     else if (square.size() > n) {
+    //         break;
+    //     }
+    // }
+    //
+    // multiset<u64> const* p;
+    // u64 mx = 0;
+    // for (auto const& [k, v]: cnt) {
+    //     if (v > mx) {
+    //         mx = v;
+    //         p = &k;
+    //     }
+    // }
+    // auto [begin, end] = rev.equal_range(*p);
+    // for (auto it = begin; it != end; ++it) {
+    //     cout << it->second << '\n';
+    //     debug("src", std::sqrt(it->second));
+    // }
+
+    if (n == 1) {
+        cout << 1 << '\n';
+        return;
     }
 
-    vu cnt_height(a.size() + 1);
-    cnt_height[0] = inf<u64>;
-    for (auto e: a) {
-        u64 lo = 0, hi = a.size();
-        while (lo < hi) {
-            u64 const mid = (lo + hi + 1) / 2;
-            if (cnt_height[mid] >= e) {
-                lo = mid;
-            }
-            else {
-                hi = mid - 1;
-            }
-        }
-        debug("lo", lo);
-        cnt_height[lo + 1] = e;
+    for (u64 i = 0; i <= (n - 3) / 2; ++i) {
+        cout << 1 << string(i, '0') << 6 << string(i, '0') << 9 << string(n - 3 - i * 2, '0') << '\n';
     }
-    debug("cntheight", cnt_height);
-    // get answer 1
-    for (u64 i = cnt_height.size() - 1; i != -1; --i) {
-        if (cnt_height[i] > 0) {
-            cout << i << '\n';
-            break;
-        }
+    for (u64 i = 0; i <= (n - 3) / 2; ++i) {
+        cout << 9 << string(i, '0') << 6 << string(i, '0') << 1 << string(n - 3 - i * 2, '0') << '\n';
     }
-
-    auto check = [&](u64 num) {
-        set<u64> h;
-        for (auto e: a) {
-            if (auto it = h.lower_bound(e); it != h.end()) {
-                h.extract(it);
-            }
-            h.insert(e);
-        }
-        return h.size() <= num;
-    };
-
-    u64 lo = 1, hi = inf<u64>;
-    while (lo < hi) {
-        u64 const mid = (lo + hi) / 2;
-        if (check(mid)) {
-            hi = mid;
-        }
-        else {
-            lo = mid + 1;
-        }
-    }
-    cout << lo << '\n';
+    cout << 1 << 9 << 6 << string(n - 3, '0') << '\n';
 }
 
 int main()

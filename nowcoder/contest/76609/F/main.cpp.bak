@@ -357,7 +357,7 @@ struct dijkstra_result {
         if (visited[u]) {
             continue;
         }
-        visited[u];
+        visited[u] = true;
 
         for (auto const& [w, v]: graph.edges_of(u)) {
             if (auto const alt{distance[u] + w}; alt < distance[v]) {
@@ -693,59 +693,66 @@ template<typename T> void solve_all_cases(T solve_case)
 
 auto solve_case()
 {
-    vu a;
-    u64 e;
-    while (cin >> e) {
-        a.push_back(e);
-    }
+    u64 n, q;
+    cin >> n >> q;
+    string s;
+    cin >> s;
+    s.insert(s.begin(), 0);
 
-    vu cnt_height(a.size() + 1);
-    cnt_height[0] = inf<u64>;
-    for (auto e: a) {
-        u64 lo = 0, hi = a.size();
-        while (lo < hi) {
-            u64 const mid = (lo + hi + 1) / 2;
-            if (cnt_height[mid] >= e) {
-                lo = mid;
-            }
-            else {
-                hi = mid - 1;
-            }
-        }
-        debug("lo", lo);
-        cnt_height[lo + 1] = e;
-    }
-    debug("cntheight", cnt_height);
-    // get answer 1
-    for (u64 i = cnt_height.size() - 1; i != -1; --i) {
-        if (cnt_height[i] > 0) {
-            cout << i << '\n';
-            break;
+    std::map<string, fenwick_tree> trees;
+    std::vector<string> perms{"red", "rde", "edr", "erd", "der", "dre"};
+    for (auto const& perm: perms) {
+        trees.insert({perm, fenwick_tree(s.size())});
+        // debug("perm", perm);
+        for (u64 i = 1; i != s.size(); ++i) {
+            trees.at(perm).update(i, s[i] != perm[(i - 1) % 3]);
+            // cout << trees.at(perm).query(i) - trees.at(perm).query(i - 1) << ' ';
         }
     }
 
-    auto check = [&](u64 num) {
-        set<u64> h;
-        for (auto e: a) {
-            if (auto it = h.lower_bound(e); it != h.end()) {
-                h.extract(it);
-            }
-            h.insert(e);
-        }
-        return h.size() <= num;
-    };
+    for (u64 i = 0; i != q; ++i) {
+        // debugging
+        // for (auto const& [perm, tree]: trees) {
+        //     cout << perm << ' ';
+        //     for (u64 j = 1; j != s.size(); ++j) {
+        //         cout << tree.query(j) - tree.query(j - 1) << ' ';
+        //     }
+        //     cout << "\n";
+        // }
+        // cout << "---------\n";
 
-    u64 lo = 1, hi = inf<u64>;
-    while (lo < hi) {
-        u64 const mid = (lo + hi) / 2;
-        if (check(mid)) {
-            hi = mid;
+        u64 op;
+        cin >> op;
+        if (op == 1) {
+            u64 x;
+            char ch;
+            cin >> x >> ch;
+            for (auto& [perm, tree]: trees) {
+                // debug("perm", perm);
+                // debug("neo", ch);
+                // debug("origin", s[x]);
+                // debug("perm[x]", perm[(x - 1) % 3]);
+                auto delta = i64(ch != perm[(x - 1) % 3]) - i64(s[x] != perm[(x - 1) % 3]);
+                tree.update(x, delta);
+                // debug("delta", delta);
+                // debug("queried", tree.query(x) - tree.query(x - 1));
+            }
+            s[x] = ch;
+        }
+        else if (op == 2) {
+            u64 l, r;
+            cin >> l >> r;
+            i64 ans = inf<i64>;
+            for (auto const& [perm, tree]: trees) {
+                ans = std::min(ans, tree.query(r) - tree.query(l - 1));
+            }
+            cout << ans << '\n';
         }
         else {
-            lo = mid + 1;
+            // unreachable
+            assert(false);
         }
     }
-    cout << lo << '\n';
 }
 
 int main()

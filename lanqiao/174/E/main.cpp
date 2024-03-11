@@ -691,61 +691,47 @@ template<typename T> void solve_all_cases(T solve_case)
 #endif
 } // namespace
 
+struct pack {
+    u64 bundle;
+    u64 num;
+    u64 main;
+};
 auto solve_case()
 {
-    vu a;
-    u64 e;
-    while (cin >> e) {
-        a.push_back(e);
+    u64 k, n;
+    cin >> k >> n;
+    std::vector<pack> packs;
+    u64 sum_x = 0;
+    for (u64 i = 0; i != k - 1; ++i) {
+        u64 x, y;
+        cin >> x >> y;
+        sum_x += x;
+        packs.push_back({0, 0, x});
+        packs.push_back({x, 1, y});
+    }
+    u64 box, boy;
+    cin >> box >> boy;
+    packs.push_back({sum_x, k - 1, box});
+    packs.push_back({sum_x + box, k, boy});
+
+    std::sort(packs.begin(), packs.end(), [&](pack const& l, pack const& r) { return l.bundle; });
+
+    u64 min_t = inf<u64>;
+    // only one
+    for (u64 i = 0; i != k - 1; ++i) {
+        auto [x, y] = a[i];
+        check_min(min_t, x + y * (n - 1));
+    }
+    // boss
+    if (n >= k) {
+        u64 boss = a[k - 1].second * (n - k);
+        for (auto [x, y]: a) {
+            boss += x;
+        }
+        check_min(min_t, boss);
     }
 
-    vu cnt_height(a.size() + 1);
-    cnt_height[0] = inf<u64>;
-    for (auto e: a) {
-        u64 lo = 0, hi = a.size();
-        while (lo < hi) {
-            u64 const mid = (lo + hi + 1) / 2;
-            if (cnt_height[mid] >= e) {
-                lo = mid;
-            }
-            else {
-                hi = mid - 1;
-            }
-        }
-        debug("lo", lo);
-        cnt_height[lo + 1] = e;
-    }
-    debug("cntheight", cnt_height);
-    // get answer 1
-    for (u64 i = cnt_height.size() - 1; i != -1; --i) {
-        if (cnt_height[i] > 0) {
-            cout << i << '\n';
-            break;
-        }
-    }
-
-    auto check = [&](u64 num) {
-        set<u64> h;
-        for (auto e: a) {
-            if (auto it = h.lower_bound(e); it != h.end()) {
-                h.extract(it);
-            }
-            h.insert(e);
-        }
-        return h.size() <= num;
-    };
-
-    u64 lo = 1, hi = inf<u64>;
-    while (lo < hi) {
-        u64 const mid = (lo + hi) / 2;
-        if (check(mid)) {
-            hi = mid;
-        }
-        else {
-            lo = mid + 1;
-        }
-    }
-    cout << lo << '\n';
+    cout << min_t;
 }
 
 int main()

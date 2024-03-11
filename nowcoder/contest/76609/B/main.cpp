@@ -357,7 +357,7 @@ struct dijkstra_result {
         if (visited[u]) {
             continue;
         }
-        visited[u];
+        visited[u] = true;
 
         for (auto const& [w, v]: graph.edges_of(u)) {
             if (auto const alt{distance[u] + w}; alt < distance[v]) {
@@ -693,59 +693,44 @@ template<typename T> void solve_all_cases(T solve_case)
 
 auto solve_case()
 {
-    vu a;
-    u64 e;
-    while (cin >> e) {
-        a.push_back(e);
-    }
-
-    vu cnt_height(a.size() + 1);
-    cnt_height[0] = inf<u64>;
-    for (auto e: a) {
-        u64 lo = 0, hi = a.size();
-        while (lo < hi) {
-            u64 const mid = (lo + hi + 1) / 2;
-            if (cnt_height[mid] >= e) {
-                lo = mid;
-            }
-            else {
-                hi = mid - 1;
-            }
-        }
-        debug("lo", lo);
-        cnt_height[lo + 1] = e;
-    }
-    debug("cntheight", cnt_height);
-    // get answer 1
-    for (u64 i = cnt_height.size() - 1; i != -1; --i) {
-        if (cnt_height[i] > 0) {
-            cout << i << '\n';
-            break;
+    u64 n, m, x;
+    cin >> n >> m >> x;
+    vvu a(n, vu(m));
+    for (auto& u: a) {
+        for (auto& e: u) {
+            cin >> e;
+            x -= e;
         }
     }
-
-    auto check = [&](u64 num) {
-        set<u64> h;
-        for (auto e: a) {
-            if (auto it = h.lower_bound(e); it != h.end()) {
-                h.extract(it);
-            }
-            h.insert(e);
+    if (x != 0) {
+        cout << "wrong answer";
+        return;
+    }
+    u64 xorr = -1;
+    for (u64 i = 0; i != n; ++i) {
+        u64 res = 0;
+        for (u64 j = 0; j != m; ++j) {
+            res ^= a[i][j];
         }
-        return h.size() <= num;
-    };
-
-    u64 lo = 1, hi = inf<u64>;
-    while (lo < hi) {
-        u64 const mid = (lo + hi) / 2;
-        if (check(mid)) {
-            hi = mid;
+        if (xorr == -1) {
+            xorr = res;
         }
-        else {
-            lo = mid + 1;
+        if (xorr != res) {
+            cout << "wrong answer";
+            return;
         }
     }
-    cout << lo << '\n';
+    for (u64 i = 0; i != m; ++i) {
+        u64 res = 0;
+        for (u64 j = 0; j != n; ++j) {
+            res ^= a[j][i];
+        }
+        if (xorr != res) {
+            cout << "wrong answer";
+            return;
+        }
+    }
+    cout << "accepted";
 }
 
 int main()

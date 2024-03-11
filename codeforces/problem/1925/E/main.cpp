@@ -693,59 +693,21 @@ template<typename T> void solve_all_cases(T solve_case)
 
 auto solve_case()
 {
-    vu a;
-    u64 e;
-    while (cin >> e) {
-        a.push_back(e);
+    u64 n, m, q;
+    cin >> n >> m >> q;
+    vu x(m), v(m);
+    cin >> x >> v;
+    std::vector<tripleu> queries(q);
+    for (auto& [a, b, c]: queries) {
+        cin >> a >> b >> c;
     }
 
-    vu cnt_height(a.size() + 1);
-    cnt_height[0] = inf<u64>;
-    for (auto e: a) {
-        u64 lo = 0, hi = a.size();
-        while (lo < hi) {
-            u64 const mid = (lo + hi + 1) / 2;
-            if (cnt_height[mid] >= e) {
-                lo = mid;
-            }
-            else {
-                hi = mid - 1;
-            }
+    for (auto [t, x, y]: queries) {
+        if (t == 1) {
         }
-        debug("lo", lo);
-        cnt_height[lo + 1] = e;
-    }
-    debug("cntheight", cnt_height);
-    // get answer 1
-    for (u64 i = cnt_height.size() - 1; i != -1; --i) {
-        if (cnt_height[i] > 0) {
-            cout << i << '\n';
-            break;
+        else if (t == 2) {
         }
     }
-
-    auto check = [&](u64 num) {
-        set<u64> h;
-        for (auto e: a) {
-            if (auto it = h.lower_bound(e); it != h.end()) {
-                h.extract(it);
-            }
-            h.insert(e);
-        }
-        return h.size() <= num;
-    };
-
-    u64 lo = 1, hi = inf<u64>;
-    while (lo < hi) {
-        u64 const mid = (lo + hi) / 2;
-        if (check(mid)) {
-            hi = mid;
-        }
-        else {
-            lo = mid + 1;
-        }
-    }
-    cout << lo << '\n';
 }
 
 int main()

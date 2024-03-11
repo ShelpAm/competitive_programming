@@ -357,7 +357,7 @@ struct dijkstra_result {
         if (visited[u]) {
             continue;
         }
-        visited[u];
+        visited[u] = true;
 
         for (auto const& [w, v]: graph.edges_of(u)) {
             if (auto const alt{distance[u] + w}; alt < distance[v]) {
@@ -693,59 +693,47 @@ template<typename T> void solve_all_cases(T solve_case)
 
 auto solve_case()
 {
-    vu a;
-    u64 e;
-    while (cin >> e) {
-        a.push_back(e);
-    }
+    double d1, c, d2, p;
+    u64 n;
+    cin >> d1 >> c >> d2 >> p >> n;
+    std::vector<std::pair<double, double>> a(n); // distance-to-next price
+    cin >> a;
+    a.insert(a.begin(), {0, p});
+    a.push_back({d1, 0});
 
-    vu cnt_height(a.size() + 1);
-    cnt_height[0] = inf<u64>;
-    for (auto e: a) {
-        u64 lo = 0, hi = a.size();
-        while (lo < hi) {
-            u64 const mid = (lo + hi + 1) / 2;
-            if (cnt_height[mid] >= e) {
-                lo = mid;
+    double total_cost = 0;
+    priority_queue<std::pair<double, double>, std::vector<std::pair<double, double>>, greater<>> petrol; // price and liters
+    petrol.push({p, c});
+    for (u64 i = 1; i != a.size(); ++i) {
+        double distance_left = a[i].first - a[i - 1].first;
+        double cur_volumn = c;
+        if (cur_volumn * d2 < distance_left) {
+            cout << "No Solution";
+            return;
+        }
+        while (distance_left > 0) {
+            auto [pack_price, pack_volumn] = petrol.top();
+            petrol.pop();
+            auto volumn_to_use = min(distance_left / d2, pack_volumn);
+            distance_left -= volumn_to_use * d2;
+            pack_volumn -= volumn_to_use;
+            cur_volumn -= volumn_to_use;
+            total_cost += volumn_to_use * pack_price;
+            // move unused petrol back to the car.
+            if (pack_volumn > 0) {
+                petrol.push({pack_price, pack_volumn});
             }
-            else {
-                hi = mid - 1;
-            }
         }
-        debug("lo", lo);
-        cnt_height[lo + 1] = e;
+        auto cur_price = a[i].second;
+        while (!petrol.empty() && petrol.top().first > cur_price) {
+            cur_volumn -= petrol.top().second;
+            petrol.pop();
+        }
+        debug("updating cheaper petrol", std::vector{cur_price, c - cur_volumn});
+        petrol.push({cur_price, c - cur_volumn});
+        cur_volumn = c;
     }
-    debug("cntheight", cnt_height);
-    // get answer 1
-    for (u64 i = cnt_height.size() - 1; i != -1; --i) {
-        if (cnt_height[i] > 0) {
-            cout << i << '\n';
-            break;
-        }
-    }
-
-    auto check = [&](u64 num) {
-        set<u64> h;
-        for (auto e: a) {
-            if (auto it = h.lower_bound(e); it != h.end()) {
-                h.extract(it);
-            }
-            h.insert(e);
-        }
-        return h.size() <= num;
-    };
-
-    u64 lo = 1, hi = inf<u64>;
-    while (lo < hi) {
-        u64 const mid = (lo + hi) / 2;
-        if (check(mid)) {
-            hi = mid;
-        }
-        else {
-            lo = mid + 1;
-        }
-    }
-    cout << lo << '\n';
+    cout << std::setprecision(2) << std::fixed << total_cost;
 }
 
 int main()

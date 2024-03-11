@@ -85,10 +85,11 @@ using pii = ::std::pair<i64, i64>;
 using puu = ::std::pair<u64, u64>;
 using triplei = ::std::tuple<i64, i64, i64>;
 using tripleu = ::std::tuple<u64, u64, u64>;
+using quadratici = ::std::tuple<i64, i64, i64, i64>;
+using quadraticu = ::std::tuple<u64, u64, u64, u64>;
 
 namespace {
-template<typename T> [[maybe_unused]]
-constexpr T mod{static_cast<T>(998244353)};
+template<typename T> [[maybe_unused]] constexpr T mod{static_cast<T>(998244353)};
 template<typename T> [[maybe_unused]] constexpr T inf{numeric_limits<T>::max() >> 2};
 [[maybe_unused]] constexpr double eps{1e-6};
 
@@ -130,8 +131,8 @@ class io_accelerator {
     {
         std::ios::sync_with_stdio(false);
         std::cin.tie(nullptr);
-        // The following line needn't to be executed because the above line
-        // actually had done this. std::cout.tie(nullptr);
+        // The following line needn't to be executed because the above line actually had done this.
+        // std::cout.tie(nullptr);
     }
     io_accelerator(const io_accelerator&) = delete;
     io_accelerator(io_accelerator&&) = delete;
@@ -167,8 +168,7 @@ auto& operator>>(auto& istream, auto&& t)
     }
     return istream;
 }
-/// @warning Do not put string literals in this function, because we hasn't
-/// (can't) inplement checking-string-literals functions.
+/// @warning Do not put string literals in this function, because we hasn't (can't) inplement checking-string-literals functions.
 void print(auto const& t, u64 const depth = 0)
 {
     using T = ::std::remove_cvref_t<decltype(t)>;
@@ -235,12 +235,12 @@ template<typename T> constexpr bool check_min(T& value, T const& other)
     return false;
 }
 #ifdef __cpp_concepts
-[[maybe_unused]] constexpr auto sum(auto const& coll) noexcept
+constexpr auto sum(auto const& coll) noexcept
 {
     using value_type = ::std::remove_cvref_t<decltype(coll.front())>;
     return std::accumulate(coll.begin(), coll.end(), value_type{});
 }
-[[maybe_unused]] constexpr auto pow(auto a, auto b, u64 const p) noexcept
+constexpr auto pow(auto a, auto b, u64 const p) noexcept
 {
     u64 res{1};
     while (b != 0) {
@@ -357,7 +357,7 @@ struct dijkstra_result {
         if (visited[u]) {
             continue;
         }
-        visited[u];
+        visited[u] = true;
 
         for (auto const& [w, v]: graph.edges_of(u)) {
             if (auto const alt{distance[u] + w}; alt < distance[v]) {
@@ -447,7 +447,7 @@ class fenwick_tree {
             }
         }
     }
-    [[nodiscard]] i64 query(i64 index) const
+    [[nodiscard]] i64 prefix_sum(i64 index) const
     {
         i64 sum{};
         while (index > 0) {
@@ -456,7 +456,7 @@ class fenwick_tree {
         }
         return sum;
     }
-    void update(u64 index, i64 const value)
+    void add_to(u64 index, i64 const value)
     {
         while (index < tree_.size()) {
             tree_[index] += value;

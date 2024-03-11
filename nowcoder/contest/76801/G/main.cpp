@@ -357,7 +357,7 @@ struct dijkstra_result {
         if (visited[u]) {
             continue;
         }
-        visited[u];
+        visited[u] = true;
 
         for (auto const& [w, v]: graph.edges_of(u)) {
             if (auto const alt{distance[u] + w}; alt < distance[v]) {
@@ -693,59 +693,41 @@ template<typename T> void solve_all_cases(T solve_case)
 
 auto solve_case()
 {
-    vu a;
-    u64 e;
-    while (cin >> e) {
-        a.push_back(e);
-    }
+    string s;
+    cin >> s;
 
-    vu cnt_height(a.size() + 1);
-    cnt_height[0] = inf<u64>;
-    for (auto e: a) {
-        u64 lo = 0, hi = a.size();
-        while (lo < hi) {
-            u64 const mid = (lo + hi + 1) / 2;
-            if (cnt_height[mid] >= e) {
-                lo = mid;
+    auto first_z = s.find('Z');
+    if (first_z != string ::npos) {
+        for (u64 i = first_z; i != s.size(); ++i) {
+            if (s[i] != 'Z') {
+                cout << -1;
+                return;
             }
-            else {
-                hi = mid - 1;
-            }
-        }
-        debug("lo", lo);
-        cnt_height[lo + 1] = e;
-    }
-    debug("cntheight", cnt_height);
-    // get answer 1
-    for (u64 i = cnt_height.size() - 1; i != -1; --i) {
-        if (cnt_height[i] > 0) {
-            cout << i << '\n';
-            break;
         }
     }
 
-    auto check = [&](u64 num) {
-        set<u64> h;
-        for (auto e: a) {
-            if (auto it = h.lower_bound(e); it != h.end()) {
-                h.extract(it);
-            }
-            h.insert(e);
+    vu x, y;
+    for (auto const ch: s) {
+        if (ch == 'X') {
+            x.push_back(1);
+            y.push_back(0);
         }
-        return h.size() <= num;
-    };
-
-    u64 lo = 1, hi = inf<u64>;
-    while (lo < hi) {
-        u64 const mid = (lo + hi) / 2;
-        if (check(mid)) {
-            hi = mid;
+        else if (ch == 'Y') {
+            y.push_back(1);
+            x.push_back(0);
         }
-        else {
-            lo = mid + 1;
+        else if (ch == 'Z') {
+            x.push_back(0);
+            y.push_back(0);
         }
     }
-    cout << lo << '\n';
+    for (auto e: x) {
+        cout << e;
+    }
+    cout << '\n';
+    for (auto e: y) {
+        cout << e;
+    }
 }
 
 int main()

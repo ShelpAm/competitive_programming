@@ -357,7 +357,7 @@ struct dijkstra_result {
         if (visited[u]) {
             continue;
         }
-        visited[u];
+        visited[u] = true;
 
         for (auto const& [w, v]: graph.edges_of(u)) {
             if (auto const alt{distance[u] + w}; alt < distance[v]) {
@@ -693,59 +693,35 @@ template<typename T> void solve_all_cases(T solve_case)
 
 auto solve_case()
 {
-    vu a;
-    u64 e;
-    while (cin >> e) {
-        a.push_back(e);
-    }
+    unordered_map<char, char> next{{'R', 'B'}, {'B', 'G'}, {'G', 'R'}};
 
-    vu cnt_height(a.size() + 1);
-    cnt_height[0] = inf<u64>;
-    for (auto e: a) {
-        u64 lo = 0, hi = a.size();
-        while (lo < hi) {
-            u64 const mid = (lo + hi + 1) / 2;
-            if (cnt_height[mid] >= e) {
-                lo = mid;
-            }
-            else {
-                hi = mid - 1;
-            }
-        }
-        debug("lo", lo);
-        cnt_height[lo + 1] = e;
-    }
-    debug("cntheight", cnt_height);
-    // get answer 1
-    for (u64 i = cnt_height.size() - 1; i != -1; --i) {
-        if (cnt_height[i] > 0) {
-            cout << i << '\n';
-            break;
+    string color(2e5 + 1, 0);
+    u64 idx;
+    char c;
+    cin >> idx >> c;
+    color[idx] = c;
+
+    queue<u64> q;
+    q.push(idx);
+    while (!q.empty()) {
+        u64 u = q.front();
+        q.pop();
+
+        u64 n;
+        cin >> n;
+        vu a(n);
+        for (auto& e: a) {
+            cin >> e;
+            color[e] = next[color[u]];
+            q.push(e);
         }
     }
 
-    auto check = [&](u64 num) {
-        set<u64> h;
-        for (auto e: a) {
-            if (auto it = h.lower_bound(e); it != h.end()) {
-                h.extract(it);
-            }
-            h.insert(e);
-        }
-        return h.size() <= num;
-    };
-
-    u64 lo = 1, hi = inf<u64>;
-    while (lo < hi) {
-        u64 const mid = (lo + hi) / 2;
-        if (check(mid)) {
-            hi = mid;
-        }
-        else {
-            lo = mid + 1;
+    for (auto const ch: color) {
+        if (ch != 0) {
+            cout << ch;
         }
     }
-    cout << lo << '\n';
 }
 
 int main()

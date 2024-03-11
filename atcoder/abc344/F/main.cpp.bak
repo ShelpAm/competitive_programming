@@ -693,59 +693,73 @@ template<typename T> void solve_all_cases(T solve_case)
 
 auto solve_case()
 {
-    vu a;
-    u64 e;
-    while (cin >> e) {
-        a.push_back(e);
+    u64 n;
+    cin >> n;
+    vvu p(n, vu(n)), r(n, vu(n - 1)), d(n - 1, vu(n));
+    cin >> p >> r >> d;
+
+    std::vector<std::vector<map<puu, u64>>> f(n, std::vector<map<puu, u64>>(n, map<puu, u64>{}));
+    f[0][0][{p[0][0], 0}] = 0;
+
+    for (u64 i = 0; i != n; ++i) {
+        for (u64 j = 0; j != n; ++j) {
+            if (i == 0 && j == 0) {
+                continue;
+            }
+            for (auto [di, dj]: std::vector<puu>{{-1, 0}, {0, -1}}) {
+                if (i + di >= n || j + dj >= n) {
+                    continue;
+                }
+
+                for (auto it = f[i + di][j + dj].begin(); it != f[i + di][j + dj].end(); ++it) {
+                    bool rubbish = false;
+                    for (auto jt = f[i + di][j + dj].begin(); jt != f[i + di][j + dj].end(); ++jt) {
+                        if (it != jt && it->first <= jt->first && it->second <= jt->second) {
+                            rubbish = true;
+                            break;
+                        }
+                    }
+                    if (rubbish) {
+                        it = std::prev(f[i + di][j + dj].erase(it));
+                    }
+                }
+
+                auto const mov = (di != 0 ? d : r)[i + di][j + dj];
+                for (auto const& [k, v]: f[i + di][j + dj]) {
+                    auto const [maxp, rema] = k;
+                    auto const neo_p = max(maxp, p[i][j]);
+                    if (rema < mov) {
+                        u64 earning_times = (mov - rema - 1) / maxp + 1;
+                        if (!f[i][j].contains({neo_p, rema - mov + earning_times * maxp})) {
+                            f[i][j][{neo_p, rema - mov + earning_times * maxp}] = inf<u64>;
+                        }
+                        check_min(f[i][j][{neo_p, rema - mov + earning_times * maxp}], v + 1 + earning_times);
+                    }
+                    else {
+                        if (!f[i][j].contains({neo_p, rema - mov})) {
+                            f[i][j][{neo_p, rema - mov}] = inf<u64>;
+                        }
+                        check_min(f[i][j][{neo_p, rema - mov}], v + 1);
+                    }
+                }
+            }
+        }
     }
 
-    vu cnt_height(a.size() + 1);
-    cnt_height[0] = inf<u64>;
-    for (auto e: a) {
-        u64 lo = 0, hi = a.size();
-        while (lo < hi) {
-            u64 const mid = (lo + hi + 1) / 2;
-            if (cnt_height[mid] >= e) {
-                lo = mid;
+    for (u64 i = 0; i != n; ++i) {
+        for (u64 j = 0; j != n; ++j) {
+            for (auto const& [k, v]: f[i][j]) {
+                auto const [maxp, rema] = k;
+                debug("i, j, maxp, remai, f", vu{i, j, maxp, rema, f[i][j][{maxp, rema}]});
             }
-            else {
-                hi = mid - 1;
-            }
-        }
-        debug("lo", lo);
-        cnt_height[lo + 1] = e;
-    }
-    debug("cntheight", cnt_height);
-    // get answer 1
-    for (u64 i = cnt_height.size() - 1; i != -1; --i) {
-        if (cnt_height[i] > 0) {
-            cout << i << '\n';
-            break;
         }
     }
 
-    auto check = [&](u64 num) {
-        set<u64> h;
-        for (auto e: a) {
-            if (auto it = h.lower_bound(e); it != h.end()) {
-                h.extract(it);
-            }
-            h.insert(e);
-        }
-        return h.size() <= num;
-    };
-
-    u64 lo = 1, hi = inf<u64>;
-    while (lo < hi) {
-        u64 const mid = (lo + hi) / 2;
-        if (check(mid)) {
-            hi = mid;
-        }
-        else {
-            lo = mid + 1;
-        }
+    u64 ans = inf<u64>;
+    for (auto const& [k, v]: f[n - 1][n - 1]) {
+        check_min(ans, v);
     }
-    cout << lo << '\n';
+    return ans;
 }
 
 int main()

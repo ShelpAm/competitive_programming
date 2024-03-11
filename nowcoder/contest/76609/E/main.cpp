@@ -357,7 +357,7 @@ struct dijkstra_result {
         if (visited[u]) {
             continue;
         }
-        visited[u];
+        visited[u] = true;
 
         for (auto const& [w, v]: graph.edges_of(u)) {
             if (auto const alt{distance[u] + w}; alt < distance[v]) {
@@ -693,59 +693,38 @@ template<typename T> void solve_all_cases(T solve_case)
 
 auto solve_case()
 {
-    vu a;
-    u64 e;
-    while (cin >> e) {
-        a.push_back(e);
+    u64 n, m;
+    cin >> n >> m;
+    vvc a(n, vc(m));
+    for (u64 i = 0; i != n; ++i) {
     }
 
-    vu cnt_height(a.size() + 1);
-    cnt_height[0] = inf<u64>;
-    for (auto e: a) {
-        u64 lo = 0, hi = a.size();
-        while (lo < hi) {
-            u64 const mid = (lo + hi + 1) / 2;
-            if (cnt_height[mid] >= e) {
-                lo = mid;
-            }
-            else {
-                hi = mid - 1;
-            }
-        }
-        debug("lo", lo);
-        cnt_height[lo + 1] = e;
+    a[0][0] = a[0][1] = 'b';
+    for (u64 j = 2; j != m; ++j) {
+        a[0][j] = 'z';
     }
-    debug("cntheight", cnt_height);
-    // get answer 1
-    for (u64 i = cnt_height.size() - 1; i != -1; --i) {
-        if (cnt_height[i] > 0) {
-            cout << i << '\n';
-            break;
+    for (u64 i = 1; i != n; ++i) {
+        a[i][0] = a[i - 1][0] ^ 1;
+        for (u64 j = 1; j != m; ++j) {
+            a[i][j] = a[i][j - 1];
         }
     }
+    // corner
+    a[n - 1][0] = a[n - 2][0] + 2;
+    a[n - 1][1] = a[n - 2][0] ^ 1;
+    for (u64 j = 2; j != m; ++j) {
+        a[n - 1][j] = a[n - 1][j - 1] ^ 1;
+    }
+    a[n - 2][m - 2] = a[n - 1][m - 2] ^ 1;
+    a[n - 2][m - 1] = (a[n - 2][m - 2] + 2) ^ 1;
+    a[n - 1][m - 1] = a[n - 1][m - 2];
 
-    auto check = [&](u64 num) {
-        set<u64> h;
-        for (auto e: a) {
-            if (auto it = h.lower_bound(e); it != h.end()) {
-                h.extract(it);
-            }
-            h.insert(e);
+    for (auto const& u: a) {
+        for (auto const v: u) {
+            cout << v;
         }
-        return h.size() <= num;
-    };
-
-    u64 lo = 1, hi = inf<u64>;
-    while (lo < hi) {
-        u64 const mid = (lo + hi) / 2;
-        if (check(mid)) {
-            hi = mid;
-        }
-        else {
-            lo = mid + 1;
-        }
+        cout << '\n';
     }
-    cout << lo << '\n';
 }
 
 int main()

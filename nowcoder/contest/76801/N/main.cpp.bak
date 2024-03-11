@@ -357,7 +357,7 @@ struct dijkstra_result {
         if (visited[u]) {
             continue;
         }
-        visited[u];
+        visited[u] = true;
 
         for (auto const& [w, v]: graph.edges_of(u)) {
             if (auto const alt{distance[u] + w}; alt < distance[v]) {
@@ -693,59 +693,51 @@ template<typename T> void solve_all_cases(T solve_case)
 
 auto solve_case()
 {
-    vu a;
-    u64 e;
-    while (cin >> e) {
-        a.push_back(e);
+    u64 n;
+    cin >> n;
+    vu a(n);
+    for (auto& e: a) {
+        cin >> e;
     }
-
-    vu cnt_height(a.size() + 1);
-    cnt_height[0] = inf<u64>;
-    for (auto e: a) {
-        u64 lo = 0, hi = a.size();
-        while (lo < hi) {
-            u64 const mid = (lo + hi + 1) / 2;
-            if (cnt_height[mid] >= e) {
-                lo = mid;
-            }
-            else {
-                hi = mid - 1;
-            }
-        }
-        debug("lo", lo);
-        cnt_height[lo + 1] = e;
-    }
-    debug("cntheight", cnt_height);
-    // get answer 1
-    for (u64 i = cnt_height.size() - 1; i != -1; --i) {
-        if (cnt_height[i] > 0) {
-            cout << i << '\n';
-            break;
+    vvu adj(n);
+    for (u64 i = 0; i != n; ++i) {
+        u64 m;
+        cin >> m;
+        adj[i].resize(m);
+        for (auto& e: adj[i]) {
+            cin >> e;
+            --e;
         }
     }
 
-    auto check = [&](u64 num) {
-        set<u64> h;
-        for (auto e: a) {
-            if (auto it = h.lower_bound(e); it != h.end()) {
-                h.extract(it);
-            }
-            h.insert(e);
-        }
-        return h.size() <= num;
-    };
+    priority_queue<puu, impl::vec1<puu>, greater<>> q;
+    q.push({a[0], 0});
+    vb vis(n);
+    vu f(n);
+    f[0] = a[0];
+    while (!q.empty()) {
+        auto [_, u] = q.top();
+        q.pop();
 
-    u64 lo = 1, hi = inf<u64>;
-    while (lo < hi) {
-        u64 const mid = (lo + hi) / 2;
-        if (check(mid)) {
-            hi = mid;
-        }
-        else {
-            lo = mid + 1;
+        // if (vis[u]) {
+        //     continue;
+        // }
+        // vis[u] = true;
+
+        for (auto v: adj[u]) {
+            auto alt = min(f[u], a[v]);
+            // debug("u v alt", vu{u, v, alt});
+            if (f[v] < alt) {
+                f[v] = alt;
+                q.push({f[v], v});
+            }
         }
     }
-    cout << lo << '\n';
+    u64 id;
+    cin >> id;
+    // debug("adj", adj);
+    // debug("f", f);
+    cout << f[id - 1];
 }
 
 int main()

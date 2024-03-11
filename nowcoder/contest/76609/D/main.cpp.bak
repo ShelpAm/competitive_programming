@@ -357,7 +357,7 @@ struct dijkstra_result {
         if (visited[u]) {
             continue;
         }
-        visited[u];
+        visited[u] = true;
 
         for (auto const& [w, v]: graph.edges_of(u)) {
             if (auto const alt{distance[u] + w}; alt < distance[v]) {
@@ -693,59 +693,46 @@ template<typename T> void solve_all_cases(T solve_case)
 
 auto solve_case()
 {
-    vu a;
-    u64 e;
-    while (cin >> e) {
-        a.push_back(e);
-    }
-
-    vu cnt_height(a.size() + 1);
-    cnt_height[0] = inf<u64>;
-    for (auto e: a) {
-        u64 lo = 0, hi = a.size();
-        while (lo < hi) {
-            u64 const mid = (lo + hi + 1) / 2;
-            if (cnt_height[mid] >= e) {
-                lo = mid;
-            }
-            else {
-                hi = mid - 1;
-            }
+    u64 n, m;
+    cin >> n >> m;
+    vvc a(n, vc(m));
+    unordered_map<char, u64> cnt;
+    for (auto& e: a) {
+        for (auto& u: e) {
+            cin >> u;
+            ++cnt[u];
         }
-        debug("lo", lo);
-        cnt_height[lo + 1] = e;
     }
-    debug("cntheight", cnt_height);
-    // get answer 1
-    for (u64 i = cnt_height.size() - 1; i != -1; --i) {
-        if (cnt_height[i] > 0) {
-            cout << i << '\n';
-            break;
+    vvu f(n, vu(m, inf<u64>));
+    f[0][0] = 0;
+    queue<puu> q;
+    q.push({0, 0});
+    while (!q.empty()) {
+        auto [x, y] = q.front();
+        q.pop();
+
+        for (auto [dx, dy]: std::vector<puu>{{-1, 0}, {0, -1}, {1, 0}, {0, 1}}) {
+            auto neox = x + dx, neoy = y + dy;
+            if (neox < n && neoy < m && a[neox][neoy] != a[x][y] && f[neox][neoy] > f[x][y] + 1) {
+                f[neox][neoy] = f[x][y] + 1;
+                q.push({neox, neoy});
+            }
         }
     }
 
-    auto check = [&](u64 num) {
-        set<u64> h;
-        for (auto e: a) {
-            if (auto it = h.lower_bound(e); it != h.end()) {
-                h.extract(it);
-            }
-            h.insert(e);
-        }
-        return h.size() <= num;
-    };
+    if (f[n - 1][m - 1] == inf<u64>) {
+        cout << -1;
+    }
+    else {
+        cout << f[n - 1][m - 1];
+    }
 
-    u64 lo = 1, hi = inf<u64>;
-    while (lo < hi) {
-        u64 const mid = (lo + hi) / 2;
-        if (check(mid)) {
-            hi = mid;
-        }
-        else {
-            lo = mid + 1;
+    // bonus
+    for (auto [k, v]: cnt) {
+        if (v > (n * m - 1) / 2 + 1) {
+            cout << k << " GREATER!";
         }
     }
-    cout << lo << '\n';
 }
 
 int main()

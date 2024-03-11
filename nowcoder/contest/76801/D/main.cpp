@@ -357,7 +357,7 @@ struct dijkstra_result {
         if (visited[u]) {
             continue;
         }
-        visited[u];
+        visited[u] = true;
 
         for (auto const& [w, v]: graph.edges_of(u)) {
             if (auto const alt{distance[u] + w}; alt < distance[v]) {
@@ -665,7 +665,7 @@ class fenwick_tree {
 void solve_all_cases(auto solve_case)
 {
     u64 t{1};
-    // std::cin >> t;
+    std::cin >> t;
     using return_type = decltype(solve_case());
     for (u64 i{}; i != t; ++i) {
         if constexpr (std::same_as<return_type, void>) {
@@ -683,7 +683,7 @@ void solve_all_cases(auto solve_case)
 template<typename T> void solve_all_cases(T solve_case)
 {
     u64 t{1};
-    // std::cin >> t;
+    std::cin >> t;
     for (u64 i{}; i != t; ++i) {
         solve_case();
     }
@@ -693,59 +693,30 @@ template<typename T> void solve_all_cases(T solve_case)
 
 auto solve_case()
 {
-    vu a;
-    u64 e;
-    while (cin >> e) {
-        a.push_back(e);
-    }
+    u64 l, r;
+    cin >> l >> r;
 
-    vu cnt_height(a.size() + 1);
-    cnt_height[0] = inf<u64>;
-    for (auto e: a) {
-        u64 lo = 0, hi = a.size();
-        while (lo < hi) {
-            u64 const mid = (lo + hi + 1) / 2;
-            if (cnt_height[mid] >= e) {
-                lo = mid;
-            }
-            else {
-                hi = mid - 1;
-            }
-        }
-        debug("lo", lo);
-        cnt_height[lo + 1] = e;
-    }
-    debug("cntheight", cnt_height);
-    // get answer 1
-    for (u64 i = cnt_height.size() - 1; i != -1; --i) {
-        if (cnt_height[i] > 0) {
-            cout << i << '\n';
-            break;
-        }
-    }
+    u64 n = r + 1 - l;
+    u64 const p = 998244353;
 
-    auto check = [&](u64 num) {
-        set<u64> h;
-        for (auto e: a) {
-            if (auto it = h.lower_bound(e); it != h.end()) {
-                h.extract(it);
-            }
-            h.insert(e);
-        }
-        return h.size() <= num;
-    };
-
-    u64 lo = 1, hi = inf<u64>;
-    while (lo < hi) {
-        u64 const mid = (lo + hi) / 2;
-        if (check(mid)) {
-            hi = mid;
-        }
-        else {
-            lo = mid + 1;
-        }
+    impl::vec1<u64> fac(2 * n + 1, 1), inv(2 * n + 1, 1), pinv(2 * n + 1, 1);
+    for (size_t i{2}; i != fac.size(); ++i) {
+        fac[i] = fac[i - 1] * i % p;
+        inv[i] = (p - p / i) * inv[p % i] % p;
+        pinv[i] = pinv[i - 1] * inv[i] % p;
     }
-    cout << lo << '\n';
+    auto c{[&](size_t n, size_t m) -> size_t {
+        auto const res{fac[n] * pinv[m] % p * pinv[n - m] % p};
+        return res;
+    }};
+
+    u64 s = 0;
+    for (u64 i = 0; i != n; ++i) {
+        auto ai = l + i;
+        s += c(n - 1, i) * ai;
+        s %= p;
+    }
+    cout << s;
 }
 
 int main()
