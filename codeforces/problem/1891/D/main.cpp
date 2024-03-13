@@ -6,7 +6,6 @@
 #include <cmath>
 #include <cstddef>
 #include <cstdint>
-#include <cstdlib>
 #include <deque>
 #include <functional>
 #include <iomanip>
@@ -135,8 +134,6 @@ template<typename T> concept c_str = std::same_as<char const*, remove_cvref_t<T>
 template<typename T> concept string = std::same_as<string, remove_cvref_t<T>>;
 template<typename T> concept string_view = std::same_as<string_view, remove_cvref_t<T>>;
 template<typename T> concept string_like = string<T> || string_view<T> || c_str<T>;
-#else
-template<class T> using remove_cvref_t = std::remove_cv_t<std::remove_reference_t<T>>;
 #endif
 
 /// @brief Turns off synchronization with stdio.
@@ -252,10 +249,13 @@ template<typename T> constexpr bool check_min(T& value, T const& other)
 #ifdef __cpp_concepts
 constexpr auto sum(auto const& coll) noexcept
 #else
+template<class T> struct remove_cvref {
+    using type = std::remove_cv_t<std::remove_reference_t<T>>;
+};
 template<typename Range> constexpr auto sum(Range const& coll) noexcept
 #endif
 {
-    using value_type = impl::remove_cvref_t<decltype(coll.front())>;
+    using value_type = typename remove_cvref<decltype(coll.front())>::type;
     return std::accumulate(coll.begin(), coll.end(), value_type{});
 }
 #ifdef __cpp_concepts
@@ -288,9 +288,9 @@ template<typename T> constexpr auto pow(T a, u64 b, u64 const p) noexcept
     return a * b / gcd(a, b);
 }
 struct sieve {
-    sieve(size_t const upper_bound): min_factor(upper_bound + 1, 0)
+    sieve(u64 const upper_bound): min_factor(upper_bound + 1, 0)
     {
-        for (size_t i = 2; i != min_factor.size(); ++i) {
+        for (u64 i{2}; i != min_factor.size(); ++i) {
             if (min_factor[i] == 0) {
                 primes.push_back(i);
                 min_factor[i] = i;
@@ -328,16 +328,16 @@ struct sieve {
 };
 struct graph {
   public:
-    graph(size_t max_num_of_vertices): adjacent(max_num_of_vertices, 0) {}
-    void add_edge(size_t u, u64 v, u64 w) { adjacent[u].emplace_back(w, v); }
-    [[nodiscard]] std::vector<puu> const& edges_of(size_t u) const { return adjacent[u]; }
+    graph(u64 max_num_of_vertices): adjacent(max_num_of_vertices, 0) {}
+    void add_edge(u64 u, u64 v, u64 w) { adjacent[u].emplace_back(w, v); }
+    [[nodiscard]] std::vector<puu> const& edges_of(u64 u) const { return adjacent[u]; }
     impl::vec2<puu> adjacent;
 };
-[[maybe_unused]] graph read_graph(size_t const num_of_vertices, size_t const num_of_edges, bool const bidirectional, bool const contains_w,
+[[maybe_unused]] graph read_graph(u64 const num_of_vertices, u64 const num_of_edges, bool const bidirectional, bool const contains_w,
                                   bool const read_from_1)
 {
     graph g(num_of_vertices);
-    for (size_t i = 0; i != num_of_edges; ++i) {
+    for (u64 i{}; i != num_of_edges; ++i) {
         u64 u, v, w;
         cin >> u >> v;
         if (contains_w) {
@@ -360,7 +360,7 @@ struct dijkstra_result {
     vu distance;
     vu previous;
 };
-[[maybe_unused]] dijkstra_result dijkstra(graph const& graph, size_t const source)
+[[maybe_unused]] dijkstra_result dijkstra(graph const& graph, u64 const source)
 {
     vu distance(graph.adjacent.size(), inf<u64>);
     vu previous(graph.adjacent.size());
@@ -393,22 +393,22 @@ struct dijkstra_result {
 }
 [[maybe_unused]] vvi floyd(impl::vec2<pii> const& adjacent)
 {
-    auto const n = adjacent.size();
+    auto const n{adjacent.size()};
 
-    vvi f(n, vi(n, inf<i64>));
+    vvi f(adjacent.size(), vi(adjacent.size(), inf<i64>));
     // Initialize data
-    for (size_t u = 0; u != n; ++u) {
+    for (u64 u{}; u != n; ++u) {
         f[u][u] = 0;
         for (auto const& [w, v]: adjacent[u]) {
             f[u][v] = w;
         }
     }
 
-    for (size_t k = 0; k != n; ++k) {
+    for (u64 k{}; k != n; ++k) {
         // In k-th round (At the end of the round), f[i][j] denotes the minimum
         // distance between i, j, concerning first k vertices.
-        for (size_t i = 0; i != n; ++i) {
-            for (size_t j = 0; j != n; ++j) {
+        for (u64 i{}; i != n; ++i) {
+            for (u64 j{}; j != n; ++j) {
                 check_min(f[i][j], f[i][k] + f[k][j]);
             }
         }
@@ -419,13 +419,13 @@ struct dijkstra_result {
 
 class disjoint_set {
   public:
-    disjoint_set(size_t size): parent_(size), size_(size, 1) { std::iota(parent_.begin(), parent_.end(), 0); }
+    disjoint_set(u64 size): parent_(size), size_(size, 1) { std::iota(parent_.begin(), parent_.end(), 0); }
     // with path compression
-    size_t find(size_t const x) { return parent_[x] == x ? x : parent_[x] = find(parent_[x]); }
+    size_t find(u64 const x) { return parent_[x] == x ? x : parent_[x] = find(parent_[x]); }
     /// @return:
     /// false if there has been pair x,y in the set.
     /// true successfully united
-    bool unite(size_t x, size_t y)
+    bool unite(u64 x, u64 y)
     {
         x = find(x);
         y = find(y);
@@ -439,45 +439,45 @@ class disjoint_set {
         size_[x] += size_[y];
         return true;
     }
-    [[nodiscard]] bool united(size_t const x, size_t const y) { return find(x) == find(y); }
-    // [[nodiscard]] auto const& size() const { return size_; }
+    bool united(size_t const x, size_t const y) { return find(x) == find(y); }
+    [[nodiscard]] auto const& size() const { return size_; }
   private:
     std::vector<size_t> parent_;
     std::vector<size_t> size_;
 };
 using ds = disjoint_set;
-[[maybe_unused]] constexpr i64 lsb(i64 const i)
+constexpr auto lsb(i64 const i)
 {
     return i & (-i);
 }
 // i mustn't be 0
-[[maybe_unused]] constexpr u64 msb(u64 const i)
+[[maybe_unused]] constexpr auto msb(u64 const i)
 {
     return sizeof(u64) * CHAR_BIT - 1 - __builtin_clzll(i | 1);
 }
 class fenwick_tree {
   public:
-    fenwick_tree(size_t const size): tree_(size) {}
+    fenwick_tree(u64 const size): tree_(size) {}
     // The input array should start from the index 1.
     fenwick_tree(vi coll): tree_{std::move(coll)}
     {
-        for (size_t i = 1; i != tree_.size(); ++i) {
-            auto parent_index = i + lsb(static_cast<i64>(i));
+        for (size_t i{1}; i != tree_.size(); ++i) {
+            auto parent_index{i + lsb(static_cast<i64>(i))};
             if (parent_index < tree_.size()) {
                 tree_[parent_index] += tree_[i];
             }
         }
     }
-    [[nodiscard]] i64 prefix_sum(size_t index) const
+    [[nodiscard]] i64 prefix_sum(i64 index) const
     {
         i64 sum{};
         while (index > 0) {
             sum += tree_[index];
-            index -= lsb(static_cast<i64>(index));
+            index -= lsb(index);
         }
         return sum;
     }
-    void add_to(size_t index, i64 const value)
+    void add_to(u64 index, i64 const value)
     {
         while (index < tree_.size()) {
             tree_[index] += value;
@@ -685,11 +685,11 @@ class fenwick_tree {
 #ifdef __cpp_concepts
 void solve_all_cases(auto solve_case, [[maybe_unused]] std::istream& is)
 #else
-template<typename F> void solve_all_cases(F solve_case, [[maybe_unused]] std::istream& is)
+template<typename T> void solve_all_cases(T solve_case, [[maybe_unused]] std::istream& is)
 #endif
 {
     u64 t = 1;
-    // is >> t;
+    is >> t;
     using return_type = decltype(solve_case());
     for (u64 i = 0; i != t; ++i) {
         if constexpr (
@@ -719,7 +719,37 @@ template<typename F> void solve_all_cases(F solve_case, [[maybe_unused]] std::is
 
 auto solve_case()
 {
-    // return 0;
+    u64 l, r;
+    cin >> l >> r;
+
+    // Intention:
+    //   Enumerate all log n, decresing time complexity
+    __uint128_t ans = 0;
+    for (u64 i = 2; i != 61; ++i) {
+        // i is [log2(x)]
+        u64 lo = 1ULL << i, hi = (1ULL << (i + 1)) - 1;
+        check_max(lo, l);
+        check_min(hi, r);
+        if (l > r) {
+            continue;
+        }
+        u64 k = 0, a = 1, b = i - 1;
+        while (true) {
+            ++k;
+            a = a * i;
+            b = b * i + i - 1;
+            if (a > hi) {
+                break;
+            }
+            u64 x = max(a, lo), y = min(b, hi);
+            if (x > y) {
+                continue;
+            }
+            ans += (y - x + 1) * k;
+        }
+    }
+    u64 t = ans % static_cast<u64>(1e9 + 7);
+    cout << t << '\n';
 }
 
 int main()
