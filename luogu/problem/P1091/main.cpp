@@ -689,7 +689,7 @@ template<typename F> void solve_all_cases(F solve_case, [[maybe_unused]] std::is
 #endif
 {
     u64 t = 1;
-    is >> t;
+    // is >> t;
     using return_type = decltype(solve_case());
     for (u64 i = 0; i != t; ++i) {
         if constexpr (
@@ -719,36 +719,66 @@ template<typename F> void solve_all_cases(F solve_case, [[maybe_unused]] std::is
 
 auto solve_case()
 {
-    u64 l, r;
-    cin >> l >> r;
-
-    // Intention:
-    //   Enumerate all log n, decresing time complexity
-    u64 ans = 0;
-    for (u64 i = 2; i != 61; ++i) {
-        // i is [log2(x)]
-        u64 lo = 1ULL << i, hi = (1ULL << (i + 1)) - 1;
-        check_max(lo, l);
-        check_min(hi, r);
-        if (l > r) {
-            continue;
-        }
-        u64 k = 0, a = 1, b = i - 1;
-        while (true) {
-            ++k;
-            a = a * i;
-            b = b * i + i - 1;
-            if (a > hi) {
-                break;
-            }
-            u64 x = max(a, lo), y = min(b, hi);
-            if (x > y) {
-                continue;
-            }
-            (ans += (y - x + 1) * k) %= static_cast<u64>(1e9 + 7);
-        }
+    u64 n;
+    cin >> n;
+    vu t(n);
+    for (auto& e: t) {
+        cin >> e;
     }
-    cout << ans << '\n';
+    t.insert(t.begin(), inf<u64>);
+
+    vu f(n + 1), h1(n + 1, inf<u64>), g(n + 1), h2(n + 1, inf<u64>);
+    h1[0] = h2[0] = 0;
+    // f denotes the max height of students who can form a line
+    // h[i] denotes the minimum height for a ascending list of length i
+    for (u64 i = 1; i != n + 1; ++i) {
+        u64 lo = 0, hi = n;
+        while (lo < hi) {
+            auto mid = (lo + hi + 1) / 2;
+            if (h1[mid] < t[i]) {
+                lo = mid;
+            }
+            else {
+                hi = mid - 1;
+            }
+        }
+        check_max(f[i], lo + 1);
+        check_min(h1[lo + 1], t[i]);
+
+        // cout << "f ";
+        // for (u64 i = 0; i != n + 1; ++i) {
+        //     cout << f[i] << ' ';
+        // }
+        // cout << '\n';
+        // cout << "h ";
+        // for (u64 i = 0; i != n + 1; ++i) {
+        //     cout << h1[i] << ' ';
+        // }
+        // cout << '\n';
+    }
+    for (u64 i = n; i != 0; --i) {
+        u64 lo = 0, hi = n;
+        while (lo < hi) {
+            auto mid = (lo + hi + 1) / 2;
+            if (h2[mid] < t[i]) {
+                lo = mid;
+            }
+            else {
+                hi = mid - 1;
+            }
+        }
+        check_max(g[i], lo + 1);
+        check_min(h2[lo + 1], t[i]);
+    }
+    u64 ans = 0;
+    // cout << "\ng ";
+    // for (u64 i = 0; i != n + 1; ++i) {
+    //     cout << g[i] << ' ';
+    // }
+    for (u64 i = 1; i != n + 1; ++i) {
+        check_max(ans, f[i] + g[i] - 1);
+    }
+    cout << n - ans;
 }
 
 int main()

@@ -719,36 +719,22 @@ template<typename F> void solve_all_cases(F solve_case, [[maybe_unused]] std::is
 
 auto solve_case()
 {
-    u64 l, r;
-    cin >> l >> r;
-
-    // Intention:
-    //   Enumerate all log n, decresing time complexity
-    u64 ans = 0;
-    for (u64 i = 2; i != 61; ++i) {
-        // i is [log2(x)]
-        u64 lo = 1ULL << i, hi = (1ULL << (i + 1)) - 1;
-        check_max(lo, l);
-        check_min(hi, r);
-        if (l > r) {
-            continue;
+    u64 q;
+    cin >> q;
+    vvu sons(1);
+    vu size(1);
+    for (u64 i = 0; i != q; ++i) {
+        u64 t, v;
+        cin >> t >> v;
+        if (t == 1) {
+            sons[v - 1].push_back(sons.size());
         }
-        u64 k = 0, a = 1, b = i - 1;
-        while (true) {
-            ++k;
-            a = a * i;
-            b = b * i + i - 1;
-            if (a > hi) {
-                break;
-            }
-            u64 x = max(a, lo), y = min(b, hi);
-            if (x > y) {
-                continue;
-            }
-            (ans += (y - x + 1) * k) %= static_cast<u64>(1e9 + 7);
+        else if (t == 2) {
+        }
+        else {
+            assert(false && "Unreachable");
         }
     }
-    cout << ans << '\n';
 }
 
 int main()

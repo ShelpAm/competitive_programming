@@ -9,7 +9,7 @@ input_problem=$(env_get input_problem)
 
 mkdir build -p
 rm -f $out
-clang++ -D DEBUG ${src} -g -std=c++17 -stdlib=libc++ -o ${out}
+clang++ -D DEBUG ${src} -g -std=c++26 -stdlib=libc++ -o ${out}
 if [ -e ${out} ]; then
     # updates the input
     if [ "${input_problem}" != "${problem}" ] || [ ! -e ${input} ] || [ ! -s ${input} ]; then

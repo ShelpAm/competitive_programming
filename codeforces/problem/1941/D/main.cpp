@@ -719,36 +719,38 @@ template<typename F> void solve_all_cases(F solve_case, [[maybe_unused]] std::is
 
 auto solve_case()
 {
-    u64 l, r;
-    cin >> l >> r;
+    u64 n, m, x;
+    cin >> n >> m >> x;
+    std::vector<pair<u64, char>> q(m + 1);
+    for (u64 i = 1; i != m + 1; ++i) {
+        cin >> q[i].first >> q[i].second;
+    }
 
-    // Intention:
-    //   Enumerate all log n, decresing time complexity
-    u64 ans = 0;
-    for (u64 i = 2; i != 61; ++i) {
-        // i is [log2(x)]
-        u64 lo = 1ULL << i, hi = (1ULL << (i + 1)) - 1;
-        check_max(lo, l);
-        check_min(hi, r);
-        if (l > r) {
-            continue;
-        }
-        u64 k = 0, a = 1, b = i - 1;
-        while (true) {
-            ++k;
-            a = a * i;
-            b = b * i + i - 1;
-            if (a > hi) {
-                break;
+    vvb f(m + 1, vb(n));
+    f[0][x - 1] = true;
+    for (u64 i = 1; i != m + 1; ++i) {
+        auto [r, x] = q[i];
+        for (u64 j = 0; j != n; ++j) {
+            if (x != '0') {
+                f[i][j] = f[i][j] || f[i - 1][(j + r + n) % n];
             }
-            u64 x = max(a, lo), y = min(b, hi);
-            if (x > y) {
-                continue;
+            if (x != '1') {
+                f[i][j] = f[i][j] || f[i - 1][(j - r + n) % n];
             }
-            (ans += (y - x + 1) * k) %= static_cast<u64>(1e9 + 7);
         }
     }
-    cout << ans << '\n';
+
+    vu p;
+    for (u64 i = 0; i != n; ++i) {
+        if (f[m][i]) {
+            p.push_back(i + 1);
+        }
+    }
+    cout << p.size() << '\n';
+    for (auto e: p) {
+        cout << e << ' ';
+    }
+    cout << '\n';
 }
 
 int main()

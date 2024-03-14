@@ -689,7 +689,7 @@ template<typename F> void solve_all_cases(F solve_case, [[maybe_unused]] std::is
 #endif
 {
     u64 t = 1;
-    is >> t;
+    // is >> t;
     using return_type = decltype(solve_case());
     for (u64 i = 0; i != t; ++i) {
         if constexpr (
@@ -719,36 +719,17 @@ template<typename F> void solve_all_cases(F solve_case, [[maybe_unused]] std::is
 
 auto solve_case()
 {
-    u64 l, r;
-    cin >> l >> r;
-
-    // Intention:
-    //   Enumerate all log n, decresing time complexity
-    u64 ans = 0;
-    for (u64 i = 2; i != 61; ++i) {
-        // i is [log2(x)]
-        u64 lo = 1ULL << i, hi = (1ULL << (i + 1)) - 1;
-        check_max(lo, l);
-        check_min(hi, r);
-        if (l > r) {
-            continue;
-        }
-        u64 k = 0, a = 1, b = i - 1;
-        while (true) {
-            ++k;
-            a = a * i;
-            b = b * i + i - 1;
-            if (a > hi) {
-                break;
-            }
-            u64 x = max(a, lo), y = min(b, hi);
-            if (x > y) {
-                continue;
-            }
-            (ans += (y - x + 1) * k) %= static_cast<u64>(1e9 + 7);
+    u64 n, m;
+    cin >> n >> m;
+    auto g = read_graph(n, m, false, true, true);
+    vu in_cnt(n);
+    for (u64 i = 0; i != n; ++i) {
+        for (auto [w, v]: g.edges_of(i)) {
+            ++in_cnt[v];
         }
     }
-    cout << ans << '\n';
+    u64 ans = inf<u64>;
+    cout << ans;
 }
 
 int main()

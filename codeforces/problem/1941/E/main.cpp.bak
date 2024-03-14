@@ -719,34 +719,42 @@ template<typename F> void solve_all_cases(F solve_case, [[maybe_unused]] std::is
 
 auto solve_case()
 {
-    u64 l, r;
-    cin >> l >> r;
+    u64 n, m, k, d;
+    cin >> n >> m >> k >> d;
+    vvu a(n + 1, vu(m + 1));
+    for (u64 i = 1; i != n + 1; ++i) {
+        for (u64 j = 1; j != m + 1; ++j) {
+            cin >> a[i][j];
+        }
+    }
 
-    // Intention:
-    //   Enumerate all log n, decresing time complexity
-    u64 ans = 0;
-    for (u64 i = 2; i != 61; ++i) {
-        // i is [log2(x)]
-        u64 lo = 1ULL << i, hi = (1ULL << (i + 1)) - 1;
-        check_max(lo, l);
-        check_min(hi, r);
-        if (l > r) {
-            continue;
-        }
-        u64 k = 0, a = 1, b = i - 1;
-        while (true) {
-            ++k;
-            a = a * i;
-            b = b * i + i - 1;
-            if (a > hi) {
-                break;
+    vvu f(n + 1, vu(m + 1, inf<u64>));
+    std::fill(f[0].begin(), f[0].end(), 0);
+    for (u64 i = 1; i != n + 1; ++i) {
+        f[i][0] = 0;
+        deque<u64> q;
+        for (u64 j = 1; j != m + 1; ++j) {
+            check_min(f[i][j], (q.empty() ? 0 : q.front()) + a[i][j] + 1);
+            if (j > d) {
+                if (q.front() == f[i][j - d]) {
+                    q.pop_front();
+                }
             }
-            u64 x = max(a, lo), y = min(b, hi);
-            if (x > y) {
-                continue;
+            while (!q.empty() && q.back() > f[i][j]) {
+                q.pop_back();
             }
-            (ans += (y - x + 1) * k) %= static_cast<u64>(1e9 + 7);
+            q.push_back(f[i][j]);
         }
+    }
+
+    u64 s = 0;
+    for (u64 i = 1; i != k; ++i) {
+        s += f[i][m];
+    }
+    u64 ans = inf<u64>;
+    for (u64 i = k; i != n + 1; ++i) {
+        s += f[i][m] - f[i - k][m];
+        check_min(ans, s);
     }
     cout << ans << '\n';
 }
