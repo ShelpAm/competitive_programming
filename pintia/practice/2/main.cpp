@@ -719,7 +719,16 @@ template<typename F> void solve_all_cases(F solve_case, [[maybe_unused]] std::is
 
 auto solve_case()
 {
-    // return 0;
+    u64 n;
+    cin >> n;
+    u64 t = sqrt((n + 1) / 2);
+    for (u64 i = t; i != 0; --i) {
+        cout << string(t - i, ' ') << string(2 * i - 1, '*') << '\n';
+    }
+    for (u64 i = 2; i != t + 1; ++i) {
+        cout << string(t - i, ' ') << string(2 * i - 1, '*') << '\n';
+    }
+    cout << n - t * t * 2 + 1;
 }
 
 int main()

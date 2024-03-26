@@ -689,7 +689,7 @@ template<typename F> void solve_all_cases(F solve_case, [[maybe_unused]] std::is
 #endif
 {
     u64 t = 1;
-    // is >> t;
+    is >> t;
     using return_type = decltype(solve_case());
     for (u64 i = 0; i != t; ++i) {
         if constexpr (
@@ -717,9 +717,72 @@ template<typename F> void solve_all_cases(F solve_case, [[maybe_unused]] std::is
 }
 } // namespace
 
+std::vector<pii> const dirs{{-1, 0}, {0, -1}, {0, 1}, {1, 0}};
 auto solve_case()
 {
-    // return 0;
+    u64 n, m;
+    cin >> n >> m;
+    vvc c(n, vc(m));
+    bool contains_red = false;
+    for (auto& e: c) {
+        for (auto& v: e) {
+            cin >> v;
+            if (v == '#') {
+                contains_red = true;
+            }
+        }
+    }
+
+    if (!contains_red) {
+        cout << "Blue\n";
+        return;
+    }
+
+    auto all_is = [&](auto const& neo, char k) {
+        for (u64 i = 0; i != n; ++i) {
+            for (u64 j = 0; j != m; ++j) {
+                if (neo[i][j] != k) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    };
+
+    puu blue;
+    for (u64 i = 0; i != n; ++i) {
+        for (u64 j = 0; j != m; ++j) {
+            if (c[i][j] == '.') {
+                blue = {i, j};
+            }
+        }
+    }
+
+    auto [bx, by] = blue;
+    for (auto [dx, dy]: dirs) {
+        if (bx + dx < n && by + dy < m && c[bx + dx][by + dy] == '#') {
+            auto neo = c;
+            vvb vis(n, vb(m));
+            auto dfs = [&](auto self, u64 x, u64 y) -> void {
+                for (auto [di, dj]: dirs) {
+                    neo[x + di][y + dj] = '#';
+                }
+                for (auto [dx, dy]: dirs) {
+                    auto neox = x + dx, neoy = y + dy;
+                    if (neox < n && neoy < m && c[neox][neoy] == '#' && !vis[neox][neoy]) {
+                        vis[neox][neoy] = true;
+                        self(self, neox, neoy);
+                    }
+                }
+            };
+            dfs(dfs, bx + dx, by + dy);
+            if (all_is(neo, '#')) {
+                cout << "Red\n";
+                return;
+            }
+        }
+    }
+    cout << "Draw\n";
 }
 
 int main()

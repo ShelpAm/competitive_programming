@@ -689,7 +689,7 @@ template<typename F> void solve_all_cases(F solve_case, [[maybe_unused]] std::is
 #endif
 {
     u64 t = 1;
-    // is >> t;
+    is >> t;
     using return_type = decltype(solve_case());
     for (u64 i = 0; i != t; ++i) {
         if constexpr (
@@ -719,7 +719,40 @@ template<typename F> void solve_all_cases(F solve_case, [[maybe_unused]] std::is
 
 auto solve_case()
 {
-    // return 0;
+    u64 n, k;
+    cin >> n >> k;
+    auto g = read_graph(n, n - 1, true, false, true);
+    auto check = [&](u64 const x) {
+        u64 blocks = 0;
+        vu size(n);
+        auto dfs = [&](auto self, u64 u, u64 p) -> void {
+            size[u] = 1;
+            for (auto [_, v]: g.edges_of(u)) {
+                if (v != p) {
+                    self(self, v, u);
+                    size[u] += size[v];
+                }
+            }
+            if (size[u] >= x) {
+                ++blocks;
+                size[u] = 0;
+            }
+        };
+        dfs(dfs, 0, -1);
+        return blocks >= k + 1;
+    };
+
+    u64 lo = 1, hi = n;
+    while (lo < hi) {
+        auto mid = (lo + hi + 1) / 2;
+        if (check(mid)) {
+            lo = mid;
+        }
+        else {
+            hi = mid - 1;
+        }
+    }
+    return lo;
 }
 
 int main()

@@ -719,7 +719,13 @@ template<typename F> void solve_all_cases(F solve_case, [[maybe_unused]] std::is
 
 auto solve_case()
 {
-    // return 0;
+    class father {};
+    class derived : public father {};
+    father f;
+    derived d;
+    derived* p = &f;
+    father* pf = &f;
+    father* pd = &d;
 }
 
 int main()

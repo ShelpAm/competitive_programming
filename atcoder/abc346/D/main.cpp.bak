@@ -719,7 +719,34 @@ template<typename F> void solve_all_cases(F solve_case, [[maybe_unused]] std::is
 
 auto solve_case()
 {
-    // return 0;
+    u64 n;
+    cin >> n;
+    string s;
+    cin >> s;
+    vu c(n);
+    cin >> c;
+    u64 ans = inf<u64>;
+    for (auto on: {0, 1}) {
+        vb changed(n);
+        u64 cost = 0;
+        for (u64 i = 0; i != n; ++i) {
+            if (s[i] != (on ^ (i % 2)) + '0') {
+                cost += c[i];
+                changed[i] = true;
+            }
+        }
+        for (u64 i = 0; i != n - 1; ++i) {
+            if (changed[i]) {
+                cost -= c[i];
+            }
+            else {
+                cost += c[i];
+            }
+            changed[i].flip();
+            check_min(ans, cost);
+        }
+    }
+    return ans;
 }
 
 int main()

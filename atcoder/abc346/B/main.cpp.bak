@@ -719,7 +719,29 @@ template<typename F> void solve_all_cases(F solve_case, [[maybe_unused]] std::is
 
 auto solve_case()
 {
-    // return 0;
+    string const s = "wbwbwwbwbwbw";
+    string t;
+    while (t.size() < 100) {
+        t += s;
+    }
+    u64 w, b;
+    cin >> w >> b;
+    for (u64 i = 0; i + w + b - 1 != 100; ++i) {
+        vu cnt(2);
+        for (u64 j = 0; j != w + b; ++j) {
+            if (t[i + j] == 'w') {
+                ++cnt[0];
+            }
+            else {
+                ++cnt[1];
+            }
+        }
+        if (vu{w, b} == cnt) {
+            cout << "Yes\n";
+            return;
+        }
+    }
+    cout << "No\n";
 }
 
 int main()

@@ -719,7 +719,51 @@ template<typename F> void solve_all_cases(F solve_case, [[maybe_unused]] std::is
 
 auto solve_case()
 {
-    // return 0;
+    u64 h, w, m;
+    cin >> h >> w >> m;
+    std::vector<puu> row(h), col(w);
+    for (u64 i = 1; i != m + 1; ++i) {
+        u64 t, a, x;
+        cin >> t >> a >> x;
+        if (t == 1) {
+            row[a - 1] = {i, x};
+        }
+        else {
+            col[a - 1] = {i, x};
+        }
+    }
+
+    sort(row, greater<>());
+    sort(col, greater<>());
+    std::map<u64, u64> cnt;
+    u64 i = 0, j = 0;
+    while (i != h && j != w) {
+        auto [ti, ci] = row[i];
+        auto [tj, cj] = col[j];
+        if (ti > tj) {
+            cnt[ci] += w - j;
+            ++i;
+        }
+        else {
+            cnt[cj] += h - i;
+            ++j;
+        }
+    }
+    while (i != h) {
+        auto [ti, ci] = row[i];
+        cnt[ci] += w - j;
+        ++i;
+    }
+    while (j != w) {
+        auto [tj, cj] = col[j];
+        cnt[cj] += h - i;
+        ++j;
+    }
+
+    cout << cnt.size() << '\n';
+    for (auto [color, cnt]: cnt) {
+        cout << color << ' ' << cnt << '\n';
+    }
 }
 
 int main()

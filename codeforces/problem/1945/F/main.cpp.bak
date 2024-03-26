@@ -689,7 +689,7 @@ template<typename F> void solve_all_cases(F solve_case, [[maybe_unused]] std::is
 #endif
 {
     u64 t = 1;
-    // is >> t;
+    is >> t;
     using return_type = decltype(solve_case());
     for (u64 i = 0; i != t; ++i) {
         if constexpr (
@@ -719,7 +719,58 @@ template<typename F> void solve_all_cases(F solve_case, [[maybe_unused]] std::is
 
 auto solve_case()
 {
-    // return 0;
+    u64 n;
+    cin >> n;
+    vu u(n), p(n);
+    cin >> u >> p;
+    vu v(n);
+    for (u64 i = 0; i != n; ++i) {
+        v[i] = u[--p[i]];
+    }
+
+    std::priority_queue<puu> order;
+    for (u64 i = 0; i != n; ++i) {
+        order.push({v[i], i});
+    }
+
+    multiset<u64> s;
+    u64 max_strenth_to_use = 0, min_number_to_use = inf<u64>;
+
+    auto push_one = [&](u64 i) {
+        while (!order.empty()) {
+            auto [val, perm] = order.top();
+            debug("perm", perm);
+            if (perm >= i - 1) {
+                break;
+            }
+            order.pop();
+        }
+        if (order.empty()) {
+            return false;
+        }
+        auto [val, perm] = order.top();
+        order.pop();
+        s.insert(val);
+        return true;
+    };
+
+    debug("v", v);
+
+    for (u64 i = 1; i <= n; ++i) {
+        while (s.size() != i && push_one(i)) {
+        }
+        if (s.size() != i) {
+            break;
+        }
+        auto alt = *s.begin() * s.size();
+        if (alt > max_strenth_to_use) {
+            max_strenth_to_use = alt;
+            min_number_to_use = s.size();
+        }
+        s.extract(v[i - 1]);
+    }
+    assert(max_strenth_to_use != 0);
+    cout << max_strenth_to_use << ' ' << min_number_to_use << '\n';
 }
 
 int main()

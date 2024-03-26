@@ -477,6 +477,7 @@ class fenwick_tree {
         }
         return sum;
     }
+    i64 at(size_t index) const { return prefix_sum(index) - prefix_sum(index - 1); }
     void add_to(size_t index, i64 const value)
     {
         while (index < tree_.size()) {
@@ -719,7 +720,36 @@ template<typename F> void solve_all_cases(F solve_case, [[maybe_unused]] std::is
 
 auto solve_case()
 {
-    // return 0;
+    constexpr u64 t = 1e6;
+
+    u64 n, q, m;
+    cin >> n >> q >> m;
+    vu a(n);
+    fenwick_tree ft(t);
+    u64 ans = 0;
+    for (u64 i = 0; i != n; ++i) {
+        cin >> a[i];
+        ft.add_to(a[i], 1);
+        ans += ft.prefix_sum(m / a[i]);
+    }
+    for (u64 i = 0; i != q; ++i) {
+        u64 op;
+        cin >> op;
+        if (op == 1) {
+            u64 p, x;
+            cin >> p >> x;
+            --p;
+            ans -= ft.prefix_sum(m / a[p]);
+            ft.add_to(a[p], -1);
+            a[p] = x;
+            ft.add_to(a[p], 1);
+            ans += ft.prefix_sum(m / a[p]);
+        }
+        else if (op == 2) {
+            cout << ans << '\n';
+        }
+        // debug("op", op);
+    }
 }
 
 int main()

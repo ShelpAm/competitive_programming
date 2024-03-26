@@ -719,7 +719,18 @@ template<typename F> void solve_all_cases(F solve_case, [[maybe_unused]] std::is
 
 auto solve_case()
 {
-    // return 0;
+    string s, t;
+    cin >> s >> t;
+    u64 p = -1;
+    u64 ans = 0;
+    for (auto ch: t) {
+        p = s.find(ch, p + 1);
+        if (p == string::npos) {
+            break;
+        }
+        ++ans;
+    }
+    return ans;
 }
 
 int main()

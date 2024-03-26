@@ -719,7 +719,32 @@ template<typename F> void solve_all_cases(F solve_case, [[maybe_unused]] std::is
 
 auto solve_case()
 {
-    // return 0;
+    u64 n, m, q, x;
+    cin >> n >> m >> q >> x;
+    auto g = read_graph(n, m, true, false, true);
+    auto [dis, prev] = dijkstra(g, x);
+    std::map<u64, u64> cnt;
+    for (auto e: dis) {
+        ++cnt[e];
+    }
+
+    constexpr u64 p = mod<u64>;
+
+    vvu f(5001, vu(5001));
+    for (auto [k, v]: cnt) {
+        f[0][k] = v;
+    }
+    for (u64 i = 1; i != f.size(); ++i) {
+        for (u64 j = i; j != f[i].size(); ++j) {
+            f[i][j] = (f[i][j - 1] + f[i - 1][j - 1] * f[0][j]) % p;
+        }
+    }
+
+    for (u64 i = 0; i != q; ++i) {
+        u64 k;
+        cin >> k;
+        cout << f[k].back() << '\n';
+    }
 }
 
 int main()

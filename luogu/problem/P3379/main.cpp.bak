@@ -719,7 +719,64 @@ template<typename F> void solve_all_cases(F solve_case, [[maybe_unused]] std::is
 
 auto solve_case()
 {
-    // return 0;
+    i64 n, m, s;
+    cin >> n >> m >> s;
+    --s;
+    auto g = read_graph(n, n - 1, true, false, true);
+
+    vu depth(n);
+    auto dfs = [&](auto self, u64 u, u64 p, u64 d) -> void {
+        depth[u] = d;
+        for (auto [_, v]: g.edges_of(u)) {
+            if (v != p) {
+                self(self, v, u, d + 1);
+            }
+        }
+    };
+    dfs(dfs, s, -1, 0);
+
+    vvu ancestor(lsb(n) + 2, vu(n));
+    for (i64 i = 0; i != lsb(n) + 2; ++i) {
+        auto get = [&](auto self, u64 u, u64 p, vu& path) -> void {
+            path.push_back(u);
+            auto t = path.size();
+            ancestor[i][u] = path[t > (1 << i) ? t - 1 - (1 << i) : 0];
+            for (auto [_, v]: g.edges_of(u)) {
+                if (v != p) {
+                    self(self, v, u, path);
+                }
+            }
+            path.pop_back();
+        };
+        vu path;
+        get(get, s, -1, path);
+    }
+
+    debug("ancestor", ancestor);
+
+    for (i64 i = 0; i != m; ++i) {
+        u64 a, b;
+        cin >> a >> b;
+        --a, --b;
+        if (depth[a] < depth[b]) {
+            swap(a, b);
+        }
+        if (depth[a] > depth[b]) {
+            auto delta = depth[a] - depth[b];
+            for (i64 bit = 0; bit != 31; ++bit) {
+                if (delta & (1 << bit)) {
+                    a = ancestor[bit][a];
+                }
+            }
+        }
+        for (i64 h = lsb(n) + 1; h != -1; --h) {
+            if (ancestor[h][a] != ancestor[h][b]) {
+                a = ancestor[h][a];
+                b = ancestor[h][b];
+            }
+        }
+        cout << ancestor[0][a] + 1 << '\n';
+    }
 }
 
 int main()

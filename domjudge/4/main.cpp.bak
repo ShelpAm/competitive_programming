@@ -719,7 +719,20 @@ template<typename F> void solve_all_cases(F solve_case, [[maybe_unused]] std::is
 
 auto solve_case()
 {
-    // return 0;
+    int n;
+    cin >> n;
+    std::vector<int> a(n);
+    cin >> a;
+    set<int> s, t;
+    for (auto e: a) {
+        s.insert(e);
+    }
+    for (auto e: a) {
+        if (!s.count(e + 9)) {
+            t.insert(e + 9);
+        }
+    }
+    cout << t.size();
 }
 
 int main()

@@ -719,7 +719,38 @@ template<typename F> void solve_all_cases(F solve_case, [[maybe_unused]] std::is
 
 auto solve_case()
 {
-    // return 0;
+    u64 n;
+    cin >> n;
+    vi a(n);
+    cin >> a;
+    for (u64 i = 0; i != n; ++i) {
+        a.push_back(-a[i]);
+    }
+    constexpr auto m = static_cast<i64>(1e5);
+    unordered_map<i64, bool> f;
+    f[0] = true;
+    for (auto e: a) {
+        if (e > 0) {
+            for (i64 i = m; i >= -m + e; --i) {
+                debug("i", i);
+                f[i] |= f[i - e];
+            }
+        }
+        else {
+            for (i64 i = -m; i <= m - e; ++i) {
+                debug("i", i);
+                f[i] |= f[i - e];
+            }
+        }
+    }
+    set<u64> uniq;
+    for (auto [k, v]: f) {
+        if (v) {
+            uniq.insert(abs(k));
+        }
+    }
+    debug("uniq", uniq);
+    return uniq.size() - 1;
 }
 
 int main()

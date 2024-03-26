@@ -719,7 +719,13 @@ template<typename F> void solve_all_cases(F solve_case, [[maybe_unused]] std::is
 
 auto solve_case()
 {
-    // return 0;
+    int n;
+    cin >> n;
+    vu a(n);
+    for (auto& e: a) {
+        cin >> e;
+    }
+    cout << (sum(a) % 2 == 1 ? "Alice" : "Bob");
 }
 
 int main()

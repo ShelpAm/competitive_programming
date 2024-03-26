@@ -719,7 +719,7 @@ template<typename F> void solve_all_cases(F solve_case, [[maybe_unused]] std::is
 
 auto solve_case()
 {
-    // return 0;
+    cout << "fengqibisheng, yingyueerlai!";
 }
 
 int main()

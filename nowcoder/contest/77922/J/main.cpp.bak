@@ -689,7 +689,7 @@ template<typename F> void solve_all_cases(F solve_case, [[maybe_unused]] std::is
 #endif
 {
     u64 t = 1;
-    // is >> t;
+    is >> t;
     using return_type = decltype(solve_case());
     for (u64 i = 0; i != t; ++i) {
         if constexpr (
@@ -719,7 +719,137 @@ template<typename F> void solve_all_cases(F solve_case, [[maybe_unused]] std::is
 
 auto solve_case()
 {
-    // return 0;
+    u64 n, m;
+    cin >> n >> m;
+    std::vector<std::pair<double, double>> points(n);
+    for (auto& [x, y]: points) {
+        cin >> x >> y;
+    }
+    vu f(1 << n, inf<u64>);
+    f[0] = 0;
+    auto dfs = [&](auto self, u64 used) {
+        if (f[used] != inf<u64>) {
+            return f[used];
+        }
+        for (u64 i = 0; i != n; ++i) {
+            if (used & (1 << i)) {
+                bool found_j = false;
+                for (u64 j = i + 1; j != n; ++j) {
+                    if (used & (1 << j)) {
+                        found_j = true;
+                        auto [x1, y1] = points[i];
+                        auto [x2, y2] = points[j];
+                        auto d0 = x1 * x2 * (x1 - x2);
+                        auto a = (y1 * x2 - y2 * x1) / d0, b = (x1 * x1 * y2 - x2 * x2 * y1) / d0;
+                        if (a >= 0) {
+                            continue;
+                        }
+                        u64 extra = 0;
+                        // debug("selecting", vu{i, j});
+                        // debug("a b", std::make_pair(a, b));
+                        for (u64 k = 0; k != n; ++k) {
+                            if (k != i && k != j && (used & (1 << k))) {
+                                auto [x, y] = points[k];
+                                // debug("k delta", std::make_pair(k, abs(y - a * x * x - b * x)));
+                                if (abs(y - a * x * x - b * x) < eps) {
+                                    extra ^= 1 << k;
+                                }
+                            }
+                        }
+                        check_min(f[used], self(self, used ^ (1 << i) ^ (1 << j) ^ extra) + 1);
+                    }
+                }
+                if (!found_j) {
+                    check_min(f[used], self(self, used ^ (1 << i)) + 1);
+                }
+            }
+        }
+        return f[used];
+    };
+    if (m == 0 || m == 1) {
+        cout << dfs(dfs, (1 << n) - 1) << '\n';
+    }
+    else if (m == 2) {
+        u64 ans = inf<u64>;
+        auto const least = n / 3;
+        for (u64 i = 0; i != n; ++i) {
+            for (u64 j = i + 1; j != n; ++j) {
+                auto [x1, y1] = points[i];
+                auto [x2, y2] = points[j];
+                auto d0 = x1 * x2 * (x1 - x2);
+                auto a = (y1 * x2 - y2 * x1) / d0, b = (x1 * x1 * y2 - x2 * x2 * y1) / d0;
+                if (a >= 0) {
+                    continue;
+                }
+                u64 bonus = 0, extra = 0;
+                // debug("selecting", vu{i, j});
+                // debug("a b", std::make_pair(a, b));
+                for (u64 k = 0; k != n; ++k) {
+                    if (k != i && k != j) {
+                        auto [x, y] = points[k];
+                        // debug("k delta", std::make_pair(k, abs(y - a * x * x - b * x)));
+                        if (abs(y - a * x * x - b * x) < eps) {
+                            ++bonus;
+                            extra ^= 1 << k;
+                        }
+                    }
+                }
+                // debug("extra", std::bitset<5>{extra});
+                if (bonus + 2 >= least) {
+                    u64 const killed = (1 << i) ^ (1 << j) ^ extra;
+                    // debug("killed", std::bitset<18>{killed});
+                    vu g(1 << n, inf<u64>);
+                    g[0] = 0;
+                    auto neodfs = [&](auto self, u64 used) -> u64 {
+                        if (used == killed) {
+                            return 1;
+                        }
+                        for (u64 i = 0; i != n; ++i) {
+                            if ((used & (1 << i)) && (killed & (1 << i))) {
+                                return inf<u64> >> 3;
+                            }
+                        }
+                        if (g[used] != inf<u64>) {
+                            return g[used];
+                        }
+                        for (u64 i = 0; i != n; ++i) {
+                            if (used & (1 << i)) {
+                                bool found_j = false;
+                                for (u64 j = i + 1; j != n; ++j) {
+                                    if (used & (1 << j)) {
+                                        found_j = true;
+                                        auto [x1, y1] = points[i];
+                                        auto [x2, y2] = points[j];
+                                        auto d0 = x1 * x2 * (x1 - x2);
+                                        auto a = (y1 * x2 - y2 * x1) / d0, b = (x1 * x1 * y2 - x2 * x2 * y1) / d0;
+                                        if (a >= 0) {
+                                            continue;
+                                        }
+                                        u64 extra = 0;
+                                        for (u64 k = 0; k != n; ++k) {
+                                            if (k != i && k != j && (used & (1 << k)) && !(killed & (1 << k))) {
+                                                auto [x, y] = points[k];
+                                                if (abs(y - a * x * x - b * x) < eps) {
+                                                    extra ^= 1 << k;
+                                                }
+                                            }
+                                        }
+                                        check_min(g[used], self(self, used ^ (1 << i) ^ (1 << j) ^ extra) + 1);
+                                    }
+                                }
+                                if (!found_j) {
+                                    check_min(g[used], self(self, used ^ (1 << i)) + 1);
+                                }
+                            }
+                        }
+                        return g[used];
+                    };
+                    check_min(ans, neodfs(neodfs, (1 << n) - 1));
+                }
+            }
+        }
+        cout << ans << '\n';
+    }
 }
 
 int main()

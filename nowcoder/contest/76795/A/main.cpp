@@ -719,7 +719,20 @@ template<typename F> void solve_all_cases(F solve_case, [[maybe_unused]] std::is
 
 auto solve_case()
 {
-    // return 0;
+    u64 n, m;
+    cin >> n >> m;
+    vu a(n);
+    u64 mx = 0;
+    for (auto& e: a) {
+        cin >> e;
+        check_max(mx, e);
+    }
+    if (mx == m) {
+        cout << "No\n";
+    }
+    else {
+        cout << "Yes\n";
+    }
 }
 
 int main()

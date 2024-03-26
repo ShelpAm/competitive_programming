@@ -719,7 +719,19 @@ template<typename F> void solve_all_cases(F solve_case, [[maybe_unused]] std::is
 
 auto solve_case()
 {
-    // return 0;
+    u64 n, k;
+    cin >> n >> k;
+    vu a(n);
+    cin >> a;
+    u64 sum = (1 + k) * k / 2;
+    set<u64> s;
+    for (auto e: a) {
+        if (e <= k && !s.contains(e)) {
+            sum -= e;
+            s.insert(e);
+        }
+    }
+    return sum;
 }
 
 int main()

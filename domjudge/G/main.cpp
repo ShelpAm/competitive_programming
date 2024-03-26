@@ -719,7 +719,34 @@ template<typename F> void solve_all_cases(F solve_case, [[maybe_unused]] std::is
 
 auto solve_case()
 {
-    // return 0;
+    u64 n, k;
+    cin >> n >> k;
+    std::vector<puu> intervals(k), lr;
+    for (u64 i = 0; i != k; ++i) {
+        u64 x, y;
+        cin >> x >> y;
+        intervals[i] = {y, y + n - x};
+    }
+    sort(intervals.begin(), intervals.end());
+    auto [last_l, last_r] = intervals.front();
+    for (u64 i = 1; i != k; ++i) {
+        auto [l, r] = intervals[i];
+        if (last_r + 1 >= l) {
+            check_max(last_r, r);
+        }
+        else {
+            last_l = l;
+            last_r = r;
+            lr.push_back({last_l, last_r});
+        }
+    }
+    lr.push_back({last_l, last_r});
+    u64 s = 0;
+    for (auto [l, r]: lr) {
+        auto d = r - l + 1;
+        s += d * (d + 1) / 2;
+    }
+    cout << s;
 }
 
 int main()

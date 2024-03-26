@@ -719,7 +719,27 @@ template<typename F> void solve_all_cases(F solve_case, [[maybe_unused]] std::is
 
 auto solve_case()
 {
-    // return 0;
+    string proto = string(6, '1');
+    for (u64 i = 0; i != 6; ++i) {
+        for (u64 j = 0; j != 6; ++j) {
+            for (u64 x = 0; x != 6; ++x) {
+                for (u64 y = 0; y != 6; ++y) {
+                    string a = proto, b = proto;
+                    a[i] = a[j] = b[x] = b[y] = '0';
+                    u64 p = 0, q = 0;
+                    for (auto ch: a) {
+                        p = p * 2 + ch - '0';
+                    }
+                    for (auto ch: b) {
+                        q = q * 2 + ch - '0';
+                    }
+                    if (p >= q && std::bitset<6>{p - q}.count() == 3) {
+                        cout << "OK! " << std::bitset<6>{p} << ' ' << std::bitset<6>{q} << '\n';
+                    }
+                }
+            }
+        }
+    }
 }
 
 int main()

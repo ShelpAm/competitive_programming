@@ -689,7 +689,7 @@ template<typename F> void solve_all_cases(F solve_case, [[maybe_unused]] std::is
 #endif
 {
     u64 t = 1;
-    // is >> t;
+    is >> t;
     using return_type = decltype(solve_case());
     for (u64 i = 0; i != t; ++i) {
         if constexpr (
@@ -719,7 +719,28 @@ template<typename F> void solve_all_cases(F solve_case, [[maybe_unused]] std::is
 
 auto solve_case()
 {
-    // return 0;
+    u64 n, m;
+    cin >> n >> m;
+    vu f(m + 1);
+    for (u64 i = 0; i != n; ++i) {
+        u64 a;
+        cin >> a;
+        vu v(a), w(a);
+        for (auto& e: v) {
+            cin >> e;
+        }
+        for (auto& e: w) {
+            cin >> e;
+        }
+        for (u64 j = m; j != -1; --j) {
+            for (u64 k = 0; k != a; ++k) {
+                if (w[k] <= j) {
+                    check_max(f[j], f[j - w[k]] + v[k]);
+                }
+            }
+        }
+    }
+    cout << f[m] << '\n';
 }
 
 int main()

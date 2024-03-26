@@ -719,7 +719,33 @@ template<typename F> void solve_all_cases(F solve_case, [[maybe_unused]] std::is
 
 auto solve_case()
 {
-    // return 0;
+    u64 n, m, k;
+    cin >> n >> m >> k;
+    vu a(n), b(n), c(n);
+    for (auto& e: a) {
+        cin >> e;
+    }
+    for (auto& e: b) {
+        cin >> e;
+    }
+    for (auto& e: c) {
+        cin >> e;
+    }
+
+    vu t(n);
+    for (u64 i = 0; i != n; ++i) {
+        t[i] = (b[i] * m - a[i]) / c[i] + 1;
+    }
+    sort(t.begin(), t.end());
+    u64 cnt = 0;
+    for (u64 i = 0; i != n; ++i) {
+        if (k < t[i]) {
+            break;
+        }
+        k -= t[i];
+        ++cnt;
+    }
+    cout << cnt;
 }
 
 int main()

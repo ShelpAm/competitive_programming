@@ -719,7 +719,80 @@ template<typename F> void solve_all_cases(F solve_case, [[maybe_unused]] std::is
 
 auto solve_case()
 {
-    // return 0;
+    u64 n;
+    cin >> n;
+
+    set<string> hall;
+    queue<string> q;
+    std::vector<string> playing;
+
+    for (u64 i = 0; i != n; ++i) {
+        string event;
+        cin >> event;
+        if (event == "start") {
+            // move all gamer from last game to the end of the queue.
+            for (auto e: playing) {
+                q.push(std::move(e));
+            }
+            playing.clear();
+
+            // determine who would be playing the game.
+            while (!q.empty() && playing.size() != 2) {
+                auto next = std::move(q.front());
+                q.pop();
+                if (hall.count(next) == 1) {
+                    playing.push_back(next);
+                }
+            }
+            if (playing.empty()) {
+                cout << "Error\n";
+            }
+            else {
+                assert(playing.size() <= 2);
+                for (u64 i = 0; i != playing.size(); ++i) {
+                    cout << playing[i];
+                    if (i == playing.size() - 1) {
+                        cout << '\n';
+                    }
+                    else {
+                        cout << ' ';
+                    }
+                }
+            }
+        }
+        else if (event == "arrive") {
+            string person;
+            cin >> person;
+            if (hall.count(person) == 1) {
+                cout << "Error\n";
+            }
+            else {
+                hall.insert(person);
+                q.push(person);
+                cout << "OK\n";
+            }
+        }
+        else if (event == "leave") {
+            string person;
+            cin >> person;
+            bool in_play = false;
+            for (const auto& player: playing) {
+                if (player == person) {
+                    in_play = true;
+                }
+            }
+            if (!hall.count(person) || in_play) {
+                cout << "Error\n";
+            }
+            else {
+                hall.erase(person);
+                cout << "OK\n";
+            }
+        }
+        else {
+            assert(false);
+        }
+    }
 }
 
 int main()

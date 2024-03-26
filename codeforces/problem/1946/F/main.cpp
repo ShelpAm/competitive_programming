@@ -719,7 +719,53 @@ template<typename F> void solve_all_cases(F solve_case, [[maybe_unused]] std::is
 
 auto solve_case()
 {
-    // return 0;
+    constexpr auto span = 'z' - 'a' + 1;
+
+    u64 n;
+    cin >> n;
+    string s, t;
+    cin >> s >> t;
+
+    vvi pref(span, vi(s.size() + 1));
+    for (u64 i = 1; i != s.size() + 1; ++i) {
+        for (u64 j = 0; j != span; ++j) {
+            pref[j][i] = pref[j][i - 1];
+        }
+        ++pref[s[i - 1] - 'a'][i];
+    }
+
+    auto check = [&](u64 k) {
+        u64 p = 1, q = 1;
+        for (auto ch: t) {
+            if (pref[ch - 'a'].back() == 0) {
+                return false;
+            }
+            auto need = k + pref[ch - 'a'][q - 1];
+            auto const mod = pref[ch - 'a'].back();
+            auto chunks = (need - 1) / mod;
+            auto remainder = need - chunks * mod;
+            if (remainder == 0) {
+                remainder = pref[ch - 'a'].back();
+            }
+            p += chunks;
+            q = next(lower_bound(pref[ch - 'a'], remainder)) - pref[ch - 'a'].begin();
+            // cout << "\tneed " << need << "\tchunks " << chunks << "\tremainder " << remainder << "\tp " << p << "\tq " << q << '\n';
+        }
+        return p <= n || (p == n + 1 && q == 1);
+    };
+
+    u64 lo = 0, hi = inf<u64>;
+    while (lo < hi) {
+        auto const mid = (lo + hi + 1) / 2;
+        // cout << "mid(k): " << mid << '\n';
+        if (check(mid)) {
+            lo = mid;
+        }
+        else {
+            hi = mid - 1;
+        }
+    }
+    return lo;
 }
 
 int main()
