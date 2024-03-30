@@ -689,7 +689,7 @@ template<typename F> void solve_all_cases(F solve_case, [[maybe_unused]] std::is
 #endif
 {
     u64 t = 1;
-    // is >> t;
+    is >> t;
     using return_type = decltype(solve_case());
     for (u64 i = 0; i != t; ++i) {
         if constexpr (
@@ -708,7 +708,7 @@ template<typename F> void solve_all_cases(F solve_case, [[maybe_unused]] std::is
             std::is_same_v<return_type, bool>
 #endif
         ) {
-            print(solve_case() ? "YES" : "NO");
+            print(solve_case() ? "true" : "false");
         }
         else {
             print(solve_case());
@@ -719,19 +719,72 @@ template<typename F> void solve_all_cases(F solve_case, [[maybe_unused]] std::is
 
 auto solve_case()
 {
-    u64 n, M, T;
-    cin >> n >> M >> T;
-    vvu f(M + 1, vu(T + 1));
-    for (u64 k = 0; k != n; ++k) {
-        u64 m, t;
-        cin >> m >> t;
-        for (u64 i = M; i >= m; --i) {
-            for (u64 j = T; j >= t; --j) {
-                check_max(f[i][j], f[i - m][j - t] + 1);
+    u64 n, m;
+    cin >> n >> m;
+
+    priority_queue<triplei, std::vector<triplei>, greater<>> q;
+    for (u64 i = 0; i != m; ++i) {
+        i64 a, b, c;
+        cin >> a >> b >> c;
+        q.push({a, b, c});
+    }
+
+    while (!q.empty()) {
+        auto [a, b, c] = q.top();
+        q.pop();
+
+        while (!q.empty()) {
+            auto [d, e, f] = q.top();
+            if (d != a) {
+                break;
             }
+            q.pop();
+            if (a == d && b == e) {
+                if (c != f) {
+                    return false;
+                }
+                continue;
+            }
+            if (a < d) {
+                q.push({d, e, f});
+                continue;
+            }
+            // a == d
+            q.push({b + 1, e, f - c});
         }
     }
-    return f[M][T];
+    return true;
+
+    // vu pa(n);
+    // vi diff(n);
+    // std::iota(pa.begin(), pa.end(), 0);
+    // auto find = [&](auto self, u64 x) -> u64 { return x == pa[x] ? x : self(self, pa[x]); };
+    // for (u64 i = 0; i != m; ++i) {
+    //     u64 a, b;
+    //     i64 c;
+    //     cin >> a >> b >> c;
+    //     --a;
+    //     --b;
+    //     if (a != 0 && b + 1 != n && find(find, a - 1) == find(find, b + 1)) {
+    //         pa[a] = b;
+    //         diff[a] = c;
+    //     }
+    //     else if (b + 1 != n && find(find, a) == find(find, b + 1)) {
+    //     }
+    //     else if (a != 0 && find(find, a - 1) == find(find, b)) {
+    //     }
+    //     else {
+    //         i64 diffa = 0, diffb = 0;
+    //         while (pa[a] != a) {
+    //             diffa += diff[a];
+    //             a = pa[a];
+    //         }
+    //         while (pa[b] != b) {
+    //             diffb += diff[b];
+    //             b = pa[b];
+    //         }
+    //     }
+    // }
 }
 
 int main()

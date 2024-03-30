@@ -724,63 +724,53 @@ auto solve_case()
     --s;
     auto g = read_graph(n, n - 1, true, false, true);
 
+    u64 const max_depth = msb(n) + 1;
+    vvu pa(n, vu(max_depth + 1));
     vu depth(n);
-    auto dfs = [&](auto self, u64 u, u64 p, u64 d) -> void {
-        depth[u] = d;
+    auto dfs = [&](auto self, u64 u, u64 p) -> void {
+        pa[u][0] = p;
+        depth[u] = depth[p] + 1;
+        for (u64 i = 1; i != max_depth + 1; ++i) {
+            pa[u][i] = pa[pa[u][i - 1]][i - 1];
+        }
         for (auto [_, v]: g.edges_of(u)) {
             if (v != p) {
-                self(self, v, u, d + 1);
+                self(self, v, u);
             }
         }
     };
-    dfs(dfs, s, -1, 0);
+    dfs(dfs, s, s);
 
-    vvu ancestor(lsb(n) + 2, vu(n));
-    for (i64 i = 0; i != lsb(n) + 2; ++i) {
-        auto get = [&](auto self, u64 u, u64 p, vu& path) -> void {
-            path.push_back(u);
-            auto t = path.size();
-            ancestor[i][u] = path[t > (1 << i) ? t - 1 - (1 << i) : 0];
-            for (auto [_, v]: g.edges_of(u)) {
-                if (v != p) {
-                    self(self, v, u, path);
-                }
-            }
-            path.pop_back();
-        };
-        vu path;
-        get(get, s, -1, path);
-    }
-
-    debug("ancestor", ancestor);
-
-    for (i64 i = 0; i != m; ++i) {
-        u64 a, b;
-        cin >> a >> b;
-        --a, --b;
+    auto lca = [&](u64 a, u64 b) {
+        // make depth[a] >= depth[b]
         if (depth[a] < depth[b]) {
             swap(a, b);
         }
-        if (depth[a] > depth[b]) {
-            auto delta = depth[a] - depth[b];
-            for (i64 bit = 0; bit != 31; ++bit) {
+        // make a and b the same height
+        auto delta = depth[a] - depth[b];
+        if (delta != 0) {
+            for (i64 bit = 0, end = msb(inf<int>); bit != end; ++bit) {
                 if (delta & (1 << bit)) {
-                    a = ancestor[bit][a];
+                    a = pa[a][bit];
                 }
             }
         }
         if (a == b) {
-            cout << a << '\n';
+            return a;
         }
-        else {
-            for (i64 h = lsb(n) + 1; h != -1; --h) {
-                if (ancestor[h][a] != ancestor[h][b]) {
-                    a = ancestor[h][a];
-                    b = ancestor[h][b];
-                }
+        for (u64 h = max_depth; h != -1; --h) {
+            if (pa[a][h] != pa[b][h]) {
+                a = pa[a][h];
+                b = pa[b][h];
             }
-            cout << ancestor[0][a] + 1 << '\n';
         }
+        return pa[a][0];
+    };
+
+    for (i64 i = 0; i != m; ++i) {
+        u64 a, b;
+        cin >> a >> b;
+        cout << lca(a - 1, b - 1) + 1 << '\n';
     }
 }
 

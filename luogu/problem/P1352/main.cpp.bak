@@ -719,19 +719,35 @@ template<typename F> void solve_all_cases(F solve_case, [[maybe_unused]] std::is
 
 auto solve_case()
 {
-    u64 n, M, T;
-    cin >> n >> M >> T;
-    vvu f(M + 1, vu(T + 1));
-    for (u64 k = 0; k != n; ++k) {
-        u64 m, t;
-        cin >> m >> t;
-        for (u64 i = M; i >= m; --i) {
-            for (u64 j = T; j >= t; --j) {
-                check_max(f[i][j], f[i - m][j - t] + 1);
-            }
+    u64 n;
+    cin >> n;
+    vi r(n);
+    cin >> r;
+    vb is_root(n, true);
+    vvu adj(n);
+    for (u64 i = 0; i != n - 1; ++i) {
+        u64 l, k;
+        cin >> l >> k;
+        adj[k - 1].push_back(l - 1);
+        is_root[l - 1] = false;
+    }
+    vvi f(n, vi(2));
+    auto dfs = [&](auto self, u64 u) -> void {
+        f[u][1] = r[u];
+        for (auto v: adj[u]) {
+            self(self, v);
+            f[u][0] += max(f[v][1], f[v][0]);
+            f[u][1] += max(f[v][0], i64{});
+        }
+    };
+    for (u64 i = 0; i != n; ++i) {
+        if (is_root[i]) {
+            dfs(dfs, i);
+            return max(f[i]);
         }
     }
-    return f[M][T];
+    // Unreachable
+    return i64{0};
 }
 
 int main()

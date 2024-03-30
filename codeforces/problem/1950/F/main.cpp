@@ -689,7 +689,7 @@ template<typename F> void solve_all_cases(F solve_case, [[maybe_unused]] std::is
 #endif
 {
     u64 t = 1;
-    // is >> t;
+    is >> t;
     using return_type = decltype(solve_case());
     for (u64 i = 0; i != t; ++i) {
         if constexpr (
@@ -717,21 +717,28 @@ template<typename F> void solve_all_cases(F solve_case, [[maybe_unused]] std::is
 }
 } // namespace
 
-auto solve_case()
+auto solve_case() -> i64
 {
-    u64 n, M, T;
-    cin >> n >> M >> T;
-    vvu f(M + 1, vu(T + 1));
-    for (u64 k = 0; k != n; ++k) {
-        u64 m, t;
-        cin >> m >> t;
-        for (u64 i = M; i >= m; --i) {
-            for (u64 j = T; j >= t; --j) {
-                check_max(f[i][j], f[i - m][j - t] + 1);
-            }
-        }
+    u64 a, b, c;
+    cin >> a >> b >> c;
+    if (a + 1 != c) {
+        return -1;
     }
-    return f[M][T];
+
+    if (a == 0) {
+        return b + c - 1;
+    }
+
+    auto depth = msb(a);
+    auto non_empty_nodes = a - ((1 << depth) - 1);
+    auto empty_nodes = (1 << depth) - non_empty_nodes;
+    auto width = 2 * non_empty_nodes + empty_nodes;
+    auto left = 2 << msb(a);
+    // debug("left", left);
+    b += c;
+    b = b <= left ? 0 : b - left;
+    auto h = (msb(a) + 1) + ((b + width - 1) / width);
+    return h;
 }
 
 int main()

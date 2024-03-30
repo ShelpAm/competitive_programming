@@ -719,19 +719,29 @@ template<typename F> void solve_all_cases(F solve_case, [[maybe_unused]] std::is
 
 auto solve_case()
 {
-    u64 n, M, T;
-    cin >> n >> M >> T;
-    vvu f(M + 1, vu(T + 1));
-    for (u64 k = 0; k != n; ++k) {
-        u64 m, t;
-        cin >> m >> t;
-        for (u64 i = M; i >= m; --i) {
-            for (u64 j = T; j >= t; --j) {
-                check_max(f[i][j], f[i - m][j - t] + 1);
+    u64 k, V, n;
+    cin >> k >> V >> n;
+    vvu f(V + 1, vu(1));
+    for (u64 i = 0; i != n; ++i) {
+        u64 w, v;
+        cin >> w >> v;
+        for (u64 j = V; j >= w; --j) {
+            auto g = f[j];
+            // debug("f[j]", f[j]);
+            for (u64 l = 0; l != f[j - w].size(); ++l) {
+                if (j - w == 0 || f[j - w][l] != 0) {
+                    g.push_back(f[j - w][l] + v);
+                }
+            }
+            sort(g, greater<>());
+            // debug("g", g);
+            f[j].resize(min(k, g.size()));
+            for (u64 l = 0; l != f[j].size(); ++l) {
+                f[j][l] = g[l];
             }
         }
     }
-    return f[M][T];
+    return sum(f[V]);
 }
 
 int main()

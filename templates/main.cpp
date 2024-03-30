@@ -453,6 +453,7 @@ using ds = disjoint_set;
 // i mustn't be 0
 [[maybe_unused]] constexpr u64 msb(u64 const i)
 {
+    assert(i != 0);
     return sizeof(u64) * CHAR_BIT - 1 - __builtin_clzll(i | 1);
 }
 class fenwick_tree {
@@ -688,6 +689,9 @@ void solve_all_cases(auto solve_case, [[maybe_unused]] std::istream& is)
 template<typename F> void solve_all_cases(F solve_case, [[maybe_unused]] std::istream& is)
 #endif
 {
+    constexpr auto my_precision = 10;
+    [[maybe_unused]] auto const default_precision = cout.precision(my_precision);
+
     u64 t = 1;
     // is >> t;
     using return_type = decltype(solve_case());

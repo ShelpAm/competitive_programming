@@ -453,6 +453,7 @@ using ds = disjoint_set;
 // i mustn't be 0
 [[maybe_unused]] constexpr u64 msb(u64 const i)
 {
+    assert(i != 0);
     return sizeof(u64) * CHAR_BIT - 1 - __builtin_clzll(i | 1);
 }
 class fenwick_tree {
@@ -719,19 +720,22 @@ template<typename F> void solve_all_cases(F solve_case, [[maybe_unused]] std::is
 
 auto solve_case()
 {
-    u64 n, M, T;
-    cin >> n >> M >> T;
-    vvu f(M + 1, vu(T + 1));
-    for (u64 k = 0; k != n; ++k) {
-        u64 m, t;
-        cin >> m >> t;
-        for (u64 i = M; i >= m; --i) {
-            for (u64 j = T; j >= t; --j) {
-                check_max(f[i][j], f[i - m][j - t] + 1);
-            }
-        }
+    i64 n, a, b;
+    cin >> n >> a >> b;
+    vi d(n);
+    cin >> d;
+    i64 l = 0, r = a + b - 1;
+    auto mod = a + b;
+    for (auto e: d) {
+        check_min(r, ((a - e - 1) % mod + mod) % mod);
+        check_max(l, (-e % mod + mod) % mod);
     }
-    return f[M][T];
+    if (r <= 0) {
+        r += mod;
+    }
+    debug("l", l);
+    debug("r", r);
+    cout << (l < a || r >= mod ? "Yes\n" : "No\n");
 }
 
 int main()

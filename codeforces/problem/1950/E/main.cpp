@@ -689,7 +689,7 @@ template<typename F> void solve_all_cases(F solve_case, [[maybe_unused]] std::is
 #endif
 {
     u64 t = 1;
-    // is >> t;
+    is >> t;
     using return_type = decltype(solve_case());
     for (u64 i = 0; i != t; ++i) {
         if constexpr (
@@ -719,19 +719,38 @@ template<typename F> void solve_all_cases(F solve_case, [[maybe_unused]] std::is
 
 auto solve_case()
 {
-    u64 n, M, T;
-    cin >> n >> M >> T;
-    vvu f(M + 1, vu(T + 1));
-    for (u64 k = 0; k != n; ++k) {
-        u64 m, t;
-        cin >> m >> t;
-        for (u64 i = M; i >= m; --i) {
-            for (u64 j = T; j >= t; --j) {
-                check_max(f[i][j], f[i - m][j - t] + 1);
-            }
+    u64 n;
+    cin >> n;
+    string s;
+    cin >> s;
+    set<u64> S;
+    for (u64 i = 1; i * i <= n; ++i) {
+        if (n % i == 0) {
+            S.insert(i);
+            S.insert(n / i);
         }
     }
-    return f[M][T];
+
+    S.extract(n);
+    for (auto len: S) {
+        auto ok = [&]() {
+            u64 diff_cnt_0 = 0, diff_cnt_1 = 0;
+            auto s0 = s.substr(0, len), s1 = s.substr(len, len);
+            for (u64 i = 0; i != n; ++i) {
+                if (s[i] != s[i % len]) {
+                    ++diff_cnt_0;
+                }
+                if (s[i] != s[i % len + len]) {
+                    ++diff_cnt_1;
+                }
+            }
+            return diff_cnt_0 <= 1 || diff_cnt_1 <= 1;
+        };
+        if (ok()) {
+            return len;
+        }
+    }
+    return n;
 }
 
 int main()

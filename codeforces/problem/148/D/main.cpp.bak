@@ -103,7 +103,7 @@ using quadraticu = ::std::tuple<u64, u64, u64, u64>;
 
 namespace {
 template<typename T> [[maybe_unused]] constexpr T mod = static_cast<T>(998244353);
-template<typename T> [[maybe_unused]] constexpr T inf = numeric_limits<T>::max() >> 2;
+template<typename T> [[maybe_unused]] constexpr T inf = numeric_limits<T>::max() / 4;
 [[maybe_unused]] constexpr double eps = 1e-6;
 
 namespace impl {
@@ -453,6 +453,7 @@ using ds = disjoint_set;
 // i mustn't be 0
 [[maybe_unused]] constexpr u64 msb(u64 const i)
 {
+    assert(i != 0);
     return sizeof(u64) * CHAR_BIT - 1 - __builtin_clzll(i | 1);
 }
 class fenwick_tree {
@@ -719,19 +720,27 @@ template<typename F> void solve_all_cases(F solve_case, [[maybe_unused]] std::is
 
 auto solve_case()
 {
-    u64 n, M, T;
-    cin >> n >> M >> T;
-    vvu f(M + 1, vu(T + 1));
-    for (u64 k = 0; k != n; ++k) {
-        u64 m, t;
-        cin >> m >> t;
-        for (u64 i = M; i >= m; --i) {
-            for (u64 j = T; j >= t; --j) {
-                check_max(f[i][j], f[i - m][j - t] + 1);
-            }
+    u64 n, m;
+    cin >> n >> m;
+    std::vector<std::vector<long double>> f(n + 1, std::vector<long double>(m + 1, inf<long double>));
+    f[1][0] = 1;
+    f[0][1] = 0;
+    auto p = [&](auto p, u64 i, u64 j) -> long double {
+        if (f[i][j] != inf<long double>) {
+            return f[i][j];
         }
-    }
-    return f[M][T];
+        long double ans = 0;
+        ans += static_cast<long double>(i) / (i + j);
+        if (i >= 1 && j >= 2) {
+            ans += static_cast<long double>(j) / (i + j) * (j - 1) / (i + j - 1) * i / (i + j - 2) * p(p, i - 1, j - 2);
+        }
+        if (j >= 3) {
+            ans += static_cast<long double>(j) / (i + j) * (j - 1) / (i + j - 1) * (j - 2) / (i + j - 2) * p(p, i, j - 3);
+        }
+        return f[i][j] = ans;
+    };
+    cout << std::setprecision(10);
+    return p(p, n, m);
 }
 
 int main()

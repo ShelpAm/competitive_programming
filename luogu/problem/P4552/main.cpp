@@ -719,19 +719,23 @@ template<typename F> void solve_all_cases(F solve_case, [[maybe_unused]] std::is
 
 auto solve_case()
 {
-    u64 n, M, T;
-    cin >> n >> M >> T;
-    vvu f(M + 1, vu(T + 1));
-    for (u64 k = 0; k != n; ++k) {
-        u64 m, t;
-        cin >> m >> t;
-        for (u64 i = M; i >= m; --i) {
-            for (u64 j = T; j >= t; --j) {
-                check_max(f[i][j], f[i - m][j - t] + 1);
-            }
+    u64 n;
+    cin >> n;
+    vi a(n);
+    cin >> a;
+    vi diff(n);
+    i64 sum_positive = 0, sum_negative = 0;
+    for (u64 i = 1; i != n; ++i) {
+        diff[i] = a[i] - a[i - 1];
+        if (diff[i] < 0) {
+            sum_negative += diff[i];
+        }
+        else if (diff[i] > 0) {
+            sum_positive += diff[i];
         }
     }
-    return f[M][T];
+    auto extra = abs(sum_positive + sum_negative);
+    cout << max(-sum_negative, sum_positive) << '\n' << extra + 1;
 }
 
 int main()

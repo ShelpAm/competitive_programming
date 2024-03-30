@@ -719,19 +719,38 @@ template<typename F> void solve_all_cases(F solve_case, [[maybe_unused]] std::is
 
 auto solve_case()
 {
-    u64 n, M, T;
-    cin >> n >> M >> T;
-    vvu f(M + 1, vu(T + 1));
-    for (u64 k = 0; k != n; ++k) {
-        u64 m, t;
-        cin >> m >> t;
-        for (u64 i = M; i >= m; --i) {
-            for (u64 j = T; j >= t; --j) {
-                check_max(f[i][j], f[i - m][j - t] + 1);
-            }
-        }
+    u64 n, m, q, k;
+    cin >> n >> m >> q >> k;
+    vu row(n), col(m);
+    for (u64 i = 0; i != q; ++i) {
+        u64 op, x;
+        cin >> op >> x;
+        ++(op == 1 ? row : col)[x - 1];
     }
-    return f[M][T];
+    map<u64, u64> cntr, cntc;
+    for (auto e: row) {
+        ++cntr[e % k];
+    }
+    for (auto e: col) {
+        ++cntc[e % k];
+    }
+    cntc.extract(0);
+    cntr.extract(0);
+
+    debug("cntc", cntc);
+    debug("cntr", cntr);
+    u64 sum = 0, numc = 0, numr = 0;
+    for (auto [covers, num]: cntc) {
+        sum += num * n;
+        numc += num;
+    }
+    for (auto [covers, num]: cntr) {
+        sum += num * m;
+        numr += num;
+        sum -= cntc[k - covers] * num;
+    }
+    sum -= numc * numr;
+    return sum;
 }
 
 int main()
