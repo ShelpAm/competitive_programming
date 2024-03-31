@@ -718,15 +718,28 @@ template<typename F> void solve_all_cases(F solve_case, [[maybe_unused]] std::is
 }
 } // namespace
 
-auto solve_case()
+auto solve_case() -> long double
 {
     u64 n, m;
     cin >> n >> m;
+
+    if (n == 0) {
+        return 0;
+    }
+    if (m == 0) {
+        return 1;
+    }
+
     std::vector<std::vector<long double>> f(n + 1, std::vector<long double>(m + 1, inf<long double>));
-    f[0][0] = 0;
     f[1][0] = 1;
     f[0][1] = 0;
     auto p = [&](auto p, u64 i, u64 j) -> long double {
+        if (i == 0) {
+            return 0;
+        }
+        if (j == 0) {
+            return 1;
+        }
         if (f[i][j] != inf<long double>) {
             return f[i][j];
         }

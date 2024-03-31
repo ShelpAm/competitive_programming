@@ -3,14 +3,15 @@ source utils.sh
 
 problem=$(env_get problem)
 src="${problem}/main.cpp"
-out=./build/a.out
+executable=./build/a.out
+# input="${problem}/input"}
 input="./build/input"
 input_problem=$(env_get input_problem)
 
 mkdir build -p
-rm -f $out
-clang++ -D DEBUG ${src} -g -std=c++26 -stdlib=libc++ -o ${out}
-if [ -e ${out} ]; then
+rm -f $executable
+clang++ ${src} -g -std=c++26 -stdlib=libc++ -o ${executable}
+if [ -e ${executable} ]; then
     # updates the input
     if [ "${input_problem}" != "${problem}" ] || [ ! -e ${input} ] || [ ! -s ${input} ]; then
       echo '' > ${input}
@@ -18,7 +19,7 @@ if [ -e ${out} ]; then
       env_set input_problem "${problem}"
     fi
     echo 'Program running...'
-    cat ${input} | ${out}
+    cat ${input} | ${executable}
 else
     echo 'Compilation failed. Retrying...'
     read -n 1 -r -s -p $'Press any key to continue...'

@@ -219,7 +219,7 @@ void print(auto const& t, u64 const depth = 0)
 }
 void debug([[maybe_unused]] std::string_view s, [[maybe_unused]] auto const& t)
 {
-#ifdef DEBUG
+#ifndef ONLINE_JUDGE
     std::cout << "[debug] " << s << ": ";
     print(t);
     cout.flush();
@@ -690,7 +690,8 @@ template<typename F> void solve_all_cases(F solve_case, [[maybe_unused]] std::is
 #endif
 {
     constexpr auto my_precision = 10;
-    [[maybe_unused]] auto const default_precision = cout.precision(my_precision);
+    [[maybe_unused]] auto const default_precision = std::cout.precision(my_precision);
+    std::cout << std::fixed;
 
     u64 t = 1;
     // is >> t;
