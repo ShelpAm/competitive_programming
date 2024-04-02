@@ -105,7 +105,7 @@ using quadraticu = ::std::tuple<u64, u64, u64, u64>;
 
 namespace {
 template<typename T> [[maybe_unused]] constexpr T mod = static_cast<T>(998244353);
-template<typename T> [[maybe_unused]] constexpr T inf = numeric_limits<T>::max() >> 2;
+template<typename T> [[maybe_unused]] constexpr T inf = numeric_limits<T>::max() / 4;
 [[maybe_unused]] constexpr double eps = 1e-6;
 
 namespace impl {
@@ -691,7 +691,7 @@ void solve_all_cases(auto solve_case, [[maybe_unused]] std::istream& is)
 template<typename F> void solve_all_cases(F solve_case, [[maybe_unused]] std::istream& is)
 #endif
 {
-    constexpr auto my_precision = 10;
+    constexpr auto my_precision = 2;
     [[maybe_unused]] auto const default_precision = std::cout.precision(my_precision);
     std::cout << std::fixed;
 
@@ -726,7 +726,30 @@ template<typename F> void solve_all_cases(F solve_case, [[maybe_unused]] std::is
 
 auto solve_case()
 {
-    // return 0;
+    u64 n, m;
+    cin >> n >> m;
+    std::vector<std::vector<puu>> adj(n);
+    for (u64 i = 0; i != m; ++i) {
+        u64 u, v, w;
+        cin >> u >> v >> w;
+        adj[u - 1].push_back({w, v - 1});
+    }
+
+    vd e(n, inf<double>);
+    e[n - 1] = 0;
+    auto calc = [&](auto self, u64 u) -> double {
+        if (abs(e[u] - inf<double>) > eps) {
+            return e[u];
+        }
+        double ans = 0;
+        for (auto [w, v]: adj[u]) {
+            ans += (self(self, v) + w) / adj[u].size();
+        }
+        return e[u] = ans;
+    };
+    auto res = calc(calc, 0);
+    debug("e", e);
+    return res;
 }
 
 int main()

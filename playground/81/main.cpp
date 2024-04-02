@@ -46,54 +46,40 @@ using tripleu = ::std::tuple<u64, u64, u64>;
 
 int main()
 {
-    auto replace_all = [&](string& s, string_view from, string_view to) {
-        // return;
-        auto p = s.find(from, 0);
-        while (p != string::npos) {
-            s.replace(p, from.size(), to);
-            p = s.find(from, p);
+    u64 n, m;
+    cin >> n >> m;
+    vi pa(n);
+    vvu adj(n);
+    for (u64 i = 0; i != n; ++i) {
+        cin >> pa[i];
+        if (pa[i] != -1) {
+            adj[pa[i]].push_back(i);
+        }
+    }
+
+    vu dis(n);
+    auto dfs = [&](auto self, u64 u, u64 d) -> void {
+        dis[u] = d;
+        for (auto v: adj[u]) {
+            self(self, v, d + 1);
         }
     };
-    string charset = " !?',\"./\\;:[]{}()-_=+*&^%$#@`~|";
+    dfs(dfs, 0, 0);
 
-    u64 n;
-    cin >> n;
-    cin.ignore();
-    for (u64 i = 0; i != n; ++i) {
-        string s;
-        getline(cin, s, '\n');
-        cout << s << '\n';
-
-        while (!s.empty() && s.back() == ' ') {
-            s.pop_back();
+    vb vis(n);
+    u64 ans = 0;
+    vis[0] = true;
+    for (u64 i = 0; i != m; ++i) {
+        u64 x;
+        cin >> x;
+        --x;
+        u64 d = 0;
+        while (!vis[x]) {
+            x = pa[x];
+            ++d;
+            vis[x] = true;
         }
-        auto first_not_space = s.find_first_not_of(' ');
-        if (first_not_space != string::npos) {
-            s = s.substr(first_not_space);
-        }
-
-        for (auto ch: charset) {
-            replace_all(s, string{" "} + ch, string{ch});
-        }
-        for (auto& ch: s) {
-            if (isalpha(ch) && ch != 'I') {
-                ch = tolower(ch);
-            }
-            else if (ch == '?') {
-                ch = '!';
-            }
-        }
-        s = ' ' + s;
-        vector<pair<string, string>> mp{{"i", "I"}, {"me", "you"}, {"I", "you"}, {"can you", "I can"}, {"could you", "I could"}};
-        for (auto l: charset) {
-            for (auto r: charset) {
-                for (auto const& [from, to]: mp) {
-                    replace_all(s, string{l} + from + r, string{l} + to + r);
-                }
-            }
-        }
-        s = s.substr(1);
-        cout << "AI: " << s << '\n';
+        ans += d;
+        cout << ans << '\n';
     }
 }
-

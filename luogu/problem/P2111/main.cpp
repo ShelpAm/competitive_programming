@@ -691,7 +691,7 @@ void solve_all_cases(auto solve_case, [[maybe_unused]] std::istream& is)
 template<typename F> void solve_all_cases(F solve_case, [[maybe_unused]] std::istream& is)
 #endif
 {
-    constexpr auto my_precision = 10;
+    constexpr auto my_precision = 3;
     [[maybe_unused]] auto const default_precision = std::cout.precision(my_precision);
     std::cout << std::fixed;
 
@@ -726,7 +726,26 @@ template<typename F> void solve_all_cases(F solve_case, [[maybe_unused]] std::is
 
 auto solve_case()
 {
-    // return 0;
+    u64 n, a, q;
+    cin >> n >> a >> q;
+    string s;
+    cin >> s;
+    vd p(n + 1);
+    p[0] = 1;
+
+    auto k = static_cast<double>(a) / 100;
+    for (auto ch: s) {
+        auto right = (ch == '1' ? k : 1 - k);
+        auto wrong = 1 - right;
+        for (u64 i = n; i != -1; --i) {
+            p[i] = p[i] * wrong + (i >= 1 ? p[i - 1] * right : 0);
+        }
+    }
+    double e = 0;
+    for (u64 i = q; i != n + 1; ++i) {
+        e += p[i];
+    }
+    return e;
 }
 
 int main()

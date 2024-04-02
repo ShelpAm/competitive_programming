@@ -46,30 +46,36 @@ using tripleu = ::std::tuple<u64, u64, u64>;
 
 int main()
 {
-    u64 n, m, k;
-    cin >> n >> m >> k;
-    for (u64 i = 0; i != k; ++i) {
-        stack<u64> S;
-        u64 cur = 1;
-        bool ok = true;
-        for (u64 j = 0; j != n; ++j) {
-            u64 x;
-            cin >> x;
-            if (x == cur) {
-                ++cur;
-            }
-            else {
-                S.push(x);
-                if (S.size() > m) {
-                    ok = false;
+    u64 n;
+    cin >> n;
+    vector<vector<string>> nums(n);
+    for (u64 i = 0; i != n; ++i) {
+        string s;
+        cin >> s;
+        auto p = s.find('.');
+        decltype(p) last = 0;
+        while (p != string::npos) {
+            nums[i].push_back(s.substr(last, p - 1));
+            last = p + 1;
+            p = s.find('.', p + 1);
+        }
+        nums[i].push_back(s.substr(last));
+        reverse(nums[i].begin(), nums[i].end());
+    }
+    map<string, string> pa;
+    for (u64 bit = 0; bit != 5; ++bit) {
+        for (u64 i = 1; i != n; ++i) {
+            if (nums[i].size() > bit && nums[i - 1].size() > bit) {
+                bool hi_same = nums[i].size() == nums[i - 1].size();
+                for (u64 j = bit + 1; j != 5; ++j) {
+                    if (nums[i][j] != nums[i - 1][j]) {
+                        hi_same = false;
+                    }
+                }
+                if (hi_same) {
+                    pa[nums[i - 1][bit]] = nums[i][bit];
                 }
             }
-            while (!S.empty() && cur == S.top()) {
-                ++cur;
-                S.pop();
-            }
-            // cout << "TOP: " << (!S.empty() ? S.top() : -1) << " x: " << x << '\n';
         }
-        cout << (S.empty() && ok ? "YES\n" : "NO\n");
     }
 }

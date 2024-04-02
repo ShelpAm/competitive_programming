@@ -726,7 +726,100 @@ template<typename F> void solve_all_cases(F solve_case, [[maybe_unused]] std::is
 
 auto solve_case()
 {
-    // return 0;
+    auto ok = [&](vu const& choice) {
+        // 第二题
+        vu mp{2, 3, 0, 1};
+        if (choice[4] != mp[choice[1]]) {
+            return false;
+        }
+        // 第三题
+        {
+            vu opts{choice[2], choice[5], choice[1], choice[3]};
+            map<u64, u64> cnt;
+            for (auto e: opts) {
+                ++cnt[e];
+            }
+            if (cnt.size() != 2 || (cnt.begin()->second != 3 && cnt.rbegin()->second != 3)) {
+                return false;
+            }
+        }
+        // 第四题
+        {
+            vb right{choice[0] == choice[4], choice[1] == choice[6], choice[0] == choice[8], choice[5] == choice[9]};
+            if (count(right, true) != 1 || choice[3] != (find(right, true) - right.begin())) {
+                return false;
+            }
+        }
+        // 第五题
+        {
+            vu ans{7, 3, 8, 6};
+            if (choice[4] != choice[ans[choice[4]]]) {
+                return false;
+            }
+        }
+        // 第六题
+        {
+            std::vector<puu> p{{choice[1], choice[3]}, {choice[0], choice[5]}, {choice[2], choice[9]}, {choice[4], choice[8]}};
+            u64 ok_cnt = 0;
+            u64 ok_choice = -1;
+            for (u64 j = 0; j != 4; ++j) {
+                auto [a, b] = p[j];
+                if (a == b && choice[7] == a) {
+                    ++ok_cnt;
+                    ok_choice = j;
+                }
+            }
+            if (ok_cnt != 1 || ok_choice != choice[5]) {
+                return false;
+            }
+        }
+        // 第七题
+        {
+            vu mp{2, 1, 0, 3};
+            map<u64, u64> cnt;
+            for (auto e: choice) {
+                ++cnt[e];
+            }
+            if (mp[choice[6]] != cnt.begin()->first) {
+                return false;
+            }
+        }
+        // 第九题
+        {
+            bool is = choice[0] == choice[5];
+            vu mp{5, 9, 1, 8};
+            if (is == (mp[choice[8]] == choice[4])) {
+                return false;
+            }
+        }
+        // 第十题
+        {
+            map<u64, u64> cnt;
+            for (auto e: choice) {
+                ++cnt[e];
+            }
+            vu mp{2, 4, 3, 1};
+            if (cnt.rbegin()->second - cnt.begin()->second != mp[choice[9]]) {
+                return false;
+            }
+        }
+        return true;
+    };
+    u64 end = 2 << 20;
+    for (u64 i = 0; i != end; ++i) {
+        vu choice(10);
+        auto tmp = i;
+        for (u64 j = 0; j != 10; ++j) {
+            choice[j] = tmp % 4;
+            tmp /= 4;
+        }
+        if (ok(choice)) {
+            for (auto e: choice) {
+                cout << static_cast<char>(e + 'A');
+            }
+            cout << '\n';
+        }
+    }
 }
 
 int main()
