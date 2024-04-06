@@ -252,7 +252,7 @@ template<typename T> constexpr bool check_min(T& value, T const& other)
     return false;
 }
 #ifdef __cpp_concepts
-constexpr auto sum(auto const& coll) noexcept
+constexpr auto sum_of(auto const& coll) noexcept
 #else
 template<typename Range> constexpr auto sum(Range const& coll) noexcept
 #endif

@@ -696,7 +696,7 @@ template<typename F> void solve_all_cases(F solve_case, [[maybe_unused]] std::is
     std::cout << std::fixed;
 
     u64 t = 1;
-    // is >> t;
+    is >> t;
     using return_type = decltype(solve_case());
     for (u64 i = 0; i != t; ++i) {
         if constexpr (
@@ -728,34 +728,13 @@ auto solve_case()
 {
     u64 n;
     cin >> n;
-    vu color(n + 1);
-    for (u64 i = 1; i <= n; ++i) {
-        cin >> color[i];
+    vu a(n);
+    set<u64> s;
+    for (auto& e: a) {
+        cin >> e;
+        s.insert(e);
     }
-    vvu adj(n + 1);
-    for (u64 i = 2; i <= n; ++i) {
-        u64 pa;
-        cin >> pa;
-        adj[pa].push_back(i);
-    }
-
-    u64 mx = 0;
-    vu id(n + 1);
-    u64 ans = 0;
-    auto dfs = [&](auto self, u64 u, u64 dfn) -> void {
-        check_max(mx, id[color[u]]);
-        id[color[u]] = dfn;
-
-        for (auto const v: adj[u]) {
-            self(self, v, dfn + 1);
-        }
-
-        if (mx < dfn) {
-            ++ans;
-        }
-    };
-    dfs(dfs, 1, 1);
-    cout << ans << '\n';
+    cout << (s.size() == 1 ? n : n - 1) << '\n';
 }
 
 int main()

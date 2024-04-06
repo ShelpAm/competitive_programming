@@ -728,34 +728,70 @@ auto solve_case()
 {
     u64 n;
     cin >> n;
-    vu color(n + 1);
-    for (u64 i = 1; i <= n; ++i) {
-        cin >> color[i];
-    }
-    vvu adj(n + 1);
-    for (u64 i = 2; i <= n; ++i) {
-        u64 pa;
-        cin >> pa;
-        adj[pa].push_back(i);
+    vu a(n);
+    cin >> a;
+    a.resize(2 * n);
+    for (u64 i = 0; i != n; ++i) {
+        a[i + n] = a[i];
     }
 
-    u64 mx = 0;
-    vu id(n + 1);
-    u64 ans = 0;
-    auto dfs = [&](auto self, u64 u, u64 dfn) -> void {
-        check_max(mx, id[color[u]]);
-        id[color[u]] = dfn;
-
-        for (auto const v: adj[u]) {
-            self(self, v, dfn + 1);
+    vu right(2 * n, inf<u64>);
+    vu dis(2 * n);
+    vb pointed(2 * n);
+    multimap<u64, u64> mp;
+    for (u64 i = 0; i != 2 * n; ++i) {
+        auto lo = mp.upper_bound(a[i]);
+        for (auto it = lo; it != mp.end();) {
+            right[it->second] = i;
+            dis[it->second] = i - it->second;
+            pointed[i] = true;
+            it = mp.erase(it);
         }
+        mp.insert({a[i], i});
+    }
 
-        if (mx < dfn) {
-            ++ans;
+    debug("a", a);
+    debug("right", right);
+
+    u64 dropping = 0;
+    u64 ans = std::accumulate(a.begin(), a.begin() + n, 0);
+    vvu left_sides(2);
+    u64 xl = 0;
+    left_sides[0].reserve(n);
+    left_sides[1].reserve(n);
+    vvu point_in_dis(n + 1);
+    for (u64 i = 0; i != n; ++i) {
+        if (dis[i] == 1) {
+            dropping += a[i] - a[right[i]];
         }
-    };
-    dfs(dfs, 1, 1);
-    cout << ans << '\n';
+        if (!pointed[i] && dis[i] == 1) {
+            left_sides[xl].push_back(i);
+        }
+        if (right[i] != inf<u64> && dis[i] != 1) {
+            point_in_dis[dis[i]].push_back(i);
+        }
+    }
+
+    for (u64 t = 1; t != n + 1; ++t) {
+        for (auto const j: point_in_dis[t]) {
+            dropping += a[j] - a[right[j]];
+            // left_sides[xl].push_back(j);
+        }
+        debug("t   ", t);
+        debug("dropping", dropping);
+        debug("left_sides", left_sides[xl]);
+        ans -= dropping;
+        cout << ans << '\n';
+        for (auto side: left_sides[xl]) {
+            dropping -= a[side] - a[right[side]];
+            if (right[right[side]] != inf<u64>) {
+                cout << "------ adding edge from " << side << " to " << right[side] << '\n';
+                left_sides[xl ^ 1].push_back(right[side]);
+            }
+        }
+        left_sides[xl].clear();
+        xl ^= 1;
+    }
 }
 
 int main()

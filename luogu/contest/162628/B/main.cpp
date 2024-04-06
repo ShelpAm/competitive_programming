@@ -691,7 +691,7 @@ void solve_all_cases(auto solve_case, [[maybe_unused]] std::istream& is)
 template<typename F> void solve_all_cases(F solve_case, [[maybe_unused]] std::istream& is)
 #endif
 {
-    constexpr auto my_precision = 10;
+    constexpr auto my_precision = 5;
     [[maybe_unused]] auto const default_precision = std::cout.precision(my_precision);
     std::cout << std::fixed;
 
@@ -724,38 +724,110 @@ template<typename F> void solve_all_cases(F solve_case, [[maybe_unused]] std::is
 }
 } // namespace
 
+auto inv(u64 u)
+{
+    return pow(u, mod<u64> - 2, mod<u64>);
+}
 auto solve_case()
 {
-    u64 n;
-    cin >> n;
-    vu color(n + 1);
-    for (u64 i = 1; i <= n; ++i) {
-        cin >> color[i];
-    }
-    vvu adj(n + 1);
-    for (u64 i = 2; i <= n; ++i) {
-        u64 pa;
-        cin >> pa;
-        adj[pa].push_back(i);
-    }
+    u64 n, rounds;
+    cin >> n >> rounds;
+    vu a(n * n), b(n * n);
+    cin >> a >> b;
+    u64 sum_all_cards = sum(a);
+    u64 num_states = 1 << (n * n);
 
-    u64 mx = 0;
-    vu id(n + 1);
-    u64 ans = 0;
-    auto dfs = [&](auto self, u64 u, u64 dfn) -> void {
-        check_max(mx, id[color[u]]);
-        id[color[u]] = dfn;
-
-        for (auto const v: adj[u]) {
-            self(self, v, dfn + 1);
+    auto bad = [n](u64 j) {
+        for (u64 k = 0; k != n; ++k) {
+            u64 num_ons = 0;
+            for (u64 l = 0; l != n; ++l) {
+                if ((j & (1 << l << (n * k))) != 0) {
+                    ++num_ons;
+                }
+            }
+            if (num_ons > 1) {
+                return true;
+            }
         }
-
-        if (mx < dfn) {
-            ++ans;
+        for (u64 k = 0; k != n; ++k) {
+            u64 num_ons = 0;
+            for (u64 l = 0; l != n; ++l) {
+                if ((j & (1 << k << (n * l))) != 0) {
+                    ++num_ons;
+                }
+            }
+            if (num_ons > 1) {
+                return true;
+            }
         }
+        return false;
     };
-    dfs(dfs, 1, 1);
-    cout << ans << '\n';
+
+    {
+        vvu p(100 * rounds * rounds * rounds * rounds * rounds + 1, vu(num_states));
+        p[0][0] = 1;
+        for (u64 i = 1; i != p.size(); ++i) {
+            for (u64 j = 1; j != num_states; ++j) {
+                if (bad(j)) {
+                    continue;
+                }
+                for (u64 k = 0; k != n * n; ++k) {
+                    if ((j & (1 << k)) != 0) {
+                        p[i][j] += a[k] * inv(sum_all_cards - __builtin_popcount(j) + 1) % mod<u64> * p[i - 1][j ^ (1 << k)];
+                        p[i][j] %= mod<u64>;
+                    }
+                }
+            }
+            p[i][0] = 1 + mod<u64> * mod<u64> - sum(p[i]);
+            p[i][0] %= mod<u64>;
+        }
+        debug("p", p);
+        u64 e = 0;
+        for (u64 i = 1; i <= rounds; ++i) {
+            for (u64 j = 0; j != num_states; ++j) {
+                for (u64 k = 0; k != n * n; ++k) {
+                    if ((j & (1 << k)) != 0) {
+                        e += (p[i][j] * b[k]) % mod<u64>;
+                        e %= mod<u64>;
+                    }
+                }
+            }
+        }
+        debug("e", e);
+    }
+
+    {
+        vvd p(rounds + 1, vd(num_states));
+        p[0][0] = 1;
+        for (u64 i = 1; i != p.size(); ++i) {
+            for (u64 j = 1; j != num_states; ++j) {
+                if (bad(j)) {
+                    continue;
+                }
+                for (u64 k = 0; k != n * n; ++k) {
+                    if ((j & (1 << k)) != 0) {
+                        p[i][j] += static_cast<double>(a[k]) / static_cast<double>(sum_all_cards - __builtin_popcount(j) + 1)
+                                   * p[i - 1][j ^ (1 << k)];
+                    }
+                }
+            }
+            assert(p[i][0] == 0);
+            p[i][0] = 1 - sum(p[i]);
+        }
+        debug("p", p);
+        double e = 0;
+        for (u64 i = 1; i <= rounds; ++i) {
+            for (u64 j = 0; j != num_states; ++j) {
+                for (u64 k = 0; k != n * n; ++k) {
+                    if (j & (1 << k)) {
+                        e += p[i][j] * b[k];
+                        // debug("new e", p[i][j] * b[k]);
+                    }
+                }
+            }
+        }
+        debug("e", e);
+    }
 }
 
 int main()

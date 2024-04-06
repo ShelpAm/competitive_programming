@@ -222,7 +222,7 @@ void print(auto const& t, u64 const depth = 0)
 void debug([[maybe_unused]] std::string_view s, [[maybe_unused]] auto const& t)
 {
 #ifndef ONLINE_JUDGE
-    std::cout << "[debug] " << s << ": ";
+    std::cout << "[debug] " << s << ": \n";
     print(t);
     cout.flush();
 #endif
@@ -715,7 +715,7 @@ template<typename F> void solve_all_cases(F solve_case, [[maybe_unused]] std::is
             std::is_same_v<return_type, bool>
 #endif
         ) {
-            print(solve_case() ? "YES" : "NO");
+            print(solve_case() ? "Yes" : "No");
         }
         else {
             print(solve_case());
@@ -726,36 +726,65 @@ template<typename F> void solve_all_cases(F solve_case, [[maybe_unused]] std::is
 
 auto solve_case()
 {
-    u64 n;
-    cin >> n;
-    vu color(n + 1);
-    for (u64 i = 1; i <= n; ++i) {
-        cin >> color[i];
-    }
-    vvu adj(n + 1);
-    for (u64 i = 2; i <= n; ++i) {
-        u64 pa;
-        cin >> pa;
-        adj[pa].push_back(i);
-    }
-
-    u64 mx = 0;
-    vu id(n + 1);
-    u64 ans = 0;
-    auto dfs = [&](auto self, u64 u, u64 dfn) -> void {
-        check_max(mx, id[color[u]]);
-        id[color[u]] = dfn;
-
-        for (auto const v: adj[u]) {
-            self(self, v, dfn + 1);
+    u64 H, W;
+    cin >> H >> W;
+    vvc A(H, vc(W));
+    vvb reachable(H, vb(W));
+    cin >> A;
+    puu S, T;
+    for (u64 i = 0; i != H; ++i) {
+        for (u64 j = 0; j != W; ++j) {
+            if (A[i][j] == 'S') {
+                S = {i, j};
+            }
+            if (A[i][j] == 'T') {
+                T = {i, j};
+            }
         }
+    }
+    u64 N;
+    cin >> N;
+    vvu E(H, vu(W));
+    for (u64 i = 0; i != N; ++i) {
+        u64 R, C, e;
+        cin >> R >> C >> e;
+        --R, --C;
+        E[R][C] = e;
+    }
 
-        if (mx < dfn) {
-            ++ans;
+    std::vector<pii> const dirs{{1, 0}, {0, 1}, {-1, 0}, {0, -1}};
+    priority_queue<tripleu> q;
+    vvb vis(H, vb(W));
+    vvi f(H, vi(W, -1));
+    q.push({f[S.first][S.second] = E[S.first][S.second], S.first, S.second});
+    while (!q.empty()) {
+        auto const [e, x, y] = q.top();
+        q.pop();
+        if (e == 0) {
+            continue;
         }
-    };
-    dfs(dfs, 1, 1);
-    cout << ans << '\n';
+        E[x][y] = 0;
+        // if (vis[x][y]) {
+        //     continue;
+        // }
+        // vis[x][y] = true;
+        for (auto const& [dx, dy]: dirs) {
+            auto const neox = x + dx, neoy = y + dy;
+            if (neox >= H || neoy >= W) {
+                continue;
+            }
+            i64 alt = max(e - 1, E[neox][neoy]);
+            if (A[neox][neoy] == 'T') {
+                return true;
+            }
+            if (A[neox][neoy] != '#' && f[neox][neoy] < alt) {
+                f[neox][neoy] = alt;
+                q.push({alt, neox, neoy});
+            }
+        }
+    }
+    debug("f", f);
+    return false;
 }
 
 int main()

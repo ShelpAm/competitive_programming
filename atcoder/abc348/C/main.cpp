@@ -728,34 +728,17 @@ auto solve_case()
 {
     u64 n;
     cin >> n;
-    vu color(n + 1);
-    for (u64 i = 1; i <= n; ++i) {
-        cin >> color[i];
+    std::map<u64, set<u64>> diliciousness;
+    for (u64 i = 0; i != n; ++i) {
+        u64 a, c;
+        cin >> a >> c;
+        diliciousness[c].insert(a);
     }
-    vvu adj(n + 1);
-    for (u64 i = 2; i <= n; ++i) {
-        u64 pa;
-        cin >> pa;
-        adj[pa].push_back(i);
-    }
-
-    u64 mx = 0;
-    vu id(n + 1);
     u64 ans = 0;
-    auto dfs = [&](auto self, u64 u, u64 dfn) -> void {
-        check_max(mx, id[color[u]]);
-        id[color[u]] = dfn;
-
-        for (auto const v: adj[u]) {
-            self(self, v, dfn + 1);
-        }
-
-        if (mx < dfn) {
-            ++ans;
-        }
-    };
-    dfs(dfs, 1, 1);
-    cout << ans << '\n';
+    for (auto const& [k, v]: diliciousness) {
+        check_max(ans, *v.begin());
+    }
+    return ans;
 }
 
 int main()

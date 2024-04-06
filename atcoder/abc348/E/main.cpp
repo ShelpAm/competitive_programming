@@ -726,36 +726,43 @@ template<typename F> void solve_all_cases(F solve_case, [[maybe_unused]] std::is
 
 auto solve_case()
 {
-    u64 n;
-    cin >> n;
-    vu color(n + 1);
-    for (u64 i = 1; i <= n; ++i) {
-        cin >> color[i];
+    u64 N;
+    cin >> N;
+    vvu adj(N);
+    for (u64 i = 0; i != N - 1; ++i) {
+        u64 A, B;
+        cin >> A >> B;
+        --A, --B;
+        adj[A].push_back(B);
+        adj[B].push_back(A);
     }
-    vvu adj(n + 1);
-    for (u64 i = 2; i <= n; ++i) {
-        u64 pa;
-        cin >> pa;
-        adj[pa].push_back(i);
-    }
-
-    u64 mx = 0;
-    vu id(n + 1);
-    u64 ans = 0;
-    auto dfs = [&](auto self, u64 u, u64 dfn) -> void {
-        check_max(mx, id[color[u]]);
-        id[color[u]] = dfn;
-
+    vu C(N);
+    cin >> C;
+    vu depth(N), size(N);
+    u64 f = 0;
+    auto dfs = [&](auto self, u64 u, u64 d, u64 p) -> void {
+        depth[u] = d;
+        f += C[u] * depth[u];
+        size[u] = C[u];
         for (auto const v: adj[u]) {
-            self(self, v, dfn + 1);
-        }
-
-        if (mx < dfn) {
-            ++ans;
+            if (v != p) {
+                self(self, v, d + 1, u);
+                size[u] += size[v];
+            }
         }
     };
-    dfs(dfs, 1, 1);
-    cout << ans << '\n';
+    dfs(dfs, 0, 0, -1);
+    u64 ans = f;
+    auto modify_root = [&](auto self, u64 u, u64 d, u64 p) -> void {
+        check_min(ans, d);
+        for (auto const v: adj[u]) {
+            if (v != p) {
+                self(self, v, d + size[0] - 2 * size[v], u);
+            }
+        }
+    };
+    modify_root(modify_root, 0, f, -1);
+    return ans;
 }
 
 int main()

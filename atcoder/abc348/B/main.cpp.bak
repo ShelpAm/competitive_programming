@@ -728,34 +728,21 @@ auto solve_case()
 {
     u64 n;
     cin >> n;
-    vu color(n + 1);
-    for (u64 i = 1; i <= n; ++i) {
-        cin >> color[i];
-    }
-    vvu adj(n + 1);
-    for (u64 i = 2; i <= n; ++i) {
-        u64 pa;
-        cin >> pa;
-        adj[pa].push_back(i);
-    }
-
-    u64 mx = 0;
-    vu id(n + 1);
-    u64 ans = 0;
-    auto dfs = [&](auto self, u64 u, u64 dfn) -> void {
-        check_max(mx, id[color[u]]);
-        id[color[u]] = dfn;
-
-        for (auto const v: adj[u]) {
-            self(self, v, dfn + 1);
+    std::vector<pii> pts(n);
+    cin >> pts;
+    for (u64 i = 0; i != n; ++i) {
+        auto [x, y] = pts[i];
+        u64 id = 0;
+        double len = 0;
+        for (u64 j = 0; j != n; ++j) {
+            auto [a, b] = pts[j];
+            double dis = sqrt((x - a) * (x - a) + (y - b) * (y - b));
+            if (dis > len) {
+                id = j;
+            }
         }
-
-        if (mx < dfn) {
-            ++ans;
-        }
-    };
-    dfs(dfs, 1, 1);
-    cout << ans << '\n';
+        cout << id + 1 << '\n';
+    }
 }
 
 int main()

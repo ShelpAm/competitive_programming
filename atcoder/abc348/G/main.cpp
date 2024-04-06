@@ -726,36 +726,40 @@ template<typename F> void solve_all_cases(F solve_case, [[maybe_unused]] std::is
 
 auto solve_case()
 {
-    u64 n;
-    cin >> n;
-    vu color(n + 1);
-    for (u64 i = 1; i <= n; ++i) {
-        cin >> color[i];
+    u64 N;
+    cin >> N;
+    std::vector<pii> p(N);
+    cin >> p;
+    multiset<pii, decltype([](auto const& l, auto const& r) { return l.first + r.second < r.first + l.second; })> a_b;
+    multiset<pii> a;
+    for (auto const& e: p) {
+        a_b.insert(e);
+        // a.insert(e);
     }
-    vvu adj(n + 1);
-    for (u64 i = 2; i <= n; ++i) {
-        u64 pa;
-        cin >> pa;
-        adj[pa].push_back(i);
+    i64 S = a_b.rbegin()->first, M = a_b.rbegin()->second;
+    cout << S - M << '\n';
+    for (u64 i = 1; i != N; ++i) {
+        while (!a_b.empty() && a_b.rbegin()->second <= M) {
+            auto it = prev(a_b.end());
+            a.insert({it->first, it->second});
+            a_b.extract(it);
+        }
+        auto from_a = a.rbegin()->first;
+        auto from_a_b = a_b.rbegin()->first - a_b.rbegin()->second;
+        if (from_a_b >= from_a) {
+            S += from_a_b;
+            assert(M < a_b.rbegin()->second);
+            M = a_b.rbegin()->second;
+            a_b.extract(prev(a_b.end()));
+        }
+        else {
+            S += from_a;
+            check_max(M, a.rbegin()->second);
+            a.extract(prev(a.end()));
+        }
+        debug("S M", puu{S, M});
+        cout << S - M << '\n';
     }
-
-    u64 mx = 0;
-    vu id(n + 1);
-    u64 ans = 0;
-    auto dfs = [&](auto self, u64 u, u64 dfn) -> void {
-        check_max(mx, id[color[u]]);
-        id[color[u]] = dfn;
-
-        for (auto const v: adj[u]) {
-            self(self, v, dfn + 1);
-        }
-
-        if (mx < dfn) {
-            ++ans;
-        }
-    };
-    dfs(dfs, 1, 1);
-    cout << ans << '\n';
 }
 
 int main()

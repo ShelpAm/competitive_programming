@@ -724,38 +724,39 @@ template<typename F> void solve_all_cases(F solve_case, [[maybe_unused]] std::is
 }
 } // namespace
 
-auto solve_case()
+auto solve_case() -> i64
 {
-    u64 n;
-    cin >> n;
-    vu color(n + 1);
-    for (u64 i = 1; i <= n; ++i) {
-        cin >> color[i];
-    }
-    vvu adj(n + 1);
-    for (u64 i = 2; i <= n; ++i) {
-        u64 pa;
-        cin >> pa;
-        adj[pa].push_back(i);
-    }
-
-    u64 mx = 0;
-    vu id(n + 1);
-    u64 ans = 0;
-    auto dfs = [&](auto self, u64 u, u64 dfn) -> void {
-        check_max(mx, id[color[u]]);
-        id[color[u]] = dfn;
-
-        for (auto const v: adj[u]) {
-            self(self, v, dfn + 1);
+    u64 n, x, M, m;
+    cin >> n >> x >> M >> m;
+    vvu f(n, vu(M - m + 1));
+    vu s(n);
+    for (u64 i = 0; i != n; ++i) {
+        u64 k;
+        cin >> k;
+        vu v(k), w(k);
+        cin >> w >> v;
+        for (u64 j = 0; j != k; ++j) {
+            s[i] += v[i];
+            for (u64 l = f[i].size() - 1; l != v[i] - 1; --l) {
+                check_min(f[i][l], f[i][l - v[j]] + w[j]);
+            }
         }
-
-        if (mx < dfn) {
-            ++ans;
+    }
+    i64 const target = static_cast<i64>(x) - static_cast<i64>(n * m);
+    if (target <= 0) {
+        return i64{0};
+    }
+    vu g(target + 1, inf<u64>);
+    for (u64 i = 0; i != n; ++i) {
+        for (u64 j = 1; j <= s[i]; ++j) {
+            auto const w = f[i][j];
+            auto const v = j;
+            for (u64 k = M - m; k >= v; --k) {
+                check_min(g[k], g[k - v] + w);
+            }
         }
-    };
-    dfs(dfs, 1, 1);
-    cout << ans << '\n';
+    }
+    return g[target] == inf<u64> ? -1 : g[target];
 }
 
 int main()

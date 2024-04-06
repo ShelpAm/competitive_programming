@@ -696,7 +696,7 @@ template<typename F> void solve_all_cases(F solve_case, [[maybe_unused]] std::is
     std::cout << std::fixed;
 
     u64 t = 1;
-    // is >> t;
+    is >> t;
     using return_type = decltype(solve_case());
     for (u64 i = 0; i != t; ++i) {
         if constexpr (
@@ -724,38 +724,39 @@ template<typename F> void solve_all_cases(F solve_case, [[maybe_unused]] std::is
 }
 } // namespace
 
-auto solve_case()
+auto solve_case() -> u64
 {
     u64 n;
     cin >> n;
-    vu color(n + 1);
-    for (u64 i = 1; i <= n; ++i) {
-        cin >> color[i];
-    }
-    vvu adj(n + 1);
-    for (u64 i = 2; i <= n; ++i) {
-        u64 pa;
-        cin >> pa;
-        adj[pa].push_back(i);
-    }
-
-    u64 mx = 0;
-    vu id(n + 1);
-    u64 ans = 0;
-    auto dfs = [&](auto self, u64 u, u64 dfn) -> void {
-        check_max(mx, id[color[u]]);
-        id[color[u]] = dfn;
-
-        for (auto const v: adj[u]) {
-            self(self, v, dfn + 1);
+    string s;
+    cin >> s;
+    vu a{0};
+    char last = s.front();
+    for (auto const ch: s) {
+        if (ch == last) {
+            ++a.back();
         }
-
-        if (mx < dfn) {
-            ++ans;
+        else {
+            a.push_back(1);
+            last = ch;
         }
-    };
-    dfs(dfs, 1, 1);
-    cout << ans << '\n';
+    }
+
+    u64 mx = 0, mn = a.size();
+    for (u64 i = 0; i != a.size(); ++i) {
+        if (a[i] != 1) {
+            check_max(mx, max(i + 1, a.size() - i));
+        }
+        if (i != 0 && i != a.size() - 1 && a[i] != 1) {
+            --mn;
+        }
+    }
+    if (mx == 0) {
+        return 0;
+    }
+    check_max(mn, a.size() / 2 + 1);
+    debug("mx mn", puu{mx, mn});
+    return mx - mn;
 }
 
 int main()
