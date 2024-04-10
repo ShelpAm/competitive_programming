@@ -252,7 +252,7 @@ template<typename T> constexpr bool check_min(T& value, T const& other)
     return false;
 }
 #ifdef __cpp_concepts
-constexpr auto sum(auto const& coll) noexcept
+constexpr auto sum_of(auto const& coll) noexcept
 #else
 template<typename Range> constexpr auto sum(Range const& coll) noexcept
 #endif
@@ -696,7 +696,7 @@ template<typename F> void solve_all_cases(F solve_case, [[maybe_unused]] std::is
     std::cout << std::fixed;
 
     u64 t = 1;
-    is >> t;
+    // is >> t;
     using return_type = decltype(solve_case());
     for (u64 i = 0; i != t; ++i) {
         if constexpr (
@@ -724,28 +724,48 @@ template<typename F> void solve_all_cases(F solve_case, [[maybe_unused]] std::is
 }
 } // namespace
 
+template<typename T> struct vec2 {
+    T x, y;
+    vec2<T>& operator<<(int i)
+    {
+        x <<= i;
+        y <<= i;
+        return *this;
+    }
+    bool operator<(vec2<T> const& rhs) const { return x < rhs.x; }
+};
+struct T {
+    int& a;
+    void operator()(int i) { a = i; }
+    operator int() { return a; }
+};
 auto solve_case()
 {
-    u64 N, M;
-    cin >> N >> M;
-    u64 p = 1;
-    u64 i = 1;
-    u64 cur = 0;
-    for (; i != -1; ++i) {
-        if (N < cur + (M - 1) * p) {
-            break;
-        }
-        cur += (M - 1) * p * i;
-        p *= M;
-    }
-    auto const t = (N - cur) / (i + 1);
-    auto const r = (N - cur) % (i + 1);
-    auto s = std::to_string(cur + t);
-    debug("s", s);
-    debug("t r", puu{t, r});
-    cout << s[r] << '\n';
-}
+    constexpr int o = 10;
+    vu a(o);
+    int i = o;
+    // T t;
+    // cout << t << '\n';
+    // t(1);
+    // cout << t << '\n';
+    // cout << "i: " << i << '\n';
+    auto t = [&](int a) {
+        cout << i << '\n';
+        return i;
+    };
 
+    auto dfs = [&](auto self, int u) {
+        if (u == 3) {
+            return u;
+        }
+        cout << u << '\n';
+        return self(self, u + 1);
+    };
+    // int b = b;
+    dfs(dfs, 0);
+
+    auto p = t(5);
+}
 int main()
 {
     impl::io_accelerator accelerator;

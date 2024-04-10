@@ -252,7 +252,7 @@ template<typename T> constexpr bool check_min(T& value, T const& other)
     return false;
 }
 #ifdef __cpp_concepts
-constexpr auto sum(auto const& coll) noexcept
+constexpr auto sum_of(auto const& coll) noexcept
 #else
 template<typename Range> constexpr auto sum(Range const& coll) noexcept
 #endif
@@ -726,24 +726,34 @@ template<typename F> void solve_all_cases(F solve_case, [[maybe_unused]] std::is
 
 auto solve_case()
 {
-    u64 N, M;
-    cin >> N >> M;
-    u64 p = 1;
-    u64 i = 1;
-    u64 cur = 0;
-    for (; i != -1; ++i) {
-        if (N < cur + (M - 1) * p) {
-            break;
+    u64 n;
+    cin >> n;
+    string s;
+    cin >> s;
+    for (u64 k = n; k != 0; --k) {
+        auto ok = [&]() {
+            vi dec(n + 1);
+            i64 cur = 0;
+            for (u64 i = 0; i + k - 1 != n; ++i) {
+                cur += dec[i];
+                if ((s[i] + cur) % 2 == 0) {
+                    --dec[i + k];
+                    ++cur;
+                }
+            }
+            for (u64 i = n - k + 1; i != n; ++i) {
+                cur += dec[i];
+                if ((s[i] + cur) % 2 == 0) {
+                    return false;
+                }
+            }
+            return true;
+        };
+        if (ok()) {
+            return k;
         }
-        cur += (M - 1) * p * i;
-        p *= M;
     }
-    auto const t = (N - cur) / (i + 1);
-    auto const r = (N - cur) % (i + 1);
-    auto s = std::to_string(cur + t);
-    debug("s", s);
-    debug("t r", puu{t, r});
-    cout << s[r] << '\n';
+    // unreachable
 }
 
 int main()

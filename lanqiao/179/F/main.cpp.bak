@@ -252,7 +252,7 @@ template<typename T> constexpr bool check_min(T& value, T const& other)
     return false;
 }
 #ifdef __cpp_concepts
-constexpr auto sum(auto const& coll) noexcept
+constexpr auto sum_of(auto const& coll) noexcept
 #else
 template<typename Range> constexpr auto sum(Range const& coll) noexcept
 #endif
@@ -696,7 +696,7 @@ template<typename F> void solve_all_cases(F solve_case, [[maybe_unused]] std::is
     std::cout << std::fixed;
 
     u64 t = 1;
-    is >> t;
+    // is >> t;
     using return_type = decltype(solve_case());
     for (u64 i = 0; i != t; ++i) {
         if constexpr (
@@ -726,24 +726,29 @@ template<typename F> void solve_all_cases(F solve_case, [[maybe_unused]] std::is
 
 auto solve_case()
 {
-    u64 N, M;
-    cin >> N >> M;
-    u64 p = 1;
-    u64 i = 1;
-    u64 cur = 0;
-    for (; i != -1; ++i) {
-        if (N < cur + (M - 1) * p) {
+    u64 n;
+    cin >> n;
+    map<u64, u64> cnt;
+    for (u64 i = 0; i != n; ++i) {
+        u64 a;
+        cin >> a;
+        ++cnt[a];
+    }
+
+    while (true) {
+        auto& [k, v] = *cnt.begin();
+        cnt[k + 1] += v / 2;
+        v %= 2;
+        if (v == 1) {
             break;
         }
-        cur += (M - 1) * p * i;
-        p *= M;
+        cnt.extract(k);
     }
-    auto const t = (N - cur) / (i + 1);
-    auto const r = (N - cur) % (i + 1);
-    auto s = std::to_string(cur + t);
-    debug("s", s);
-    debug("t r", puu{t, r});
-    cout << s[r] << '\n';
+    if (cnt.rbegin()->second == 0) {
+        cnt.extract(cnt.rbegin()->first);
+    }
+    debug("cnt", cnt);
+    cout << (cnt.size() <= 1 ? 1 : 2) << '\n';
 }
 
 int main()
