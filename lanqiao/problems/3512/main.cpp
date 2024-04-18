@@ -1,4 +1,30 @@
-#include <bits/stdc++.h>
+#include <algorithm>
+#include <array>
+#include <bitset>
+#include <cassert>
+#include <climits>
+#include <cmath>
+#include <cstddef>
+#include <cstdint>
+#include <cstdlib>
+#include <deque>
+#include <functional>
+#include <iomanip>
+#include <iostream>
+#include <list>
+#include <map>
+#include <numeric>
+#include <queue>
+#include <set>
+#include <sstream>
+#include <stack>
+#include <string>
+#include <string_view>
+#include <tuple>
+#include <unordered_map>
+#include <unordered_set>
+#include <utility>
+#include <vector>
 using ::std::abs;
 using ::std::cin;
 using ::std::cout;
@@ -11,14 +37,15 @@ using ::std::multiset;
 using ::std::numeric_limits;
 using ::std::pair;
 using ::std::priority_queue;
+using ::std::ptrdiff_t;
 using ::std::queue;
 using ::std::set;
+using ::std::size_t;
 using ::std::stack;
 using ::std::string;
 using ::std::string_view;
 using ::std::unordered_map;
 using ::std::unordered_set;
-using ::std::vector;
 using ::std::operator""sv;
 
 #ifdef __cpp_lib_ranges
@@ -81,9 +108,7 @@ namespace {
 template<typename T> [[maybe_unused]] constexpr T mod
     = static_cast<T>(998244353);
 template<typename T> [[maybe_unused]] constexpr T inf
-    = std::numeric_limits<T>::max() >> 2;
-template<> [[maybe_unused]] constexpr double inf<double>
-    = std::numeric_limits<double>::max() / 4;
+    = numeric_limits<T>::max() >> 2;
 [[maybe_unused]] constexpr double eps = 1e-6;
 
 namespace impl {
@@ -209,10 +234,6 @@ void debug([[maybe_unused]] std::string_view s, [[maybe_unused]] auto const& t)
 {
 #ifndef ONLINE_JUDGE
   std::cout << "[debug] " << s << ": ";
-  if constexpr (std::ranges::range<decltype(t)>
-                && std::ranges::range<decltype(t.front())>) {
-    std::cout << '\n';
-  }
   print(t);
   cout.flush();
 #endif
@@ -418,9 +439,9 @@ struct dijkstra_result {
   return f;
 }
 
-class disjoint_set_union {
+class disjoint_set {
  public:
-  explicit disjoint_set_union(size_t size): parent_(size), size_(size, 1)
+  disjoint_set(size_t size): parent_(size), size_(size, 1)
   {
     std::iota(parent_.begin(), parent_.end(), 0);
   }
@@ -434,7 +455,8 @@ class disjoint_set_union {
   /// true successfully united
   bool unite(size_t x, size_t y)
   {
-    x = find(x), y = find(y);
+    x = find(x);
+    y = find(y);
     if (x == y) {
       return false;
     }
@@ -454,8 +476,7 @@ class disjoint_set_union {
   std::vector<size_t> parent_;
   std::vector<size_t> size_;
 };
-using dsu = disjoint_set_union;
-
+using ds = disjoint_set;
 [[maybe_unused]] constexpr i64 lsb(i64 const i)
 {
   return i & (-i);
@@ -746,56 +767,35 @@ void solve_all_cases(F solve_case, [[maybe_unused]] std::istream& is)
 
 auto solve_case()
 {
-  i64 n, m, k;
-  cin >> n >> m >> k;
-
-  if (k == 0) {
-    return min(n, m);
+  u64 n;
+  cin >> n;
+  vu a(n);
+  for (auto& e: a) {
+    cin >> e;
   }
-
-  vi pa(n + 1);
-  std::iota(pa.begin(), pa.end(), 0);
-  vi size(n + 1, 1);
-  std::function<i64(i64)> find{
-      [&](i64 x) { return x == pa[x] ? pa[x] : pa[x] = find(pa[x]); }};
-  std::function<void(i64, i64)> merge{[&](i64 x, i64 y) {
-    x = find(x), y = find(y);
-    if (x == y) {
-      return;
+  std::vector<puu> t(n);
+  for (u64 i = 0; i != n; ++i) {
+    auto lo = a[i] % 10;
+    while (a[i] >= 10) {
+      a[i] /= 10;
     }
-    pa[x] = y;
-    size[y] += size[x];
-  }};
-  for (i64 i{}; i != k; ++i) {
-    i64 x, y;
-    cin >> x >> y;
-    merge(x, y);
+    t[i] = {a[i], lo};
   }
-  vu list;
-  for (i64 i{1}; i != n + 1; ++i) {
-    if (i == find(i)) {
-      list.push_back(size[i]);
+  // f[i] denotes most lengthy that ends with i.
+  vi f(10);
+  for (u64 i = 0; i != n; ++i) {
+    auto l = t[i].first;
+    auto r = t[i].second;
+    auto alt = f[l] + 1;
+    if (f[r] < alt) {
+      f[r] = alt;
     }
   }
-  vb f(2 * m + 1);
-  f[0] = true;
-  for (auto e: list) {
-    for (u64 i{f.size() - 1}; i != -1; --i) {
-      if (i >= e) {
-        f[i] = f[i] || f[i - e];
-      }
-    }
+  i64 most_lengthy = 0;
+  for (auto e: f) {
+    check_max(most_lengthy, e);
   }
-  for (i64 i{}; i != m + 1; ++i) {
-    if (f[m - i]) {
-      return m - i;
-    }
-    if (f[m + i]) {
-      return m + i;
-    }
-  }
-  // Unreachable
-  return i64{-1};
+  cout << n - most_lengthy;
 }
 
 int main()

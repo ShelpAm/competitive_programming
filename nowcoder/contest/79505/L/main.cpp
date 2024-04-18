@@ -1,4 +1,30 @@
-#include <bits/stdc++.h>
+#include <algorithm>
+#include <array>
+#include <bitset>
+#include <cassert>
+#include <climits>
+#include <cmath>
+#include <cstddef>
+#include <cstdint>
+#include <cstdlib>
+#include <deque>
+#include <functional>
+#include <iomanip>
+#include <iostream>
+#include <list>
+#include <map>
+#include <numeric>
+#include <queue>
+#include <set>
+#include <sstream>
+#include <stack>
+#include <string>
+#include <string_view>
+#include <tuple>
+#include <unordered_map>
+#include <unordered_set>
+#include <utility>
+#include <vector>
 using ::std::abs;
 using ::std::cin;
 using ::std::cout;
@@ -11,14 +37,15 @@ using ::std::multiset;
 using ::std::numeric_limits;
 using ::std::pair;
 using ::std::priority_queue;
+using ::std::ptrdiff_t;
 using ::std::queue;
 using ::std::set;
+using ::std::size_t;
 using ::std::stack;
 using ::std::string;
 using ::std::string_view;
 using ::std::unordered_map;
 using ::std::unordered_set;
-using ::std::vector;
 using ::std::operator""sv;
 
 #ifdef __cpp_lib_ranges
@@ -81,9 +108,7 @@ namespace {
 template<typename T> [[maybe_unused]] constexpr T mod
     = static_cast<T>(998244353);
 template<typename T> [[maybe_unused]] constexpr T inf
-    = std::numeric_limits<T>::max() >> 2;
-template<> [[maybe_unused]] constexpr double inf<double>
-    = std::numeric_limits<double>::max() / 4;
+    = numeric_limits<T>::max() >> 2;
 [[maybe_unused]] constexpr double eps = 1e-6;
 
 namespace impl {
@@ -703,104 +728,96 @@ class fenwick_tree {
 //   static constexpr u64 alphabet_size = 26;
 //   vvu next_(1, vu(alphabet_size, -1UZ));
 // };
-#ifdef __cpp_concepts
-void solve_all_cases(auto solve_case, [[maybe_unused]] std::istream& is)
-#else
-template<typename F>
-void solve_all_cases(F solve_case, [[maybe_unused]] std::istream& is)
-#endif
+using namespace std;
+typedef long long ll;
+typedef unsigned long long ull;
+typedef pair<int, int> PII;
+void solve()
 {
-  constexpr auto my_precision = 10;
-  [[maybe_unused]] auto const default_precision
-      = std::cout.precision(my_precision);
-  std::cout << std::fixed;
+  int n;
+  cin >> n;
+  vector<long long> a(2);
+  vector<long long> b(2);
+  for (int i = 0; i != n; ++i) {
+    cin >> a[i];
+  }
+  for (int i = 0; i != n; ++i) {
+    cin >> b[i];
+  }
+  int q;
+  cin >> q;
 
-  u64 t = 1;
-  // is >> t;
-  using return_type = decltype(solve_case());
-  for (u64 i = 0; i != t; ++i) {
-    if constexpr (
-#ifdef __cpp_concepts
-        std::same_as<return_type, void>
-#else
-        std::is_same_v<return_type, void>
-#endif
-    ) {
-      solve_case();
-    }
-    else if constexpr (
-#ifdef __cpp_concepts
-        std::same_as<return_type, bool>
-#else
-        std::is_same_v<return_type, bool>
-#endif
-    ) {
-      print(solve_case() ? "YES" : "NO");
+  while (q--) {
+    long long u, v;
+    cin >> u >> v;
+
+    if (n == 1) {
+      bool no_solution = false;
+      bool any1 = false;
+      bool any2 = false;
+      long double c1, c2;
+      if (u == 0) {
+        c1 = 0;
+        if (a[0] == 0) {
+          any1 = true;
+        }
+      }
+      else {
+        if (a[0] == 0) {
+          no_solution = true;
+        }
+        c1 = static_cast<long double>(u) / a[0];
+      }
+      if (v == 0) {
+        c2 = 0;
+        if (b[0] == 0) {
+          any2 = true;
+        }
+      }
+      else {
+        if (b[0] == 0) {
+          no_solution = true;
+        }
+        c2 = static_cast<long double>(v) / b[0];
+      }
+
+      if (no_solution) {
+        cout << 'N';
+      }
+      else {
+        cout << (c1 >= 0 && c1 <= 1 && c2 >= 0 && c2 <= 1
+                         && (c1 == c2 || any1 || any2)
+                     ? 'Y'
+                     : 'N');
+      }
     }
     else {
-      print(solve_case());
+      if (u == 0 && v == 0) {
+        cout << 'Y';
+        continue;
+      }
+      long long d = a[0] * b[1] - a[1] * b[0];
+      if (d == 0) {
+        cout << 'N';
+        continue;
+      }
+      long double c1 = u * b[1] - v * a[1];
+      long double c2 = a[0] * v - b[0] * u;
+      c1 /= d;
+      c2 /= d;
+      cout << (c1 >= 0 && c1 <= 1 && c2 >= 0 && c2 <= 1 ? 'Y' : 'N');
     }
   }
+  cout << '\n';
 }
 } // namespace
 
-auto solve_case()
+signed main()
 {
-  i64 n, m, k;
-  cin >> n >> m >> k;
-
-  if (k == 0) {
-    return min(n, m);
-  }
-
-  vi pa(n + 1);
-  std::iota(pa.begin(), pa.end(), 0);
-  vi size(n + 1, 1);
-  std::function<i64(i64)> find{
-      [&](i64 x) { return x == pa[x] ? pa[x] : pa[x] = find(pa[x]); }};
-  std::function<void(i64, i64)> merge{[&](i64 x, i64 y) {
-    x = find(x), y = find(y);
-    if (x == y) {
-      return;
-    }
-    pa[x] = y;
-    size[y] += size[x];
-  }};
-  for (i64 i{}; i != k; ++i) {
-    i64 x, y;
-    cin >> x >> y;
-    merge(x, y);
-  }
-  vu list;
-  for (i64 i{1}; i != n + 1; ++i) {
-    if (i == find(i)) {
-      list.push_back(size[i]);
-    }
-  }
-  vb f(2 * m + 1);
-  f[0] = true;
-  for (auto e: list) {
-    for (u64 i{f.size() - 1}; i != -1; --i) {
-      if (i >= e) {
-        f[i] = f[i] || f[i - e];
-      }
-    }
-  }
-  for (i64 i{}; i != m + 1; ++i) {
-    if (f[m - i]) {
-      return m - i;
-    }
-    if (f[m + i]) {
-      return m + i;
-    }
-  }
-  // Unreachable
-  return i64{-1};
-}
-
-int main()
-{
-  impl::io_accelerator accelerator;
-  solve_all_cases(solve_case, std::cin);
+  ios::sync_with_stdio(0), cin.tie(0), cout.tie(0);
+  int T;
+  cin >> T;
+  while (T--)
+    solve();
   return 0;
 }

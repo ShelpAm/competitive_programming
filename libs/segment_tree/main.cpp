@@ -1,259 +1,194 @@
-#include <algorithm>
-#include <array>
-#include <bitset>
-#include <cassert>
-#include <cmath>
-#include <cstddef>
-#include <deque>
-#include <iomanip>
-#include <iostream>
-#include <list>
-#include <map>
-#include <numeric>
-#include <queue>
-#include <set>
-#include <stack>
-#include <string>
-#include <string_view>
-#include <unordered_map>
-#include <unordered_set>
-#include <utility>
-#include <vector>
-#ifdef __cpp_concepts
-#include <ranges>
-#endif
+#include <bits/stdc++.h>
+using namespace std;
 
-// configs
-using ::std::cin;
-using ::std::cout;
-using ::std::size_t;
-using ::std::string;
-using ::std::string_view;
-using ::std::operator""sv;
-using ::std::greater;
-using ::std::less;
-using ::std::map;
-using ::std::numeric_limits;
-using ::std::pair;
-using ::std::priority_queue;
-using ::std::queue;
-using ::std::set;
-using ::std::stack;
-using ::std::unordered_map;
-using ::std::unordered_set;
-#ifdef __cpp_lib_ranges
-using ::std::ranges::max;
-using ::std::ranges::min;
-using ::std::ranges::sort;
-using ::std::ranges::swap;
-using ::std::ranges::views::drop;
-using ::std::ranges::views::iota;
-using ::std::ranges::views::reverse;
-using ::std::ranges::views::split;
-using ::std::ranges::views::take;
-#else
-// TODO: Defines my own sort, etc.
-#endif
-[[maybe_unused]] constexpr auto endl{'\n'};
-template<typename T> [[maybe_unused]] constexpr T mod{static_cast<T>(998244353ULL)};
-template<typename T> [[maybe_unused]] constexpr T inf{numeric_limits<T>::max() >> 16};
-namespace impl {
-  template<typename value_type> using vec2_placeholder = std::vector<std::vector<value_type>>;
-  template<typename value_type, size_t size> using arr1 = ::std::array<value_type, size>;
-  template<size_t i, size_t j, typename value_type> using arr2
-      = std::array<std::array<value_type, j>, i>;
-  template<typename value_type> using vec1 = ::std::vector<value_type>;
-  template<typename value_type> class vec2 : public vec2_placeholder<value_type> {
-  public:
-    constexpr vec2(size_t const i, size_t const j, value_type const& value = {})
-        : vec2_placeholder<value_type>(i, std::vector<value_type>(j, value))
-    {}
-  };
+using i64 = ::std::int_fast64_t;
+using u64 = ::std::uint_fast64_t;
+template<typename T> [[maybe_unused]] constexpr T inf
+    = std::numeric_limits<T>::max() >> 2;
+template<> [[maybe_unused]] constexpr double inf<double>
+    = std::numeric_limits<double>::max() / 4;
+[[maybe_unused]] constexpr double eps = 1e-6;
+[[maybe_unused]] constexpr u64 msb(u64 const i)
+{
+  assert(i != 0);
+  return sizeof(u64) * CHAR_BIT - 1 - __builtin_clzll(i | 1);
+}
 
-#ifdef __cpp_concepts
-  template<typename T> concept pair = requires(T t) {
-    t.first;
-    t.second;
-  };
+template<typename info_type, typename tag_type> class segment_tree {
+ public:
+  segment_tree(u64 n);
+  // The input array should start from the index 0.
+  segment_tree(std::vector<i64> const& raw);
 
-  template<typename> struct is_tuple_t : std::false_type {};
-  template<typename... T> struct is_tuple_t<std::tuple<T...>> : std::true_type {};
-  template<typename... T> concept tuple = is_tuple_t<T...>::value;
-
-  template<typename T> concept c_str = std::same_as<char const*, std::remove_cvref_t<T>>;
-  template<typename T> concept string = std::same_as<string, std::remove_cvref_t<T>>;
-  template<typename T> concept string_view = std::same_as<string_view, std::remove_cvref_t<T>>;
-  template<typename T> concept string_like = string<T> || string_view<T> || c_str<T>;
-#endif
-  class io_accelerator {
-  public:
-    io_accelerator()
-    {
-      std::ios::sync_with_stdio(false);
-      std::cin.tie(nullptr);
-      // The following line needn't to be executed because the above line actually had done this.
-      // std::cout.tie(nullptr);
-    }
-    io_accelerator(const io_accelerator&) = delete;
-    io_accelerator(io_accelerator&&) = delete;
-    io_accelerator& operator=(const io_accelerator&) = delete;
-    io_accelerator& operator=(io_accelerator&&) = delete;
-    ~io_accelerator()
-    {
-      std::ios::sync_with_stdio(true);
-      std::cin.tie(&std::cout);
-    }
-  };
-} // namespace impl
-using puz = pair<size_t, size_t>;
-using pll = pair<long long, long long>;
-template<size_t i, size_t j> using arr2uz = impl::arr2<i, j, size_t>;
-template<size_t i, size_t j> using arr2ll = impl::arr2<i, j, long long>;
-template<size_t i, size_t j> using arr2b = impl::arr2<i, j, bool>;
-using vec1uz = impl::vec1<size_t>;
-using vec1ll = impl::vec1<long long>;
-using vec1b = impl::vec1<bool>;
-using vec2uz = impl::vec2<size_t>;
-using vec2ll = impl::vec2<long long>;
-using vec2b = impl::vec2<bool>;
-[[maybe_unused]] static inline constexpr bool check_max(auto&& value, auto&& other)
-{
-  if (value < other) {
-    value = other;
-    return true;
-  }
-  return false;
-}
-[[maybe_unused]] static inline constexpr bool check_min(auto&& value, auto&& other)
-{
-  if (value > other) {
-    value = other;
-    return true;
-  }
-  return false;
-}
-static inline constexpr auto&& operator>>(auto&& is, auto&& t)
-{
-  using T = std::remove_cvref_t<decltype(t)>;
-#ifdef __cpp_lib_ranges
-  if constexpr (std::ranges::range<decltype(t)>) {
-    for (auto&& ele: t) {
-      is >> ele;
-    }
-    return is;
-  }
-#endif
-#ifdef __cpp_concepts
-  if constexpr (impl::pair<decltype(t)>) {
-    return is >> t.first >> t.second;
-  }
-  else if constexpr (impl::tuple<T>) {
-    std::cout
-        << "[operator>>] TODO: This is a tuple whose output method hasn't been implemented.\n";
-  }
-#endif
-  return is >> t;
-}
-static inline constexpr void print(auto const& t)
-{
-  using T = std::remove_cvref_t<decltype(t)>;
-  if constexpr (impl::string_like<T>) {
-    cout << t;
-  }
-  else if constexpr (std::is_convertible_v<T, char const*>) {
-    cout << static_cast<char const*>(t);
-  }
-#ifdef __cpp_lib_ranges
-  else if constexpr (std::ranges::range<T>) {
-    for (auto&& ele: t) {
-      print(ele);
-    }
-    std::cout << endl;
-  }
-#endif
-#ifdef __cpp_concepts
-  else if constexpr (impl::pair<T>) {
-    std::cout << t.first << ": " << t.second << ", ";
-  }
-  else if constexpr (impl::tuple<T>) {
-    std::cout << "[print] TODO: This is a tuple whose output method hasn't been implemented.\n";
-  }
-#endif
-  else {
-    std::cout << t << ' ';
-  }
-}
-static inline constexpr void debug([[maybe_unused]] std::string_view s, [[maybe_unused]] auto&& t)
-{
-#ifdef DEBUG
-  std::cout << "[debug] " << s << ": ";
-  print(t);
-  std::cout << endl;
-#endif
-}
-struct vertex {
-  size_t l, r, max;
-};
-class segment_tree {
-public:
-  segment_tree(size_t const r): vertices_(r * 2 - 1) { build(0, 1, r); }
-  void increase(size_t const l, size_t const r, size_t const x) { increase(0, l, r, x); }
-  auto&& vertices() { return vertices_; }
-private:
-  auto&& lson(size_t const idx) { return vertices_[idx * 2 + 1]; }
-  auto&& rson(size_t const idx) { return vertices_[idx * 2 + 2]; }
-  void build(size_t const idx, size_t const l, size_t const r)
+  [[deprecated("unimplemented")]] void modify_range(u64 a, u64 b, u64 x)
   {
-    vertices_[idx].l = l;
-    vertices_[idx].r = r;
+    modify_range_impl(1, 0, n_, a, b, x);
+  }
+  void apply_range(u64 a, u64 b, tag_type const& tag)
+  {
+    apply_range_impl(1, 0, n_, a, b, tag);
+  }
+  info_type query_range(u64 a, u64 b)
+  {
+    return query_range_impl(1, 0, n_, a, b);
+  }
+ private:
+  // pull info from subtree(s)
+  void pull(u64 p);
 
-    if (r == l) {
+  // push tag into subtree(s)
+  void push(u64 p, u64 l, u64 r);
+
+  // apply tag on node `p`
+  void apply(u64 p, tag_type const& tag);
+
+  void modify_range_impl(u64 p, u64 l, u64 r, u64 a, u64 b, i64 x);
+  void apply_range_impl(u64 p, u64 l, u64 r, u64 a, u64 b, tag_type const& tag);
+  info_type query_range_impl(u64 p, u64 l, u64 r, u64 a, u64 b);
+
+  [[deprecated]] void add_on_segment_impl(u64 a, u64 b, i64 d, u64 l, u64 r,
+                                          u64 x)
+  {
+    if (a <= l && r <= b) {
+      info_[x].tag += d;
       return;
     }
 
-    build(idx * 2 + 1, l, (r + l) / 2);
-    build(idx * 2 + 2, (r + l) / 2 + 1, r);
+    push(l, r, x);
+    u64 const mid = (l + r) / 2;
+    if (a <= mid) {
+      add_on_segment_impl(a, b, d, l, mid, x * 2);
+    }
+    if (mid < b) {
+      add_on_segment_impl(a, b, d, mid + 1, r, x * 2 + 1);
+    }
+    pull(x);
   }
-  void increase(size_t const idx, size_t const l, size_t const r, size_t const x)
-  {
-    if (l >= r) {
-      if (l == r) {
-        vertices_[idx].max += x;
-      }
+
+  u64 n_;
+  std::vector<info_type> info_;
+  std::vector<tag_type> tags_;
+};
+template<typename info_type, typename tag_type>
+segment_tree<info_type, tag_type>::segment_tree(u64 const n)
+    : n_(n), info_(4ULL << msb(n_), info_type{0, 0, 0, 0}),
+      tags_(4ULL << msb(n_))
+{}
+template<typename info_type, typename tag_type>
+segment_tree<info_type, tag_type>::segment_tree(std::vector<i64> const& raw)
+    : segment_tree(raw.size())
+{
+  auto build = [this, &raw](auto build, u64 p, u64 l, u64 r) {
+    // if we don't change the structure of the tree, we won't save info of
+    // internal nodes, since it can be calculated at runtime.
+    if (r - l == 1) {
+      info_[p] = raw[l];
       return;
     }
 
-    increase(idx * 2 + 1, l, (r + l) / 2, x);
-    increase(idx * 2 + 2, (r + l) / 2 + 1, r, x);
+    u64 const m = (l + r) / 2;
+    build(build, p * 2, l, m);
+    build(build, p * 2 + 1, m, r);
+    pull(p);
+  };
+  build(build, 1, n_, 1);
+}
+template<typename info_type, typename tag_type>
+void segment_tree<info_type, tag_type>::pull(u64 p)
+{
+  info_[p] = info_[p * 2] + info_[p * 2 + 1];
+}
+template<typename info_type, typename tag_type>
+void segment_tree<info_type, tag_type>::push(u64 p, u64 l, u64 r)
+{
+  if (r - l == 1) {
+    return;
   }
-  impl::vec1<vertex> vertices_;
+
+  apply(p * 2, tags_[p]);
+  apply(p * 2 + 1, tags_[p]);
+  tags_[p] = tag_type{};
+}
+template<typename info_type, typename tag_type>
+void segment_tree<info_type, tag_type>::apply(u64 p, tag_type const& tag)
+{
+  info_[p].apply(tag);
+  tags_[p].apply(tag);
+}
+template<typename info_type, typename tag_type> void
+segment_tree<info_type, tag_type>::modify_range_impl([[maybe_unused]] u64 p,
+                                                     u64 l, u64 r, u64 a, u64 b,
+                                                     [[maybe_unused]] i64 x)
+{
+  // ranges not intersecting
+  if (b <= l || r <= a) {
+    return;
+  }
+}
+template<typename info_type, typename tag_type>
+void segment_tree<info_type, tag_type>::apply_range_impl(u64 p, u64 l, u64 r,
+                                                         u64 a, u64 b,
+                                                         tag_type const& tag)
+{
+  // ranges not intersecting
+  if (b <= l || r <= a) {
+    return;
+  }
+
+  // range fully included in [a, b)
+  if (a <= l && r <= b) {
+    apply(p, tag);
+    return;
+  }
+
+  push(p, l, r);
+  u64 const m = (l + r) / 2;
+  apply_range_impl(p * 2, l, m, a, b, tag);
+  apply_range_impl(p * 2 + 1, m, r, a, b, tag);
+  pull(p);
+}
+template<typename info_type, typename tag_type>
+info_type segment_tree<info_type, tag_type>::query_range_impl(u64 p, u64 l,
+                                                              u64 r, u64 a,
+                                                              u64 b)
+{
+  // ranges not intersecting
+  if (b <= l || r <= a) {
+    return info_type{};
+  }
+
+  // range fully included in [a, b)
+  if (a <= l && r <= b) {
+    return info_[p];
+  }
+
+  push(l, r, p);
+  u64 const m = (l + r) / 2;
+  return query_range_impl(p * 2, l, m, a, b)
+         + query_range_impl(p * 2 + 1, m, r, a, b);
+}
+
+struct tag {
+  void apply(tag const& tag) { add += tag.add; }
+  i64 add;
 };
-static inline auto solve_case()
-{
-  segment_tree st(10);
-  st.increase(1, 4, 2);
-  for (auto const& [l, r, val]: st.vertices()) {
-    cout << l << ' ' << r << ' ' << val << '\n';
+struct info {
+  info operator+(info const& rhs) const
+  {
+    return info{.min = ::min(this->min, rhs.min),
+                .max = ::max(this->max, rhs.max),
+                .sum = this->sum + rhs.sum,
+                .act = this->act + rhs.act};
   }
-  return 0;
-}
-static inline constexpr void solve_all_cases(auto&& solve_case_f)
-{
-  size_t t{1};
-  // std::cin >> t;
-  for (size_t i{}; i != t; ++i) {
-    if constexpr (std::is_void_v<decltype(solve_case_f())>) {
-      solve_case_f();
-    }
-    else {
-      print(solve_case_f());
-      cout << endl;
-    }
+  void apply(tag const& tag)
+  {
+    min += tag.add;
+    max += tag.add;
+    sum += act * tag.add;
   }
-}
-int main()
-{
-  impl::io_accelerator accelerator;
-  solve_all_cases(solve_case);
-  return 0;
-}
+  i64 min = inf<i64>;
+  i64 max = -inf<i64>;
+  i64 sum = 0;
+  i64 act = 0;
+};
+using segtree = segment_tree<info, tag>;

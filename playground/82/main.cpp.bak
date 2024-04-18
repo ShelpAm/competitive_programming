@@ -754,12 +754,13 @@ auto solve_case()
         return i;
     };
 
-    auto dfs = [&](auto self, int u) {
+    auto dfs = [&](auto self, int u) -> void {
         if (u == 3) {
-            return u;
+            return;
         }
         cout << u << '\n';
-        return self(self, u + 1);
+        self(self, u + 1);
+        return;
     };
     // int b = b;
     dfs(dfs, 0);

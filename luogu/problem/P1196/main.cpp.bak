@@ -746,56 +746,40 @@ void solve_all_cases(F solve_case, [[maybe_unused]] std::istream& is)
 
 auto solve_case()
 {
-  i64 n, m, k;
-  cin >> n >> m >> k;
-
-  if (k == 0) {
-    return min(n, m);
-  }
-
-  vi pa(n + 1);
-  std::iota(pa.begin(), pa.end(), 0);
-  vi size(n + 1, 1);
-  std::function<i64(i64)> find{
-      [&](i64 x) { return x == pa[x] ? pa[x] : pa[x] = find(pa[x]); }};
-  std::function<void(i64, i64)> merge{[&](i64 x, i64 y) {
-    x = find(x), y = find(y);
-    if (x == y) {
-      return;
+  int q;
+  cin >> q;
+  int const n{30000 + 50};
+  vector<int> pa(n), dist(n), size(n, 1);
+  std::function<int(int)> find{[&](int x) {
+    if (x != pa[x]) {
+      int direct_pa = pa[x];
+      pa[x] = find(pa[x]);
+      dist[x] += dist[direct_pa];
     }
-    pa[x] = y;
-    size[y] += size[x];
+    return pa[x];
   }};
-  for (i64 i{}; i != k; ++i) {
-    i64 x, y;
-    cin >> x >> y;
-    merge(x, y);
-  }
-  vu list;
-  for (i64 i{1}; i != n + 1; ++i) {
-    if (i == find(i)) {
-      list.push_back(size[i]);
+  std::iota(pa.begin(), pa.end(), 0);
+  while (q--) {
+    char op;
+    int i, j;
+    cin >> op >> i >> j;
+    if (op == 'M') {
+      int r = find(i);
+      dist[r] = 1;
+      pa[r] = j;
+      size[find(j)] += size[r];
     }
-  }
-  vb f(2 * m + 1);
-  f[0] = true;
-  for (auto e: list) {
-    for (u64 i{f.size() - 1}; i != -1; --i) {
-      if (i >= e) {
-        f[i] = f[i] || f[i - e];
+    else if (op == 'C') {
+      if (find(i) == find(j)) {
+        cout << abs(dist[i] - dist[j]) - 1 << '\n';
+      }
+      else {
+        cout << -1 << '\n';
       }
     }
+    debug("dist", dist | take(5));
+    debug("  pa", pa | take(5));
   }
-  for (i64 i{}; i != m + 1; ++i) {
-    if (f[m - i]) {
-      return m - i;
-    }
-    if (f[m + i]) {
-      return m + i;
-    }
-  }
-  // Unreachable
-  return i64{-1};
 }
 
 int main()

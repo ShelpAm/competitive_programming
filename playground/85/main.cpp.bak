@@ -1,0 +1,29 @@
+#include <bits/stdc++.h>
+using i64 = ::std::int_fast64_t;
+using u64 = ::std::uint_fast64_t;
+using vi = ::std::vector<i64>;
+using vvi = ::std::vector<vi>;
+using vu = ::std::vector<u64>;
+using vvu = ::std::vector<vu>;
+using vb = ::std::vector<bool>;
+using vvb = ::std::vector<vb>;
+using vc = std::vector<char>;
+using vvc = std::vector<vc>;
+using vd = std::vector<double>;
+using vvd = std::vector<vd>;
+using pii = ::std::pair<i64, i64>;
+using puu = ::std::pair<u64, u64>;
+using triplei = ::std::tuple<i64, i64, i64>;
+using tripleu = ::std::tuple<u64, u64, u64>;
+using namespace std;
+
+int main()
+{
+  double E = 1000, g = 9.8;
+  double w, p;
+  cin >> w >> p;
+  w /= 100;
+  p = 1 - p / 100;
+  cout << 2 * E / (w * g * (1 - p));
+  return 0;
+}

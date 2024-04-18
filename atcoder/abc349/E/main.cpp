@@ -1,4 +1,30 @@
-#include <bits/stdc++.h>
+#include <algorithm>
+#include <array>
+#include <bitset>
+#include <cassert>
+#include <climits>
+#include <cmath>
+#include <cstddef>
+#include <cstdint>
+#include <cstdlib>
+#include <deque>
+#include <functional>
+#include <iomanip>
+#include <iostream>
+#include <list>
+#include <map>
+#include <numeric>
+#include <queue>
+#include <set>
+#include <sstream>
+#include <stack>
+#include <string>
+#include <string_view>
+#include <tuple>
+#include <unordered_map>
+#include <unordered_set>
+#include <utility>
+#include <vector>
 using ::std::abs;
 using ::std::cin;
 using ::std::cout;
@@ -11,14 +37,15 @@ using ::std::multiset;
 using ::std::numeric_limits;
 using ::std::pair;
 using ::std::priority_queue;
+using ::std::ptrdiff_t;
 using ::std::queue;
 using ::std::set;
+using ::std::size_t;
 using ::std::stack;
 using ::std::string;
 using ::std::string_view;
 using ::std::unordered_map;
 using ::std::unordered_set;
-using ::std::vector;
 using ::std::operator""sv;
 
 #ifdef __cpp_lib_ranges
@@ -81,9 +108,7 @@ namespace {
 template<typename T> [[maybe_unused]] constexpr T mod
     = static_cast<T>(998244353);
 template<typename T> [[maybe_unused]] constexpr T inf
-    = std::numeric_limits<T>::max() >> 2;
-template<> [[maybe_unused]] constexpr double inf<double>
-    = std::numeric_limits<double>::max() / 4;
+    = numeric_limits<T>::max() >> 2;
 [[maybe_unused]] constexpr double eps = 1e-6;
 
 namespace impl {
@@ -418,9 +443,9 @@ struct dijkstra_result {
   return f;
 }
 
-class disjoint_set_union {
+class disjoint_set {
  public:
-  explicit disjoint_set_union(size_t size): parent_(size), size_(size, 1)
+  disjoint_set(size_t size): parent_(size), size_(size, 1)
   {
     std::iota(parent_.begin(), parent_.end(), 0);
   }
@@ -434,7 +459,8 @@ class disjoint_set_union {
   /// true successfully united
   bool unite(size_t x, size_t y)
   {
-    x = find(x), y = find(y);
+    x = find(x);
+    y = find(y);
     if (x == y) {
       return false;
     }
@@ -454,8 +480,7 @@ class disjoint_set_union {
   std::vector<size_t> parent_;
   std::vector<size_t> size_;
 };
-using dsu = disjoint_set_union;
-
+using ds = disjoint_set;
 [[maybe_unused]] constexpr i64 lsb(i64 const i)
 {
   return i & (-i);
@@ -735,7 +760,7 @@ void solve_all_cases(F solve_case, [[maybe_unused]] std::istream& is)
         std::is_same_v<return_type, bool>
 #endif
     ) {
-      print(solve_case() ? "YES" : "NO");
+      print(solve_case() ? "Takahashi" : "Aoki");
     }
     else {
       print(solve_case());
@@ -744,58 +769,55 @@ void solve_all_cases(F solve_case, [[maybe_unused]] std::istream& is)
 }
 } // namespace
 
-auto solve_case()
+constexpr u64 n{3};
+u64 c[n][n];
+bool full()
 {
-  i64 n, m, k;
-  cin >> n >> m >> k;
-
-  if (k == 0) {
-    return min(n, m);
-  }
-
-  vi pa(n + 1);
-  std::iota(pa.begin(), pa.end(), 0);
-  vi size(n + 1, 1);
-  std::function<i64(i64)> find{
-      [&](i64 x) { return x == pa[x] ? pa[x] : pa[x] = find(pa[x]); }};
-  std::function<void(i64, i64)> merge{[&](i64 x, i64 y) {
-    x = find(x), y = find(y);
-    if (x == y) {
-      return;
-    }
-    pa[x] = y;
-    size[y] += size[x];
-  }};
-  for (i64 i{}; i != k; ++i) {
-    i64 x, y;
-    cin >> x >> y;
-    merge(x, y);
-  }
-  vu list;
-  for (i64 i{1}; i != n + 1; ++i) {
-    if (i == find(i)) {
-      list.push_back(size[i]);
-    }
-  }
-  vb f(2 * m + 1);
-  f[0] = true;
-  for (auto e: list) {
-    for (u64 i{f.size() - 1}; i != -1; --i) {
-      if (i >= e) {
-        f[i] = f[i] || f[i - e];
+  for (u64 i = 0; i != n; ++i) {
+    for (u64 j = 0; j != n; ++j) {
+      if (c[i][j] == 2) {
+        return false;
       }
     }
   }
-  for (i64 i{}; i != m + 1; ++i) {
-    if (f[m - i]) {
-      return m - i;
+  return true;
+}
+bool dfs(u64 i, u64 j, u64 color)
+{
+  for (u64 t = 0; t != 3; ++t) {
+    u64 cnt{};
+    for (u64 s = 0; s != 3; ++s) {
+      if (c[t][s] == (color ^ 1)) {
+        ++cnt;
+      }
     }
-    if (f[m + i]) {
-      return m + i;
+    if (cnt == 2) {
     }
   }
-  // Unreachable
-  return i64{-1};
+  for (u64 i = 0; i != 3; ++i) {
+    for (u64 j = 0; j != 3; ++j) {
+      dfs(i, j, color ^ 1);
+    }
+  }
+}
+auto solve_case()
+{
+  vvi a(n, vi(n));
+  cin >> a;
+
+  for (u64 i = 0; i != 3; ++i) {
+    for (u64 j = 0; j != 3; ++j) {
+      for (u64 i = 0; i != n; ++i) {
+        for (u64 j = 0; j != n; ++j) {
+          c[i][j] = 2;
+        }
+      }
+      if (dfs(i, j, 0)) {
+        return true;
+      }
+    }
+  }
+  return false;
 }
 
 int main()

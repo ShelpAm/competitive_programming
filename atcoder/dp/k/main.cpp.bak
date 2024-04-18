@@ -746,56 +746,20 @@ void solve_all_cases(F solve_case, [[maybe_unused]] std::istream& is)
 
 auto solve_case()
 {
-  i64 n, m, k;
-  cin >> n >> m >> k;
-
-  if (k == 0) {
-    return min(n, m);
-  }
-
-  vi pa(n + 1);
-  std::iota(pa.begin(), pa.end(), 0);
-  vi size(n + 1, 1);
-  std::function<i64(i64)> find{
-      [&](i64 x) { return x == pa[x] ? pa[x] : pa[x] = find(pa[x]); }};
-  std::function<void(i64, i64)> merge{[&](i64 x, i64 y) {
-    x = find(x), y = find(y);
-    if (x == y) {
-      return;
-    }
-    pa[x] = y;
-    size[y] += size[x];
-  }};
-  for (i64 i{}; i != k; ++i) {
-    i64 x, y;
-    cin >> x >> y;
-    merge(x, y);
-  }
-  vu list;
-  for (i64 i{1}; i != n + 1; ++i) {
-    if (i == find(i)) {
-      list.push_back(size[i]);
-    }
-  }
-  vb f(2 * m + 1);
-  f[0] = true;
-  for (auto e: list) {
-    for (u64 i{f.size() - 1}; i != -1; --i) {
-      if (i >= e) {
-        f[i] = f[i] || f[i - e];
+  u64 n, k;
+  cin >> n >> k;
+  vu a(n);
+  cin >> a;
+  cout << a[10];
+  vb f(k + 1);
+  for (u64 t{}; t != k + 1; ++t) {
+    for (u64 i{}; i != n; ++i) {
+      if (t >= a[i]) {
+        f[t] = f[t] || !f[t - a[i]];
       }
     }
   }
-  for (i64 i{}; i != m + 1; ++i) {
-    if (f[m - i]) {
-      return m - i;
-    }
-    if (f[m + i]) {
-      return m + i;
-    }
-  }
-  // Unreachable
-  return i64{-1};
+  cout << (f[k] ? "First" : "Second") << '\n';
 }
 
 int main()
