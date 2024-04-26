@@ -1,53 +1,16 @@
+// Problem: $(PROBLEM)
+// Contest: $(CONTEST)
+// Judge: $(JUDGE)
+// URL: $(URL)
+// Memory Limit: $(MEMLIM)
+// Time Limit: $(TIMELIM)
+// Start: $(DATE)
+// Author: ShelpAm
+
 #include <bits/stdc++.h>
-using ::std::abs;
-using ::std::cin;
-using ::std::cout;
-using ::std::deque;
-using ::std::greater;
-using ::std::less;
-using ::std::map;
-using ::std::multimap;
-using ::std::multiset;
-using ::std::numeric_limits;
-using ::std::pair;
-using ::std::priority_queue;
-using ::std::queue;
-using ::std::set;
-using ::std::stack;
-using ::std::string;
-using ::std::string_view;
-using ::std::unordered_map;
-using ::std::unordered_set;
-using ::std::vector;
 
 #ifdef __cpp_lib_ranges
 #include <ranges>
-using ::std::ranges::binary_search;
-using ::std::ranges::count;
-using ::std::ranges::find;
-using ::std::ranges::lower_bound;
-using ::std::ranges::max;
-using ::std::ranges::min;
-using ::std::ranges::reverse;
-using ::std::ranges::reverse_view;
-using ::std::ranges::sort;
-using ::std::ranges::swap;
-using ::std::ranges::upper_bound;
-using ::std::ranges::views::drop;
-using ::std::ranges::views::iota;
-using ::std::ranges::views::split;
-using ::std::ranges::views::take;
-#else
-using ::std::binary_search;
-using ::std::count;
-using ::std::find;
-using ::std::lower_bound;
-using ::std::max;
-using ::std::min;
-using ::std::reverse;
-using ::std::sort;
-using ::std::swap;
-using ::std::upper_bound;
 #endif
 
 using i64 = std::int_fast64_t;
@@ -77,10 +40,8 @@ namespace {
 template<typename T>
 [[maybe_unused]] constexpr T mod{static_cast<T>(998244353)};
 template<typename T>
-[[maybe_unused]] constexpr T inf{std::numeric_limits<T>::max() >> 2};
-template<> [[maybe_unused]] constexpr double inf<double>{
-    std::numeric_limits<double>::max() / 4};
-[[maybe_unused]] constexpr double eps{1e-6};
+[[maybe_unused]] constexpr T inf{std::numeric_limits<T>::max() / 2};
+[[maybe_unused]] constexpr double eps{1e-8};
 
 namespace impl {
 // Concepts.
@@ -98,9 +59,10 @@ template<typename... T> concept tuple = is_tuple_t<T...>::value;
 
 template<typename T> concept c_str
     = std::same_as<char const*, remove_cvref_t<T>>;
-template<typename T> concept string = std::same_as<string, remove_cvref_t<T>>;
+template<typename T> concept string
+    = std::same_as<std::string, remove_cvref_t<T>>;
 template<typename T> concept string_view
-    = std::same_as<string_view, remove_cvref_t<T>>;
+    = std::same_as<std::string_view, remove_cvref_t<T>>;
 template<typename T> concept string_like
     = string<T> || string_view<T> || c_str<T>;
 #else
@@ -108,26 +70,6 @@ template<class T> using remove_cvref_t
     = std::remove_cv_t<std::remove_reference_t<T>>;
 #endif
 
-/// @brief Turns off synchronization with stdio.
-class io_accelerator {
- public:
-  io_accelerator()
-  {
-    std::ios::sync_with_stdio(false);
-    std::cin.tie(nullptr);
-    // The following line needn't to be executed because the above line actually
-    // had done this. std::cout.tie(nullptr);
-  }
-  io_accelerator(const io_accelerator&) = delete;
-  io_accelerator(io_accelerator&&) = delete;
-  io_accelerator& operator=(const io_accelerator&) = delete;
-  io_accelerator& operator=(io_accelerator&&) = delete;
-  ~io_accelerator()
-  {
-    std::ios::sync_with_stdio(true);
-    std::cin.tie(&std::cout);
-  }
-};
 } // namespace impl
 
 #ifdef __cpp_concepts
@@ -158,10 +100,10 @@ void print(auto const& t, u64 const depth = 0)
 {
   using T = ::std::remove_cvref_t<decltype(t)>;
   if constexpr (impl::string_like<T>) {
-    cout << t;
+    std::cout << t;
   }
   else if constexpr (::std::is_convertible_v<T, char const*>) {
-    cout << static_cast<char const*>(t);
+    std::cout << static_cast<char const*>(t);
   }
 #ifdef __cpp_lib_ranges
   else if constexpr (std::ranges::range<T>) {
@@ -169,7 +111,7 @@ void print(auto const& t, u64 const depth = 0)
       print(ele, depth + 1);
     }
     if (depth != 0) {
-      cout << '\n';
+      std::cout << '\n';
     }
   }
 #endif
@@ -184,19 +126,18 @@ void print(auto const& t, u64 const depth = 0)
   }
 
   if (depth == 0) {
-    cout << '\n';
+    std::cout << '\n';
   }
 }
 void debug([[maybe_unused]] std::string_view s, [[maybe_unused]] auto const& t)
 {
 #ifndef ONLINE_JUDGE
   std::cout << "[debug] " << s << ": ";
-  if constexpr (std::ranges::range<decltype(t)>
-                && std::ranges::range<decltype(t.front())>) {
+  if constexpr (std::ranges::range<decltype(t)>) {
     std::cout << '\n';
   }
   print(t);
-  cout.flush();
+  std::cout.flush();
 #endif
 }
 constexpr bool check_max(auto& value, auto const& other)
@@ -247,251 +188,29 @@ template<typename T> constexpr auto pow(T a, u64 b, u64 const p) noexcept
   }
   return res;
 }
-[[maybe_unused]] constexpr u64 gcd(u64 a, u64 b) noexcept
-{
-  while (b != 0) {
-    auto t = b;
-    b = a % b;
-    a = t;
-  }
-  return a;
-}
-[[maybe_unused]] constexpr u64 lcm(u64 a, u64 b) noexcept
-{
-  return a * b / gcd(a, b);
-}
-struct sieve {
-  sieve(size_t const upper_bound): min_factor(upper_bound + 1, 0)
-  {
-    for (size_t i = 2; i != min_factor.size(); ++i) {
-      if (min_factor[i] == 0) {
-        primes.push_back(i);
-        min_factor[i] = i;
-      }
-      for (auto const p: primes) {
-        if (i * p > upper_bound || p > min_factor[i]) {
-          break;
-        }
-        min_factor[i * p] = p;
-      }
-    }
-  }
-
-  [[nodiscard]] std::map<u64, u64> factorize(u64 x) const
-  {
-    std::map<u64, u64> res;
-    assert(x <= (min_factor.size() - 1) * (min_factor.size() - 1));
-    for (auto const p: primes) {
-      if (p > x) {
-        break;
-      }
-      while (x % p == 0) {
-        x /= p;
-        ++res[p];
-      }
-    }
-    if (x >= min_factor.size()) {
-      ++res[x];
-    }
-    return res;
-  }
-
-  vu primes;
-  vu min_factor;
-};
-struct graph {
- public:
-  graph(size_t max_num_of_vertices): adjacent(max_num_of_vertices) {}
-  void add_edge(size_t u, u64 v, u64 w) { adjacent[u].emplace_back(w, v); }
-  [[nodiscard]] std::vector<puu> const& edges_of(size_t u) const
-  {
-    return adjacent[u];
-  }
-  std::vector<std::vector<puu>> adjacent;
-};
-[[maybe_unused]] graph read_graph(size_t const num_of_vertices,
-                                  size_t const num_of_edges,
-                                  bool const bidirectional,
-                                  bool const contains_w, bool const read_from_1)
-{
-  graph g(num_of_vertices);
-  for (size_t i = 0; i != num_of_edges; ++i) {
-    u64 u, v, w;
-    cin >> u >> v;
-    if (contains_w) {
-      cin >> w;
-    }
-    else {
-      w = 1;
-    }
-    if (read_from_1) {
-      --u, --v;
-    }
-    g.add_edge(u, v, w);
-    if (bidirectional) {
-      g.add_edge(v, u, w);
-    }
-  }
-  return g;
-}
-struct dijkstra_result {
-  vu distance;
-  vu previous;
-};
-[[maybe_unused]] dijkstra_result dijkstra(graph const& graph, u64 const source)
-{
-  vu distance(graph.adjacent.size(), inf<u64>);
-  vu previous(graph.adjacent.size());
-  distance[source] = 0;
-
-  vb visited(graph.adjacent
-                 .size()); // `visited[u]` is true means u has been a start
-                           // point, and it shouldn't be start point once more.
-
-  priority_queue<puu, std::vector<puu>, greater<>> q;
-  q.emplace(distance[source], source);
-
-  while (!q.empty()) { // The main loop
-    auto const [_, u]{q.top()}; // Extract the closest vertex. (Get and remove
-                                // the best vertex)
-    q.pop();
-
-    if (visited[u]) {
-      continue;
-    }
-    visited[u] = true;
-
-    for (auto const& [w, v]: graph.edges_of(u)) {
-      if (auto const alt{distance[u] + w}; alt < distance[v]) {
-        distance[v] = alt;
-        previous[v] = u;
-        q.emplace(alt, v);
-      }
-    }
-  }
-
-  return {distance, previous};
-}
-[[maybe_unused]] vvi floyd(std::vector<std::vector<pii>> const& adjacent)
-{
-  auto const n = adjacent.size();
-
-  vvi f(n, vi(n, inf<i64>));
-  // Initialize data
-  for (u64 u = 0; u != n; ++u) {
-    f[u][u] = 0;
-    for (auto const& [w, v]: adjacent[u]) {
-      f[u][v] = w;
-    }
-  }
-
-  for (size_t k = 0; k != n; ++k) {
-    // In k-th round (At the end of the round), f[i][j] denotes the minimum
-    // distance between i, j, concerning first k vertices.
-    for (size_t i = 0; i != n; ++i) {
-      for (size_t j = 0; j != n; ++j) {
-        check_min(f[i][j], f[i][k] + f[k][j]);
-      }
-    }
-  }
-
-  return f;
-}
-
-class disjoint_set_union {
- public:
-  explicit disjoint_set_union(size_t size): parent_(size), size_(size, 1)
-  {
-    std::iota(parent_.begin(), parent_.end(), 0);
-  }
-  // with path compression
-  size_t find(size_t const x)
-  {
-    return parent_[x] == x ? x : parent_[x] = find(parent_[x]);
-  }
-  /// @return:
-  /// false if there has been pair x,y in the set.
-  /// true successfully united
-  bool unite(size_t x, size_t y)
-  {
-    x = find(x), y = find(y);
-    if (x == y) {
-      return false;
-    }
-    if (size_[x] < size_[y]) {
-      swap(x, y);
-    }
-    parent_[y] = x;
-    size_[x] += size_[y];
-    return true;
-  }
-  [[nodiscard]] bool united(size_t const x, size_t const y)
-  {
-    return find(x) == find(y);
-  }
-  // [[nodiscard]] auto const& size() const { return size_; }
- private:
-  std::vector<size_t> parent_;
-  std::vector<size_t> size_;
-};
-using dsu = disjoint_set_union;
-
-[[maybe_unused]] constexpr i64 lsb(i64 const i)
+[[maybe_unused]] constexpr std::int_fast64_t lsb(std::int_fast64_t const i)
 {
   return i & (-i);
 }
 // i mustn't be 0
-[[maybe_unused]] constexpr u64 msb(u64 const i)
+[[maybe_unused]] constexpr std::size_t msb(std::uint_fast64_t const i)
 {
   assert(i != 0);
-  return sizeof(u64) * CHAR_BIT - 1 - __builtin_clzll(i | 1);
+  return sizeof(u64) * CHAR_BIT - 1 - __builtin_clzll(i);
 }
-class fenwick_tree {
- public:
-  fenwick_tree(u64 const size): tree_(size) {}
-  // The input array should start from the index 1.
-  fenwick_tree(vi coll): tree_{std::move(coll)}
-  {
-    for (size_t i = 1; i != tree_.size(); ++i) {
-      auto parent_index = i + lsb(static_cast<i64>(i));
-      if (parent_index < tree_.size()) {
-        tree_[parent_index] += tree_[i];
-      }
-    }
-  }
-  [[nodiscard]] i64 prefix_sum(u64 index) const
-  {
-    i64 sum{};
-    while (index > 0) {
-      sum += tree_[index];
-      index -= lsb(static_cast<i64>(index));
-    }
-    return sum;
-  }
-  void add_to(u64 index, i64 const value)
-  {
-    while (index < tree_.size()) {
-      tree_[index] += value;
-      index += lsb(static_cast<i64>(index));
-    }
-  }
- private:
-  vi tree_;
-};
 #ifdef __cpp_concepts
-void solve_all_cases(auto solve_case, [[maybe_unused]] std::istream& is)
+void solve_all_cases(auto solve_case)
 #else
-template<typename F>
-void solve_all_cases(F solve_case, [[maybe_unused]] std::istream& is)
+template<typename F> void solve_all_cases(F solve_case)
 #endif
 {
-  constexpr auto my_precision = 10;
-  [[maybe_unused]] auto const default_precision
-      = std::cout.precision(my_precision);
+  constexpr auto my_precision{10};
+  [[maybe_unused]] auto const default_precision{
+      std::cout.precision(my_precision)};
   std::cout << std::fixed;
 
   int t{1};
-  // is >> t;
+  // std::cin >> t;
   using return_type = decltype(solve_case());
   for (int i = 0; i != t; ++i) {
     if constexpr (
@@ -521,12 +240,13 @@ void solve_all_cases(F solve_case, [[maybe_unused]] std::istream& is)
 
 auto solve_case()
 {
+  using namespace std;
   // return 0;
 }
 
 int main()
 {
-  impl::io_accelerator accelerator;
-  solve_all_cases(solve_case, std::cin);
+  std::ios::sync_with_stdio(false), std::cin.tie(nullptr);
+  solve_all_cases(solve_case);
   return 0;
 }
