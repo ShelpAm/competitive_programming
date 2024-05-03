@@ -2,21 +2,18 @@
 #include "libs/generics.h"
 
 class disjoint_set_union {
- public:
-  explicit disjoint_set_union(int size): parent_(size), size_(size, 1)
-  {
+public:
+  explicit disjoint_set_union(int size) : parent_(size), size_(size, 1) {
     std::iota(parent_.begin(), parent_.end(), 0);
   }
   // with path compression
-  int find(int const x)
-  {
+  int find(int const x) {
     return parent_[x] == x ? x : parent_[x] = find(parent_[x]);
   }
   /// @return:
   /// false if there has been pair x,y in the set.
   /// true successfully united
-  bool unite(int x, int y)
-  {
+  bool unite(int x, int y) {
     x = find(x), y = find(y);
     if (x == y) {
       return false;
@@ -28,12 +25,11 @@ class disjoint_set_union {
     size_[x] += size_[y];
     return true;
   }
-  [[nodiscard]] bool united(int const x, int const y)
-  {
+  [[nodiscard]] bool united(int const x, int const y) {
     return find(x) == find(y);
   }
   // [[nodiscard]] auto const& size() const { return size_; }
- private:
+private:
   std::vector<int> parent_;
   std::vector<int> size_;
 };
