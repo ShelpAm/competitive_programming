@@ -1,10 +1,10 @@
-// Problem: G1. Division + LCP (easy version)
-// Contest: Codeforces Round 943 (Div. 3)
+// Problem: B. Make It Ugly
+// Contest: Educational Codeforces Round 164 (Rated for Div. 2)
 // Judge: Codeforces
-// URL: https://codeforces.com/contest/1968/problem/G1
+// URL: https://codeforces.com/contest/1954/problem/B
 // Memory Limit: 256
 // Time Limit: 2000
-// Start: Fri 03 May 2024 12:28:06 AM CST
+// Start: Sat 04 May 2024 12:56:31 PM CST
 // Author: ShelpAm
 
 #include <bits/stdc++.h>
@@ -237,35 +237,32 @@ void solve_all_cases(F solve_case)
 
 auto solve_case() {
   using namespace std;
-  int n, l, r;
-  cin >> n >> l >> r;
-  string s;
-  cin >> s;
-
-  auto check{[&](int len, int segs) {
-    auto const t{s.substr(0, len)};
-    int cnt{};
-    string::size_type i{};
-    while (i != string::npos) {
-      ++cnt;
-      i = s.find(t, i + t.size());
-      if (cnt >= segs) {
-        return true;
-      }
-    }
-    return false;
-  }};
-
-  int lo{}, hi{n / l};
-  while (lo < hi) {
-    auto const mid{(lo + hi + 1) / 2};
-    if (check(mid, l)) {
-      lo = mid;
+  int n;
+  cin >> n;
+  vector<int> a(n);
+  cin >> a;
+  vector<int> size{1}, type{a.front()};
+  for (int i{1}; i != n; ++i) {
+    if (a[i] != a[i - 1]) {
+      size.push_back(1);
+      type.push_back(a[i]);
     } else {
-      hi = mid - 1;
+      ++size.back();
     }
   }
-  cout << lo << '\n';
+  if (size.size() == 1) {
+    cout << -1 << '\n';
+  } else if (size.size() == 2) {
+    assert(false && "IMPOSSIBLE INPUT");
+  } else {
+    int ans{inf<int>};
+    for (int i{}; i != size.size(); ++i) {
+      if (type[i] == type.front()) {
+        check_min(ans, size[i]);
+      }
+    }
+    cout << ans << '\n';
+  }
 }
 
 int main() {

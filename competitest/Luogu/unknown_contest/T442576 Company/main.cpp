@@ -1,10 +1,10 @@
-// Problem: G1. Division + LCP (easy version)
-// Contest: Codeforces Round 943 (Div. 3)
-// Judge: Codeforces
-// URL: https://codeforces.com/contest/1968/problem/G1
-// Memory Limit: 256
-// Time Limit: 2000
-// Start: Fri 03 May 2024 12:28:06 AM CST
+// Problem: T442576 Company
+// Contest: unknown_contest
+// Judge: Luogu
+// URL: https://www.luogu.com.cn/problem/T442576?contestId=167054
+// Memory Limit: 512
+// Time Limit: 1000
+// Start: Fri 03 May 2024 02:00:14 PM CST
 // Author: ShelpAm
 
 #include <bits/stdc++.h>
@@ -209,7 +209,7 @@ void solve_all_cases(F solve_case)
   std::cout << std::fixed;
 
   int t{1};
-  std::cin >> t;
+  // std::cin >> t;
   using return_type = decltype(solve_case());
   for (int i = 0; i != t; ++i) {
     if constexpr (
@@ -237,35 +237,60 @@ void solve_all_cases(F solve_case)
 
 auto solve_case() {
   using namespace std;
-  int n, l, r;
-  cin >> n >> l >> r;
-  string s;
-  cin >> s;
-
-  auto check{[&](int len, int segs) {
-    auto const t{s.substr(0, len)};
-    int cnt{};
-    string::size_type i{};
-    while (i != string::npos) {
-      ++cnt;
-      i = s.find(t, i + t.size());
-      if (cnt >= segs) {
-        return true;
+  int n;
+  cin >> n;
+  vector<vector<int>> depth(n), pa(n);
+  vector<vector<vector<int>>> adj(n);
+  int mid{};
+  for (int i{}; i != n; ++i) {
+    function<int(int)> getdepth{[&](int u) {
+      if (depth[i][u] != 0) {
+        return depth[i][u];
       }
+      return depth[i][u] = 1 + getdepth(pa[i][u]);
+    }};
+    int m;
+    cin >> m;
+    depth[i].resize(m);
+    depth[i][0] = 1;
+    pa[i].resize(m);
+    adj[i].resize(m);
+    for (int j{1}; j != m; ++j) {
+      cin >> pa[i][j];
+      adj[i][--pa[i][j]].push_back(j);
+      adj[i][j].push_back(pa[i][j]);
     }
-    return false;
-  }};
-
-  int lo{}, hi{n / l};
-  while (lo < hi) {
-    auto const mid{(lo + hi + 1) / 2};
-    if (check(mid, l)) {
-      lo = mid;
-    } else {
-      hi = mid - 1;
+    for (int i{}; i != m; ++i) {
+      getdepth(i);
+    }
+    if (i >= 2) {
+      int d{};
+      for (int i{}; i != m; ++i) {
+        check_max(d, getdepth(i));
+      }
+      mid += d;
     }
   }
-  cout << lo << '\n';
+  auto deepest{[&](auto self, int tree, int u, int p) -> int {
+    int res{};
+    for (auto const v : adj[tree][u]) {
+      if (v != p && (v != 0 || adj[tree][v].size() != 1)) {
+        check_max(res, self(self, tree, v, u) + 1);
+      }
+    }
+    return res;
+  }};
+  vector<int> xy(2);
+  cin >> xy;
+  for (auto &e : xy) {
+    --e;
+  }
+  int ans{};
+  for (int i{}; i != 2; ++i) {
+    auto const dist{deepest(deepest, i, xy[i], -1)};
+    check_max(ans, dist + depth[i ^ 1][xy[i ^ 1]]);
+  }
+  cout << ans + mid;
 }
 
 int main() {

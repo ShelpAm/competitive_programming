@@ -1,10 +1,10 @@
-// Problem: G1. Division + LCP (easy version)
-// Contest: Codeforces Round 943 (Div. 3)
-// Judge: Codeforces
-// URL: https://codeforces.com/contest/1968/problem/G1
-// Memory Limit: 256
-// Time Limit: 2000
-// Start: Fri 03 May 2024 12:28:06 AM CST
+// Problem: T441280 Queue
+// Contest: unknown_contest
+// Judge: Luogu
+// URL: https://www.luogu.com.cn/problem/T441280?contestId=167054
+// Memory Limit: 512
+// Time Limit: 1000
+// Start: Fri 03 May 2024 02:00:14 PM CST
 // Author: ShelpAm
 
 #include <bits/stdc++.h>
@@ -237,35 +237,29 @@ void solve_all_cases(F solve_case)
 
 auto solve_case() {
   using namespace std;
-  int n, l, r;
-  cin >> n >> l >> r;
-  string s;
-  cin >> s;
-
-  auto check{[&](int len, int segs) {
-    auto const t{s.substr(0, len)};
-    int cnt{};
-    string::size_type i{};
-    while (i != string::npos) {
-      ++cnt;
-      i = s.find(t, i + t.size());
-      if (cnt >= segs) {
-        return true;
-      }
-    }
-    return false;
-  }};
-
-  int lo{}, hi{n / l};
-  while (lo < hi) {
-    auto const mid{(lo + hi + 1) / 2};
-    if (check(mid, l)) {
-      lo = mid;
-    } else {
-      hi = mid - 1;
-    }
+  u64 n;
+  cin >> n;
+  auto const r{n % 4};
+  if (r == 0) {
+    cout << 0;
+  } else if (r == 1) {
+    cout << n;
+  } else if (r == 2) {
+    cout << n - 2;
+  } else {
+    cout << 3;
   }
-  cout << lo << '\n';
+  // u64 x{1};
+  // cout << x << ' ' << 1 << '\n';
+  // for (int i{2}; i != n + 1; ++i) {
+  //   if (x % 2 == 1) {
+  //     x &= i;
+  //   } else {
+  //     x ^= i;
+  //   }
+  //   cout << x << ' ' << i << '\n';
+  // }
+  cout << '\n';
 }
 
 int main() {

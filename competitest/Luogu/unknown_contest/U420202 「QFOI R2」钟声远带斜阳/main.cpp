@@ -1,10 +1,10 @@
-// Problem: G1. Division + LCP (easy version)
-// Contest: Codeforces Round 943 (Div. 3)
-// Judge: Codeforces
-// URL: https://codeforces.com/contest/1968/problem/G1
-// Memory Limit: 256
-// Time Limit: 2000
-// Start: Fri 03 May 2024 12:28:06 AM CST
+// Problem: U420202 「QFOI R2」钟声远带斜阳
+// Contest: unknown_contest
+// Judge: Luogu
+// URL: https://www.luogu.com.cn/problem/U420202?contestId=166040
+// Memory Limit: 512
+// Time Limit: 1000
+// Start: Sat 04 May 2024 02:21:52 PM CST
 // Author: ShelpAm
 
 #include <bits/stdc++.h>
@@ -209,7 +209,7 @@ void solve_all_cases(F solve_case)
   std::cout << std::fixed;
 
   int t{1};
-  std::cin >> t;
+  // std::cin >> t;
   using return_type = decltype(solve_case());
   for (int i = 0; i != t; ++i) {
     if constexpr (
@@ -237,35 +237,27 @@ void solve_all_cases(F solve_case)
 
 auto solve_case() {
   using namespace std;
-  int n, l, r;
-  cin >> n >> l >> r;
-  string s;
-  cin >> s;
-
-  auto check{[&](int len, int segs) {
-    auto const t{s.substr(0, len)};
-    int cnt{};
-    string::size_type i{};
-    while (i != string::npos) {
-      ++cnt;
-      i = s.find(t, i + t.size());
-      if (cnt >= segs) {
-        return true;
-      }
-    }
-    return false;
-  }};
-
-  int lo{}, hi{n / l};
-  while (lo < hi) {
-    auto const mid{(lo + hi + 1) / 2};
-    if (check(mid, l)) {
-      lo = mid;
-    } else {
-      hi = mid - 1;
-    }
+  i64 n, p, q, r;
+  cin >> n >> p >> q >> r;
+  vector<i64> a(n);
+  cin >> a;
+  ranges::sort(a);
+  auto pos{ranges::partition_point(a, [](auto e) { return e < 0; })};
+  __int128_t sum{sum_of(a)};
+  i64 ans{inf<i64>};
+  i64 cnt_remove{};
+  for (auto it{a.begin()}; it != pos; ++it) {
+    check_min(ans, max(__int128_t{}, p * -sum) + cnt_remove * q);
+    // debug("sum", sum);
+    // debug("cost1", max(__int128_t{}, p * -sum));
+    // debug("cost2", cnt_remove * q);
+    sum -= *it;
+    ++cnt_remove;
   }
-  cout << lo << '\n';
+  if (pos != a.end()) {
+    check_min(ans, max(__int128_t{}, p * -sum) + cnt_remove * q);
+  }
+  cout << max(0L, ans);
 }
 
 int main() {

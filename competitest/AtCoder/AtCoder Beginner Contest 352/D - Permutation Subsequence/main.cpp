@@ -1,10 +1,10 @@
-// Problem: G1. Division + LCP (easy version)
-// Contest: Codeforces Round 943 (Div. 3)
-// Judge: Codeforces
-// URL: https://codeforces.com/contest/1968/problem/G1
-// Memory Limit: 256
+// Problem: D - Permutation Subsequence
+// Contest: AtCoder Beginner Contest 352
+// Judge: AtCoder
+// URL: https://atcoder.jp/contests/abc352/tasks/abc352_d
+// Memory Limit: 1024
 // Time Limit: 2000
-// Start: Fri 03 May 2024 12:28:06 AM CST
+// Start: Sat 04 May 2024 08:15:52 PM CST
 // Author: ShelpAm
 
 #include <bits/stdc++.h>
@@ -209,7 +209,7 @@ void solve_all_cases(F solve_case)
   std::cout << std::fixed;
 
   int t{1};
-  std::cin >> t;
+  // std::cin >> t;
   using return_type = decltype(solve_case());
   for (int i = 0; i != t; ++i) {
     if constexpr (
@@ -237,35 +237,38 @@ void solve_all_cases(F solve_case)
 
 auto solve_case() {
   using namespace std;
-  int n, l, r;
-  cin >> n >> l >> r;
-  string s;
-  cin >> s;
+  int n, k;
+  cin >> n >> k;
+  vector<int> pos_of(n);
+  for (int i{}; i != n; ++i) {
+    int p;
+    cin >> p;
+    pos_of[--p] = i;
+  }
 
-  auto check{[&](int len, int segs) {
-    auto const t{s.substr(0, len)};
-    int cnt{};
-    string::size_type i{};
-    while (i != string::npos) {
-      ++cnt;
-      i = s.find(t, i + t.size());
-      if (cnt >= segs) {
-        return true;
-      }
-    }
-    return false;
-  }};
-
-  int lo{}, hi{n / l};
-  while (lo < hi) {
-    auto const mid{(lo + hi + 1) / 2};
-    if (check(mid, l)) {
-      lo = mid;
-    } else {
-      hi = mid - 1;
+  vector<vector<int>> f(msb(n) + 1, vector<int>(n)),
+      g(msb(n) + 1, vector<int>(n));
+  f[0] = g[0] = pos_of;
+  for (int i{1}; i != f.size(); ++i) {
+    for (int j{}; j != n; ++j) {
+      f[i][j] = max(f[i - 1][j], f[i - 1][j + (1 << (i - 1))]);
+      g[i][j] = min(g[i - 1][j], g[i - 1][j + (1 << (i - 1))]);
     }
   }
-  cout << lo << '\n';
+  auto getmax{[&](int l, int r) {
+    auto const k{msb(r - l + 1)};
+    return max(f[k][l], f[k][r + 1 - (1 << k)]);
+  }};
+  auto getmin{[&](int l, int r) {
+    auto const len{msb(r - l + 1)};
+    return min(g[len][l], g[len][r + 1 - (1 << len)]);
+  }};
+
+  int ans{inf<int>};
+  for (int i{}; i + k - 1 != n; ++i) {
+    check_min(ans, getmax(i, i + k - 1) - getmin(i, i + k - 1));
+  }
+  cout << ans;
 }
 
 int main() {

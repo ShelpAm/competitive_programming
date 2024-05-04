@@ -1,10 +1,10 @@
-// Problem: G1. Division + LCP (easy version)
-// Contest: Codeforces Round 943 (Div. 3)
-// Judge: Codeforces
-// URL: https://codeforces.com/contest/1968/problem/G1
-// Memory Limit: 256
+// Problem: F - Estimate Order
+// Contest: AtCoder Beginner Contest 352
+// Judge: AtCoder
+// URL: https://atcoder.jp/contests/abc352/tasks/abc352_f
+// Memory Limit: 1024
 // Time Limit: 2000
-// Start: Fri 03 May 2024 12:28:06 AM CST
+// Start: Sat 04 May 2024 08:15:52 PM CST
 // Author: ShelpAm
 
 #include <bits/stdc++.h>
@@ -209,7 +209,7 @@ void solve_all_cases(F solve_case)
   std::cout << std::fixed;
 
   int t{1};
-  std::cin >> t;
+  // std::cin >> t;
   using return_type = decltype(solve_case());
   for (int i = 0; i != t; ++i) {
     if constexpr (
@@ -237,35 +237,65 @@ void solve_all_cases(F solve_case)
 
 auto solve_case() {
   using namespace std;
-  int n, l, r;
-  cin >> n >> l >> r;
-  string s;
-  cin >> s;
-
-  auto check{[&](int len, int segs) {
-    auto const t{s.substr(0, len)};
-    int cnt{};
-    string::size_type i{};
-    while (i != string::npos) {
-      ++cnt;
-      i = s.find(t, i + t.size());
-      if (cnt >= segs) {
-        return true;
+  int n, m;
+  cin >> n >> m;
+  vector<vector<int>> restrain(n, vector<int>(n, inf<int>));
+  vector<vector<pair<int, int>>> ppp(n);
+  vector<tuple<int, int, int>> req(m);
+  for (auto &[a, b, c] : req) {
+    cin >> a >> b >> c;
+    --a, --b;
+    restrain[a][b] = c;
+    restrain[b][a] = -c;
+    ppp[a].push_back({b, c});
+    ppp[b].push_back({a, -c});
+  }
+  auto check{[&](vector<int> const &rank, int p) {
+    for (int i{}; i != p; ++i) {
+      if (restrain[i][p] != inf<int> && rank[i] - rank[p] != restrain[i][p]) {
+        return false;
       }
     }
-    return false;
+    return true;
   }};
-
-  int lo{}, hi{n / l};
-  while (lo < hi) {
-    auto const mid{(lo + hi + 1) / 2};
-    if (check(mid, l)) {
-      lo = mid;
+  vector<set<int>> pos(n);
+  vector<int> rank(n, inf<int>);
+  auto calc{[&](auto self, int p, int avail) {
+    if (avail == 0) { // p == n
+      for (int i{}; i != n; ++i) {
+        pos[i].insert(rank[i]);
+      }
+      return;
+    }
+    if (rank[p] != inf<int>) {
+      self(self, p + 1, avail);
     } else {
-      hi = mid - 1;
+      for (int i{}; i != n; ++i) {
+        if (avail >> i & 1) {
+          rank[p] = i;
+          int tmp_avail{avail ^ (1 << i)};
+          if (check(rank, p)) {
+            for (auto const &[b, c] : ppp[p]) {
+              if (rank[b] == inf<int>) {
+                rank[b] = i - c;
+                tmp_avail ^= 1 << b;
+              }
+            }
+            self(self, p + 1, tmp_avail);
+          }
+          rank[p] = inf<int>;
+        }
+      }
+    }
+  }};
+  calc(calc, 0, (1 << n) - 1);
+  for (auto const &e : pos) {
+    if (e.size() == 1) {
+      cout << *e.begin() + 1 << ' ';
+    } else {
+      cout << -1 << ' ';
     }
   }
-  cout << lo << '\n';
 }
 
 int main() {

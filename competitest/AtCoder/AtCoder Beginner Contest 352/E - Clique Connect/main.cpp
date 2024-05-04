@@ -1,10 +1,10 @@
-// Problem: G1. Division + LCP (easy version)
-// Contest: Codeforces Round 943 (Div. 3)
-// Judge: Codeforces
-// URL: https://codeforces.com/contest/1968/problem/G1
-// Memory Limit: 256
+// Problem: E - Clique Connect
+// Contest: AtCoder Beginner Contest 352
+// Judge: AtCoder
+// URL: https://atcoder.jp/contests/abc352/tasks/abc352_e
+// Memory Limit: 1024
 // Time Limit: 2000
-// Start: Fri 03 May 2024 12:28:06 AM CST
+// Start: Sat 04 May 2024 08:15:52 PM CST
 // Author: ShelpAm
 
 #include <bits/stdc++.h>
@@ -209,7 +209,7 @@ void solve_all_cases(F solve_case)
   std::cout << std::fixed;
 
   int t{1};
-  std::cin >> t;
+  // std::cin >> t;
   using return_type = decltype(solve_case());
   for (int i = 0; i != t; ++i) {
     if constexpr (
@@ -235,37 +235,64 @@ void solve_all_cases(F solve_case)
 }
 } // namespace
 
+class disjoint_set_union {
+public:
+  explicit disjoint_set_union(int size) : parent_(size), size_(size, 1) {
+    std::iota(parent_.begin(), parent_.end(), 0);
+  }
+  // with path compression
+  int find(int const x) {
+    return parent_[x] == x ? x : parent_[x] = find(parent_[x]);
+  }
+  /// @return:
+  /// false if there has been pair x,y in the set.
+  /// true successfully united
+  bool unite(int x, int y) {
+    x = find(x), y = find(y);
+    if (x == y) {
+      return false;
+    }
+    if (size_[x] < size_[y]) {
+      std::swap(x, y);
+    }
+    parent_[y] = x;
+    size_[x] += size_[y];
+    return true;
+  }
+  [[nodiscard]] bool united(int const x, int const y) {
+    return find(x) == find(y);
+  }
+  // [[nodiscard]] auto const& size() const { return size_; }
+  // private:
+  std::vector<int> parent_;
+  std::vector<int> size_;
+};
+using dsu = disjoint_set_union;
 auto solve_case() {
   using namespace std;
-  int n, l, r;
-  cin >> n >> l >> r;
-  string s;
-  cin >> s;
-
-  auto check{[&](int len, int segs) {
-    auto const t{s.substr(0, len)};
-    int cnt{};
-    string::size_type i{};
-    while (i != string::npos) {
-      ++cnt;
-      i = s.find(t, i + t.size());
-      if (cnt >= segs) {
-        return true;
+  int n, m;
+  cin >> n >> m;
+  multimap<int, vector<int>> conn;
+  for (int i{}; i != m; ++i) {
+    int k, c;
+    cin >> k >> c;
+    vector<int> a(k);
+    cin >> a;
+    for (auto &e : a) {
+      --e;
+    }
+    conn.insert({c, a});
+  }
+  dsu dsu(n);
+  i64 ans{};
+  for (auto const &[weight, vertices] : conn) {
+    for (auto p : vertices) {
+      if (dsu.unite(vertices.front(), p)) {
+        ans += weight;
       }
     }
-    return false;
-  }};
-
-  int lo{}, hi{n / l};
-  while (lo < hi) {
-    auto const mid{(lo + hi + 1) / 2};
-    if (check(mid, l)) {
-      lo = mid;
-    } else {
-      hi = mid - 1;
-    }
   }
-  cout << lo << '\n';
+  cout << (dsu.size_[dsu.find(0)] == n ? ans : -1);
 }
 
 int main() {

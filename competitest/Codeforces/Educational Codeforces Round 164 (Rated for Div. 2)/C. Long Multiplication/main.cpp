@@ -1,10 +1,10 @@
-// Problem: G1. Division + LCP (easy version)
-// Contest: Codeforces Round 943 (Div. 3)
+// Problem: C. Long Multiplication
+// Contest: Educational Codeforces Round 164 (Rated for Div. 2)
 // Judge: Codeforces
-// URL: https://codeforces.com/contest/1968/problem/G1
+// URL: https://codeforces.com/contest/1954/problem/C
 // Memory Limit: 256
 // Time Limit: 2000
-// Start: Fri 03 May 2024 12:28:06 AM CST
+// Start: Sat 04 May 2024 12:56:31 PM CST
 // Author: ShelpAm
 
 #include <bits/stdc++.h>
@@ -235,37 +235,34 @@ void solve_all_cases(F solve_case)
 }
 } // namespace
 
+std::vector<int> &operator+=(auto &lhs, auto const &rhs) {
+  for (int i{}; i != std::max(lhs.size(), rhs.size()); ++i) {
+    lhs[i] += rhs[i];
+    if (lhs[i] >= 10 && i == lhs.size() - 1) {
+      lhs.push_back(0);
+    }
+    lhs[i + 1] += lhs[i] / 10;
+    lhs[i] %= 10;
+  }
+  return lhs;
+}
 auto solve_case() {
   using namespace std;
-  int n, l, r;
-  cin >> n >> l >> r;
-  string s;
-  cin >> s;
-
-  auto check{[&](int len, int segs) {
-    auto const t{s.substr(0, len)};
-    int cnt{};
-    string::size_type i{};
-    while (i != string::npos) {
-      ++cnt;
-      i = s.find(t, i + t.size());
-      if (cnt >= segs) {
-        return true;
-      }
+  string x, y;
+  cin >> x >> y;
+  auto greater{[](auto x, auto y) {
+    if (x.size() != y.size()) {
+      return x.size() > y.size();
     }
-    return false;
+    return x > y;
   }};
-
-  int lo{}, hi{n / l};
-  while (lo < hi) {
-    auto const mid{(lo + hi + 1) / 2};
-    if (check(mid, l)) {
-      lo = mid;
-    } else {
-      hi = mid - 1;
+  for (int i{}; i != x.size(); ++i) {
+    auto const a{x.substr(0, i)}, b{y.substr(0, i)};
+    if (greater(a, b) == (x[i] > y[i])) {
+      swap(x[i], y[i]);
     }
   }
-  cout << lo << '\n';
+  cout << x << '\n' << y << '\n';
 }
 
 int main() {

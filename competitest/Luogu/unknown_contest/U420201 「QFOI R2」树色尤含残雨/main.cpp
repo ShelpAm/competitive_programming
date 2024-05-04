@@ -1,10 +1,10 @@
-// Problem: G1. Division + LCP (easy version)
-// Contest: Codeforces Round 943 (Div. 3)
-// Judge: Codeforces
-// URL: https://codeforces.com/contest/1968/problem/G1
-// Memory Limit: 256
-// Time Limit: 2000
-// Start: Fri 03 May 2024 12:28:06 AM CST
+// Problem: U420201 「QFOI R2」树色尤含残雨
+// Contest: unknown_contest
+// Judge: Luogu
+// URL: https://www.luogu.com.cn/problem/U420201?contestId=166040
+// Memory Limit: 512
+// Time Limit: 1000
+// Start: Sat 04 May 2024 02:21:52 PM CST
 // Author: ShelpAm
 
 #include <bits/stdc++.h>
@@ -209,7 +209,7 @@ void solve_all_cases(F solve_case)
   std::cout << std::fixed;
 
   int t{1};
-  std::cin >> t;
+  // std::cin >> t;
   using return_type = decltype(solve_case());
   for (int i = 0; i != t; ++i) {
     if constexpr (
@@ -235,37 +235,66 @@ void solve_all_cases(F solve_case)
 }
 } // namespace
 
-auto solve_case() {
-  using namespace std;
-  int n, l, r;
-  cin >> n >> l >> r;
-  string s;
-  cin >> s;
-
-  auto check{[&](int len, int segs) {
-    auto const t{s.substr(0, len)};
-    int cnt{};
-    string::size_type i{};
-    while (i != string::npos) {
-      ++cnt;
-      i = s.find(t, i + t.size());
-      if (cnt >= segs) {
-        return true;
+struct sieve {
+  sieve(size_t const upper_bound) : min_factor(upper_bound + 1, 0) {
+    for (size_t i = 2; i != min_factor.size(); ++i) {
+      if (min_factor[i] == 0) {
+        primes.push_back(i);
+        min_factor[i] = i;
+      }
+      for (auto const p : primes) {
+        if (i * p > upper_bound || p > min_factor[i]) {
+          break;
+        }
+        min_factor[i * p] = p;
       }
     }
-    return false;
-  }};
-
-  int lo{}, hi{n / l};
-  while (lo < hi) {
-    auto const mid{(lo + hi + 1) / 2};
-    if (check(mid, l)) {
-      lo = mid;
-    } else {
-      hi = mid - 1;
-    }
   }
-  cout << lo << '\n';
+
+  [[nodiscard]] std::map<u64, u64> factorize(u64 x) const {
+    std::map<u64, u64> res;
+    assert(x <= (min_factor.size() - 1) * (min_factor.size() - 1));
+    for (auto const p : primes) {
+      if (p > x) {
+        break;
+      }
+      while (x % p == 0) {
+        x /= p;
+        ++res[p];
+      }
+    }
+    if (x >= min_factor.size()) {
+      ++res[x];
+    }
+    return res;
+  }
+
+  vu primes;
+  vu min_factor;
+};
+auto solve_case() {
+#define int long long
+  using namespace std;
+  int x;
+  cin >> x;
+  // for (int x{2}; x != 11; ++x) {
+  sieve sieve(sqrt(x) + 1);
+  auto const factors{sieve.factorize(x)};
+  int num_factors{}, max_num{};
+  for (auto const [k, v] : factors) {
+    num_factors += v;
+    check_max(max_num, v);
+  }
+  if (factors.size() == 1) {
+    cout << x;
+  } else if (max_num >= 2 || num_factors % 2 == 0) {
+    cout << 1;
+  } else {
+    cout << factors.begin()->first;
+  }
+  cout << '\n';
+  // }
+#undef int
 }
 
 int main() {

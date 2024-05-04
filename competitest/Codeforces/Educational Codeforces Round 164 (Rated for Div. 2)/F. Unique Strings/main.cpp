@@ -1,10 +1,10 @@
-// Problem: G1. Division + LCP (easy version)
-// Contest: Codeforces Round 943 (Div. 3)
+// Problem: F. Unique Strings
+// Contest: Educational Codeforces Round 164 (Rated for Div. 2)
 // Judge: Codeforces
-// URL: https://codeforces.com/contest/1968/problem/G1
+// URL: https://codeforces.com/contest/1954/problem/F
 // Memory Limit: 256
 // Time Limit: 2000
-// Start: Fri 03 May 2024 12:28:06 AM CST
+// Start: Sat 04 May 2024 12:56:31 PM CST
 // Author: ShelpAm
 
 #include <bits/stdc++.h>
@@ -37,9 +37,9 @@ using quadratici = std::tuple<i64, i64, i64, i64>;
 using quadraticu = std::tuple<u64, u64, u64, u64>;
 
 namespace {
-template <typename T>
+template<typename T>
 [[maybe_unused]] constexpr T mod{static_cast<T>(998244353)};
-template <typename T>
+template<typename T>
 [[maybe_unused]] constexpr T inf{std::numeric_limits<T>::max() / 2};
 [[maybe_unused]] constexpr double eps{1e-8};
 
@@ -48,64 +48,66 @@ namespace impl {
 #ifdef __cpp_concepts
 using ::std::remove_cvref_t;
 
-template <typename T>
-concept pair = requires(T t) {
+template<typename T> concept pair = requires(T t) {
   t.first;
   t.second;
 };
 
-template <typename> struct is_tuple_t : std::false_type {};
-template <typename... T>
-struct is_tuple_t<std::tuple<T...>> : std::true_type {};
-template <typename... T>
-concept tuple = is_tuple_t<T...>::value;
+template<typename> struct is_tuple_t : std::false_type {};
+template<typename... T> struct is_tuple_t<std::tuple<T...>> : std::true_type {};
+template<typename... T> concept tuple = is_tuple_t<T...>::value;
 
-template <typename T>
-concept c_str = std::same_as<char const *, remove_cvref_t<T>>;
-template <typename T>
-concept string = std::same_as<std::string, remove_cvref_t<T>>;
-template <typename T>
-concept string_view = std::same_as<std::string_view, remove_cvref_t<T>>;
-template <typename T>
-concept string_like = string<T> || string_view<T> || c_str<T>;
+template<typename T> concept c_str
+    = std::same_as<char const*, remove_cvref_t<T>>;
+template<typename T> concept string
+    = std::same_as<std::string, remove_cvref_t<T>>;
+template<typename T> concept string_view
+    = std::same_as<std::string_view, remove_cvref_t<T>>;
+template<typename T> concept string_like
+    = string<T> || string_view<T> || c_str<T>;
 #else
-template <class T>
-using remove_cvref_t = std::remove_cv_t<std::remove_reference_t<T>>;
+template<class T> using remove_cvref_t
+    = std::remove_cv_t<std::remove_reference_t<T>>;
 #endif
 
 } // namespace impl
 
 #ifdef __cpp_concepts
-auto &operator>>(auto &istream, auto &&t) {
+auto& operator>>(auto& istream, auto&& t)
+{
   using T = ::std::remove_cvref_t<decltype(t)>;
 #ifdef __cpp_lib_ranges
   if constexpr (std::ranges::range<T>) {
-    for (auto &ele : t) {
+    for (auto& ele: t) {
       istream >> ele;
     }
   }
 #endif
   else if constexpr (impl::pair<T>) {
     istream >> t.first >> t.second;
-  } else if constexpr (impl::tuple<T>) {
+  }
+  else if constexpr (impl::tuple<T>) {
     static_assert(!impl::tuple<T>, "[operator>>] tuple: not implemented yet.");
-  } else {
+  }
+  else {
     istream >> t;
   }
   return istream;
 }
 /// @warning Do not put string literals in this function, because we hasn't
 /// (can't) inplement checking-string-literals functions.
-void print(auto const &t, u64 const depth = 0) {
+void print(auto const& t, u64 const depth = 0)
+{
   using T = ::std::remove_cvref_t<decltype(t)>;
   if constexpr (impl::string_like<T>) {
     std::cout << t;
-  } else if constexpr (::std::is_convertible_v<T, char const *>) {
-    std::cout << static_cast<char const *>(t);
+  }
+  else if constexpr (::std::is_convertible_v<T, char const*>) {
+    std::cout << static_cast<char const*>(t);
   }
 #ifdef __cpp_lib_ranges
   else if constexpr (std::ranges::range<T>) {
-    for (auto const &ele : t) {
+    for (auto const& ele: t) {
       print(ele, depth + 1);
     }
     if (depth != 0) {
@@ -115,9 +117,11 @@ void print(auto const &t, u64 const depth = 0) {
 #endif
   else if constexpr (impl::pair<T>) {
     std::cout << "{ " << t.first << ", " << t.second << " } ";
-  } else if constexpr (impl::tuple<T>) {
+  }
+  else if constexpr (impl::tuple<T>) {
     static_assert(!impl::tuple<T>, "[print] tuple: not implemented yet.\n");
-  } else {
+  }
+  else {
     std::cout << t << ' ';
   }
 
@@ -125,8 +129,8 @@ void print(auto const &t, u64 const depth = 0) {
     std::cout << '\n';
   }
 }
-void debug([[maybe_unused]] std::string_view s,
-           [[maybe_unused]] auto const &t) {
+void debug([[maybe_unused]] std::string_view s, [[maybe_unused]] auto const& t)
+{
 #ifndef ONLINE_JUDGE
   std::cout << "[debug] " << s << ": ";
   if constexpr (std::ranges::range<decltype(t)>) {
@@ -136,10 +140,9 @@ void debug([[maybe_unused]] std::string_view s,
   std::cout.flush();
 #endif
 }
-constexpr bool check_max(auto &value, auto const &other)
+constexpr bool check_max(auto& value, auto const& other)
 #else
-template <typename T>
-constexpr bool check_max(T &value, T const &other)
+template<typename T> constexpr bool check_max(T& value, T const& other)
 #endif
 {
   if (value < other) {
@@ -149,10 +152,9 @@ constexpr bool check_max(T &value, T const &other)
   return false;
 }
 #ifdef __cpp_concepts
-constexpr bool check_min(auto &value, auto const &other)
+constexpr bool check_min(auto& value, auto const& other)
 #else
-template <typename T>
-constexpr bool check_min(T &value, T const &other)
+template<typename T> constexpr bool check_min(T& value, T const& other)
 #endif
 {
   if (value > other) {
@@ -162,10 +164,9 @@ constexpr bool check_min(T &value, T const &other)
   return false;
 }
 #ifdef __cpp_concepts
-constexpr auto sum_of(auto const &coll) noexcept
+constexpr auto sum_of(auto const& coll) noexcept
 #else
-template <typename Range>
-constexpr auto sum(Range const &coll) noexcept
+template<typename Range> constexpr auto sum(Range const& coll) noexcept
 #endif
 {
   using value_type = impl::remove_cvref_t<decltype(coll.front())>;
@@ -174,8 +175,7 @@ constexpr auto sum(Range const &coll) noexcept
 #ifdef __cpp_concepts
 constexpr auto pow(auto a, u64 b, u64 const p) noexcept
 #else
-template <typename T>
-constexpr auto pow(T a, u64 b, u64 const p) noexcept
+template<typename T> constexpr auto pow(T a, u64 b, u64 const p) noexcept
 #endif
 {
   u64 res{1};
@@ -188,19 +188,20 @@ constexpr auto pow(T a, u64 b, u64 const p) noexcept
   }
   return res;
 }
-[[maybe_unused]] constexpr std::int_fast64_t lsb(std::int_fast64_t const i) {
+[[maybe_unused]] constexpr std::int_fast64_t lsb(std::int_fast64_t const i)
+{
   return i & (-i);
 }
 // i mustn't be 0
-[[maybe_unused]] constexpr std::size_t msb(std::uint_fast64_t const i) {
+[[maybe_unused]] constexpr std::size_t msb(std::uint_fast64_t const i)
+{
   assert(i != 0);
   return sizeof(u64) * CHAR_BIT - 1 - __builtin_clzll(i);
 }
 #ifdef __cpp_concepts
 void solve_all_cases(auto solve_case)
 #else
-template <typename F>
-void solve_all_cases(F solve_case)
+template<typename F> void solve_all_cases(F solve_case)
 #endif
 {
   constexpr auto my_precision{10};
@@ -209,7 +210,7 @@ void solve_all_cases(F solve_case)
   std::cout << std::fixed;
 
   int t{1};
-  std::cin >> t;
+  // std::cin >> t;
   using return_type = decltype(solve_case());
   for (int i = 0; i != t; ++i) {
     if constexpr (
@@ -220,7 +221,8 @@ void solve_all_cases(F solve_case)
 #endif
     ) {
       solve_case();
-    } else if constexpr (
+    }
+    else if constexpr (
 #ifdef __cpp_concepts
         std::same_as<return_type, bool>
 #else
@@ -228,47 +230,22 @@ void solve_all_cases(F solve_case)
 #endif
     ) {
       print(solve_case() ? "YES" : "NO");
-    } else {
+    }
+    else {
       print(solve_case());
     }
   }
 }
 } // namespace
 
-auto solve_case() {
+auto solve_case()
+{
   using namespace std;
-  int n, l, r;
-  cin >> n >> l >> r;
-  string s;
-  cin >> s;
-
-  auto check{[&](int len, int segs) {
-    auto const t{s.substr(0, len)};
-    int cnt{};
-    string::size_type i{};
-    while (i != string::npos) {
-      ++cnt;
-      i = s.find(t, i + t.size());
-      if (cnt >= segs) {
-        return true;
-      }
-    }
-    return false;
-  }};
-
-  int lo{}, hi{n / l};
-  while (lo < hi) {
-    auto const mid{(lo + hi + 1) / 2};
-    if (check(mid, l)) {
-      lo = mid;
-    } else {
-      hi = mid - 1;
-    }
-  }
-  cout << lo << '\n';
+  // return 0;
 }
 
-int main() {
+int main()
+{
   std::ios::sync_with_stdio(false), std::cin.tie(nullptr);
   solve_all_cases(solve_case);
   return 0;

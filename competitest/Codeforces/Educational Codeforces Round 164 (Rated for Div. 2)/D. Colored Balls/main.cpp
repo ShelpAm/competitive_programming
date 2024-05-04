@@ -1,10 +1,10 @@
-// Problem: G1. Division + LCP (easy version)
-// Contest: Codeforces Round 943 (Div. 3)
+// Problem: D. Colored Balls
+// Contest: Educational Codeforces Round 164 (Rated for Div. 2)
 // Judge: Codeforces
-// URL: https://codeforces.com/contest/1968/problem/G1
-// Memory Limit: 256
+// URL: https://codeforces.com/contest/1954/problem/D
+// Memory Limit: 1024
 // Time Limit: 2000
-// Start: Fri 03 May 2024 12:28:06 AM CST
+// Start: Sat 04 May 2024 12:56:31 PM CST
 // Author: ShelpAm
 
 #include <bits/stdc++.h>
@@ -209,7 +209,7 @@ void solve_all_cases(F solve_case)
   std::cout << std::fixed;
 
   int t{1};
-  std::cin >> t;
+  // std::cin >> t;
   using return_type = decltype(solve_case());
   for (int i = 0; i != t; ++i) {
     if constexpr (
@@ -237,35 +237,26 @@ void solve_all_cases(F solve_case)
 
 auto solve_case() {
   using namespace std;
-  int n, l, r;
-  cin >> n >> l >> r;
-  string s;
-  cin >> s;
-
-  auto check{[&](int len, int segs) {
-    auto const t{s.substr(0, len)};
-    int cnt{};
-    string::size_type i{};
-    while (i != string::npos) {
-      ++cnt;
-      i = s.find(t, i + t.size());
-      if (cnt >= segs) {
-        return true;
+  int n;
+  cin >> n;
+  vector<int> a(n);
+  cin >> a;
+  int ans{};
+  vector<int> buf;
+  function<void(int)> getall{[&](int i) {
+    if (i == n) {
+      if (!buf.empty()) {
+        ans += max(ranges::max(buf), (sum_of(buf) + 1) / 2);
       }
+      return;
     }
-    return false;
+    getall(i + 1);
+    buf.push_back(a[i]);
+    getall(i + 1);
+    buf.pop_back();
   }};
-
-  int lo{}, hi{n / l};
-  while (lo < hi) {
-    auto const mid{(lo + hi + 1) / 2};
-    if (check(mid, l)) {
-      lo = mid;
-    } else {
-      hi = mid - 1;
-    }
-  }
-  cout << lo << '\n';
+  getall(0);
+  cout << ans << '\n';
 }
 
 int main() {

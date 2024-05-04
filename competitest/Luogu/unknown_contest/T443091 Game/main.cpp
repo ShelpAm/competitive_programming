@@ -1,10 +1,10 @@
-// Problem: G1. Division + LCP (easy version)
-// Contest: Codeforces Round 943 (Div. 3)
-// Judge: Codeforces
-// URL: https://codeforces.com/contest/1968/problem/G1
-// Memory Limit: 256
-// Time Limit: 2000
-// Start: Fri 03 May 2024 12:28:06 AM CST
+// Problem: T443091 Game
+// Contest: unknown_contest
+// Judge: Luogu
+// URL: https://www.luogu.com.cn/problem/T443091?contestId=167054
+// Memory Limit: 512
+// Time Limit: 1000
+// Start: Fri 03 May 2024 02:00:14 PM CST
 // Author: ShelpAm
 
 #include <bits/stdc++.h>
@@ -209,7 +209,7 @@ void solve_all_cases(F solve_case)
   std::cout << std::fixed;
 
   int t{1};
-  std::cin >> t;
+  // std::cin >> t;
   using return_type = decltype(solve_case());
   for (int i = 0; i != t; ++i) {
     if constexpr (
@@ -237,35 +237,37 @@ void solve_all_cases(F solve_case)
 
 auto solve_case() {
   using namespace std;
-  int n, l, r;
-  cin >> n >> l >> r;
-  string s;
-  cin >> s;
-
-  auto check{[&](int len, int segs) {
-    auto const t{s.substr(0, len)};
-    int cnt{};
-    string::size_type i{};
-    while (i != string::npos) {
-      ++cnt;
-      i = s.find(t, i + t.size());
-      if (cnt >= segs) {
-        return true;
-      }
-    }
-    return false;
-  }};
-
-  int lo{}, hi{n / l};
-  while (lo < hi) {
-    auto const mid{(lo + hi + 1) / 2};
-    if (check(mid, l)) {
-      lo = mid;
-    } else {
-      hi = mid - 1;
+  int n;
+  cin >> n;
+  vector<int> a(n), b;
+  cin >> a;
+  for (auto e : a) {
+    for (int i{1}; i != e + 1; ++i) {
+      b.push_back(i);
     }
   }
-  cout << lo << '\n';
+  vector<vector<int>> f(msb(b.size()) + 1, vector<int>(b.size()));
+  for (int i{}; i != f[0].size(); ++i) {
+    f[0][i] = b[i];
+  }
+  for (int len{1}; len != f.size(); ++len) {
+    for (int i{}; i + (1 << len) - 1 != b.size(); ++i) {
+      f[len][i] = max(f[len - 1][i], f[len - 1][i + (1 << (len - 1))]);
+    }
+  }
+  auto getmax{[&f](int l, int r) {
+    auto const k{msb(r - l + 1)};
+    return max(f[k][l], f[k][r - (1 << k) + 1]);
+  }};
+
+  u64 ans{};
+  for (int l{}; l != b.size(); ++l) {
+    for (int r{l}; r != b.size(); ++r) {
+      ans = (ans + getmax(l, r)) % mod<u64>;
+    }
+  }
+  // debug("b", b);
+  cout << ans;
 }
 
 int main() {

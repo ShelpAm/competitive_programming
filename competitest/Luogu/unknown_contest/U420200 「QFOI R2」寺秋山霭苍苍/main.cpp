@@ -1,10 +1,10 @@
-// Problem: G1. Division + LCP (easy version)
-// Contest: Codeforces Round 943 (Div. 3)
-// Judge: Codeforces
-// URL: https://codeforces.com/contest/1968/problem/G1
-// Memory Limit: 256
-// Time Limit: 2000
-// Start: Fri 03 May 2024 12:28:06 AM CST
+// Problem: U420200 「QFOI R2」寺秋山霭苍苍
+// Contest: unknown_contest
+// Judge: Luogu
+// URL: https://www.luogu.com.cn/problem/U420200?contestId=166040
+// Memory Limit: 512
+// Time Limit: 1000
+// Start: Sat 04 May 2024 02:21:52 PM CST
 // Author: ShelpAm
 
 #include <bits/stdc++.h>
@@ -209,7 +209,7 @@ void solve_all_cases(F solve_case)
   std::cout << std::fixed;
 
   int t{1};
-  std::cin >> t;
+  // std::cin >> t;
   using return_type = decltype(solve_case());
   for (int i = 0; i != t; ++i) {
     if constexpr (
@@ -235,37 +235,59 @@ void solve_all_cases(F solve_case)
 }
 } // namespace
 
+std::pair<double, double> operator+(std::pair<double, double> const &l,
+                                    std::pair<double, double> const &r) {
+  return {l.first + r.first, l.second + r.second};
+}
+std::pair<double, double> operator*(std::pair<double, double> const &l,
+                                    std::pair<double, double> const &r) {
+  return {l.first * r.first, l.second * r.second};
+}
+std::pair<double, double> operator-(std::pair<double, double> const &l) {
+  return {-l.first, -l.second};
+}
+std::pair<double, double> operator*(std::pair<double, double> const &l,
+                                    double p) {
+  return {l.first * p, l.second * p};
+}
 auto solve_case() {
   using namespace std;
-  int n, l, r;
-  cin >> n >> l >> r;
-  string s;
-  cin >> s;
-
-  auto check{[&](int len, int segs) {
-    auto const t{s.substr(0, len)};
-    int cnt{};
-    string::size_type i{};
-    while (i != string::npos) {
-      ++cnt;
-      i = s.find(t, i + t.size());
-      if (cnt >= segs) {
-        return true;
-      }
+  double lo, hi;
+  cin >> lo >> hi;
+  vector<pair<double, double>> pts(3);
+  cin >> pts;
+  auto get{[&](double p) {
+    // debug("when p is", p);
+    vector<pair<double, double>> q(3);
+    for (int i{}; i != 3; ++i) {
+      q[i] = pts[i] + (pts[(i + 1) % 3] + -pts[i]) * p;
     }
-    return false;
+    vector<double> len(3);
+    double s{};
+    for (int i{}; i != 3; ++i) {
+      auto d{q[(i + 1) % 3] + -q[i]};
+      d = d * d;
+      len[i] = sqrt(d.first + d.second);
+      s += len[i];
+    }
+    // debug("len", len);
+    s /= 2;
+    double res{sqrt(s)};
+    for (auto const e : len) {
+      res *= sqrt(s - e);
+    }
+    // debug("area", res);
+    return res;
   }};
-
-  int lo{}, hi{n / l};
-  while (lo < hi) {
-    auto const mid{(lo + hi + 1) / 2};
-    if (check(mid, l)) {
-      lo = mid;
+  while (hi - lo >= eps) {
+    auto l{(2 * lo + hi) / 3}, r{(lo + 2 * hi) / 3};
+    if (get(l) < get(r)) {
+      hi = r;
     } else {
-      hi = mid - 1;
+      lo = l;
     }
   }
-  cout << lo << '\n';
+  cout << get(lo);
 }
 
 int main() {
