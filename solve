@@ -12,11 +12,11 @@ if [[ ${1-""} == "--usage" ]]; then
   exit 0
 fi
 
-template_dir="templates"
+template_dir="$(pwd)/templates"
 problem="${1:-$(env_get problem)}"
 
 mkdir ${problem} -p
-cd ${problem}
+# cd ${problem}
 src="main.cpp"
 
 if [[ -e ${src} ]]; then
