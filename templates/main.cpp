@@ -43,9 +43,8 @@ template <typename T>
 [[maybe_unused]] constexpr T inf{std::numeric_limits<T>::max() / 2};
 [[maybe_unused]] constexpr double eps{1e-8};
 
-namespace impl {
 #ifdef __cpp_concepts
-using ::std::remove_cvref_t;
+namespace impl {
 // Concepts.
 template <typename T>
 concept pair = requires(T t) {
@@ -53,24 +52,19 @@ concept pair = requires(T t) {
   t.second;
 };
 template <typename T>
-concept string_like = std::same_as<std::string, remove_cvref_t<T>> ||
-                      std::same_as<std::string_view, remove_cvref_t<T>> ||
-                      std::convertible_to<remove_cvref_t<T>, char const*>;
+concept string_like = std::same_as<std::string, std::remove_cvref_t<T>> ||
+                      std::same_as<std::string_view, std::remove_cvref_t<T>> ||
+                      std::convertible_to<std::remove_cvref_t<T>, char const*>;
 template <typename> struct is_tuple_t : std::false_type {};
 template <typename... T>
 struct is_tuple_t<std::tuple<T...>> : std::true_type {};
 template <typename... T>
 concept tuple = is_tuple_t<T...>::value;
-#else
-// template <typename T>
-// using remove_cvref_t = std::remove_cv_t<std::remove_reference_t<T>>;
-#endif
 } // namespace impl
 
-#ifdef __cpp_concepts
 constexpr auto& operator>>(auto& istream, auto&& t)
 {
-  using T = impl::remove_cvref_t<decltype(t)>;
+  using T = std::remove_cvref_t<decltype(t)>;
 #ifdef __cpp_lib_ranges
   if constexpr (std::ranges::range<T>) {
     for (auto& ele : t) {
@@ -89,11 +83,9 @@ constexpr auto& operator>>(auto& istream, auto&& t)
   }
   return istream;
 }
-/// @warning Do not put string literals in this function, because we hasn't
-/// (can't) inplement checking-string-literals functions.
 constexpr void print(auto const& t, int const depth = 0)
 {
-  using T = impl::remove_cvref_t<decltype(t)>;
+  using T = std::remove_cvref_t<decltype(t)>;
   if constexpr (impl::string_like<T>) {
     std::cout << t;
   }
@@ -164,16 +156,17 @@ constexpr auto sum_of(auto const& coll) noexcept
 template <typename Range> constexpr auto sum(Range const& coll) noexcept
 #endif
 {
-  using value_type = impl::remove_cvref_t<decltype(coll.front())>;
-  return std::accumulate(coll.begin(), coll.end(), value_type{});
+  return std::accumulate(coll.begin(), coll.end(), std::int_fast64_t{});
 }
 #ifdef __cpp_concepts
-constexpr auto pow(auto a, u64 b, u64 const p) noexcept
+constexpr auto pow(auto a, std::int_fast64_t b,
+                   std::int_fast64_t const p) noexcept
 #else
 template <typename T> constexpr auto pow(T a, u64 b, u64 const p) noexcept
 #endif
 {
-  u64 res{1};
+  assert(b >= 0);
+  decltype(a) res{1};
   while (b != 0) {
     if ((b & 1) == 1) {
       res = res * a % p;
