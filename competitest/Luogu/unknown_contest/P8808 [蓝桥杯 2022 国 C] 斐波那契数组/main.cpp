@@ -1,10 +1,10 @@
-// Problem: $(PROBLEM)
-// Contest: $(CONTEST)
-// Judge: $(JUDGE)
-// URL: $(URL)
-// Memory Limit: $(MEMLIM)
-// Time Limit: $(TIMELIM)
-// Start: $(DATE)
+// Problem: P8808 [蓝桥杯 2022 国 C] 斐波那契数组
+// Contest: unknown_contest
+// Judge: Luogu
+// URL: https://www.luogu.com.cn/problem/P8808?contestId=171012
+// Memory Limit: 128
+// Time Limit: 1000
+// Start: Tue 07 May 2024 01:36:56 PM CST
 // Author: ShelpAm
 
 #include <bits/stdc++.h>
@@ -43,9 +43,8 @@ template <typename T>
 [[maybe_unused]] constexpr T inf{std::numeric_limits<T>::max() / 2};
 [[maybe_unused]] constexpr double eps{1e-8};
 
-namespace impl {
 #ifdef __cpp_concepts
-using ::std::remove_cvref_t;
+namespace impl {
 // Concepts.
 template <typename T>
 concept pair = requires(T t) {
@@ -53,24 +52,19 @@ concept pair = requires(T t) {
   t.second;
 };
 template <typename T>
-concept string_like = std::same_as<std::string, remove_cvref_t<T>> ||
-                      std::same_as<std::string_view, remove_cvref_t<T>> ||
-                      std::convertible_to<remove_cvref_t<T>, char const*>;
+concept string_like = std::same_as<std::string, std::remove_cvref_t<T>> ||
+                      std::same_as<std::string_view, std::remove_cvref_t<T>> ||
+                      std::convertible_to<std::remove_cvref_t<T>, char const*>;
 template <typename> struct is_tuple_t : std::false_type {};
 template <typename... T>
 struct is_tuple_t<std::tuple<T...>> : std::true_type {};
 template <typename... T>
 concept tuple = is_tuple_t<T...>::value;
-#else
-// template <typename T>
-// using remove_cvref_t = std::remove_cv_t<std::remove_reference_t<T>>;
-#endif
 } // namespace impl
 
-#ifdef __cpp_concepts
 constexpr auto& operator>>(auto& istream, auto&& t)
 {
-  using T = impl::remove_cvref_t<decltype(t)>;
+  using T = std::remove_cvref_t<decltype(t)>;
 #ifdef __cpp_lib_ranges
   if constexpr (std::ranges::range<T>) {
     for (auto& ele : t) {
@@ -89,11 +83,9 @@ constexpr auto& operator>>(auto& istream, auto&& t)
   }
   return istream;
 }
-/// @warning Do not put string literals in this function, because we hasn't
-/// (can't) inplement checking-string-literals functions.
 constexpr void print(auto const& t, int const depth = 0)
 {
-  using T = impl::remove_cvref_t<decltype(t)>;
+  using T = std::remove_cvref_t<decltype(t)>;
   if constexpr (impl::string_like<T>) {
     std::cout << t;
   }
@@ -164,16 +156,17 @@ constexpr auto sum_of(auto const& coll) noexcept
 template <typename Range> constexpr auto sum(Range const& coll) noexcept
 #endif
 {
-  using value_type = impl::remove_cvref_t<decltype(coll.front())>;
-  return std::accumulate(coll.begin(), coll.end(), value_type{});
+  return std::accumulate(coll.begin(), coll.end(), std::int_fast64_t{});
 }
 #ifdef __cpp_concepts
-constexpr auto pow(auto a, u64 b, u64 const p) noexcept
+constexpr auto pow(auto a, std::int_fast64_t b,
+                   std::int_fast64_t const p) noexcept
 #else
 template <typename T> constexpr auto pow(T a, u64 b, u64 const p) noexcept
 #endif
 {
-  u64 res{1};
+  assert(b >= 0);
+  decltype(a) res{1};
   while (b != 0) {
     if ((b & 1) == 1) {
       res = res * a % p;
@@ -236,37 +229,25 @@ template <typename F> void solve_all_cases(F solve_case)
 auto solve_case()
 {
   using namespace std;
-  int n, m;
-  cin >> n >> m;
-  vector<pair<double, double>> a(n);
-  for (auto& [p, w] : a) {
-    cin >> p >> w;
-  }
-  auto check{[&](int c, int d) {
-    double sum{};
-    for (auto const [p, w] : a) {
-      if (w * d > p * c) {
-        return false;
-      }
-      sum += p * static_cast<double>(c) / d;
+  int n;
+  cin >> n;
+  vector<int> a(n);
+  cin >> a;
+  vector<int> p(1e6 + 1);
+  for (int i{}; i != n; ++i) {
+    auto const corr{i < 2 ? 1 : a[i - 1] + a[i - 2]};
+    if (corr > 1e6) {
+      break;
     }
-    return sum <= m;
-  }};
-  int loa{}, hia{1};
-  int lob{1}, hib{1};
-  while (loa * hib < hia * lob) {
-    auto mida{(loa * hib + hia * lob)};
-    auto midb{lob * hib * 2};
-    auto const d{gcd(mida, midb)};
-    mida /= d, midb /= d;
-    if (check(mida, midb)) {
-      hia = mida, hib = midb;
+    if (a[i] % corr == 0) {
+      ++p[a[i] / corr];
     }
-    else {
-      loa = mida, lob = midb;
+    if (a[i] != corr) {
+      a[i] = corr;
     }
   }
-  cout << hia << '/' << hib << '\n';
+  // debug("p", p);
+  cout << n - ranges::max(p);
 }
 
 int main()
