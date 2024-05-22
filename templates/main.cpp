@@ -39,6 +39,7 @@ using quadraticu = std::tuple<u64, u64, u64, u64>;
 namespace {
 template <typename T>
 [[maybe_unused]] constexpr T mod{static_cast<T>(998244353)};
+[[maybe_unused]] constexpr std::int_fast64_t mod1e9{1000'000'009};
 template <typename T>
 [[maybe_unused]] constexpr T inf{std::numeric_limits<T>::max() / 2};
 [[maybe_unused]] constexpr double eps{1e-8};
@@ -100,7 +101,9 @@ constexpr void print(auto const& t, int const depth = 0)
   }
 #endif
   else if constexpr (impl::pair<T>) {
-    std::cout << "{ " << t.first << ", ";
+    std::cout << "{ ";
+    print(t.first, depth + 1);
+    std::cout << ", ";
     print(t.second, depth + 1);
     std::cout << " } ";
   }

@@ -17,15 +17,15 @@ problem="${1:-$(env_get problem)}"
 
 mkdir ${problem} -p
 # cd ${problem}
-src="main.cpp"
+src="${problem}/main.cpp"
 
 if [[ -e ${src} ]]; then
   cp ${src} ${src}.bak
   if [[ ${2-""} == "--force" ]]; then
-    cp "${template_dir}"/main.cpp ${src}
+    cp "${template_dir}/main.cpp" ${src}
   fi
 else
-  cp "${template_dir}"/main.cpp ${src}
+  cp "${template_dir}/main.cpp" ${src}
 fi
-nvim main.cpp +${cpp_start_point}
+nvim ${src} +${cpp_start_point}
 env_set problem ${problem}

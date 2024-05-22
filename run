@@ -15,8 +15,7 @@ if [ -f ${executable} ]; then
 fi
 
 # g++ ${src} -g -I. -std=c++26 -o ${executable}
-clang++ -x c++ -g -std=gnu++20 ${src} -o ${executable}
-# g++
+g++ -x c++ -g -std=gnu++20 ${src} -o ${executable}
 # -O2
 # -static
 

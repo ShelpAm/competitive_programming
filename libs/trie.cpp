@@ -7,12 +7,12 @@ using vvu = ::std::vector<vu>;
 
 // TODO: to be implemented
 class trie {
- public:
+public:
   [[nodiscard]] bool find(string_view s) const
   {
     u64 idx{};
-    for (auto const c: s) {
-      if (next_[idx][c] == -1UZ) {
+    for (auto const c : s) {
+      if (next_[idx][c] == -1U) {
         return false;
       }
       idx = next_[idx][c];
@@ -23,15 +23,16 @@ class trie {
   void emplace(string_view s)
   {
     u64 idx{};
-    for (auto const c: s) {
-      if (next_[idx][c] == -1UZ) {
+    for (auto const c : s) {
+      if (next_[idx][c] == -1U) {
         next_.emplace_back(alphabet_size, -1);
         next_[idx][c] = next_.size() - 1;
       }
       idx = next_[idx][c];
     }
   }
- private:
+
+private:
   static constexpr u64 alphabet_size = 26;
-  vvu next_{1, vu(alphabet_size, -1UZ)};
+  vvu next_{1, vu(alphabet_size, -1U)};
 };
