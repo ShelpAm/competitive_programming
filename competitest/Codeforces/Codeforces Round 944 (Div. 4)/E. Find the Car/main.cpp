@@ -198,7 +198,7 @@ template <typename F> void solve_all_cases(F solve_case)
   std::cout << std::fixed;
 
   int t{1};
-  // std::cin >> t;
+  std::cin >> t;
   using return_type = decltype(solve_case());
   for (int i = 0; i != t; ++i) {
     if constexpr (
@@ -229,7 +229,26 @@ template <typename F> void solve_all_cases(F solve_case)
 auto solve_case()
 {
   using namespace std;
-  // return 0;
+  int n, k, q;
+  cin >> n >> k >> q;
+  vector<int> a(k), b(k);
+  cin >> a >> b;
+  map<int, int> mp;
+  mp[0] = 0;
+  mp[n + 1] = n + 1;
+  for (int i{}; i != k; ++i) {
+    mp[a[i]] = b[i];
+  }
+  for (int i{}; i != q; ++i) {
+    int d;
+    cin >> d;
+    auto it{mp.upper_bound(d)};
+    auto t{prev(it)->second + u64(d - prev(it)->first) *
+                                  (it->second - prev(it)->second) /
+                                  (it->first - prev(it)->first)};
+    cout << static_cast<int>(t) << ' ';
+  }
+  cout << '\n';
 }
 
 int main()

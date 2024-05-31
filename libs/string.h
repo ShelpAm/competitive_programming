@@ -1,7 +1,7 @@
 #pragma once
 #include <bits/stdc++.h>
 
-namespace string {
+namespace str {
 std::vector<int> prefix_function(std::string_view pat)
 {
   auto n = static_cast<int>(pat.size());
@@ -52,4 +52,4 @@ std::vector<int> z_function(std::string_view s)
   }
   return z;
 }
-} // namespace string
+} // namespace str

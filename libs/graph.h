@@ -3,7 +3,7 @@
 
 namespace graph {
 constexpr std::int_fast64_t infinity{
-    std::numeric_limits<std::int_fast64_t>::max()};
+    std::numeric_limits<std::int_fast64_t>::max() / 2};
 struct graph {
 public:
   graph(std::size_t max_num_of_vertices) : adjacent(max_num_of_vertices) {}
@@ -128,15 +128,15 @@ dijkstra_result dijkstra(graph const& graph, int const source)
 
   return {distance, previous};
 }
-std::vector<std::vector<std::int_fast64_t>> floyd(
-    std::vector<std::vector<std::pair<std::int_fast64_t, int>>> const& adjacent)
+using adjacent_matrix_t = std::vector<std::vector<std::int_fast64_t>>;
+adjacent_matrix_t floyd(graph const& g)
 {
+  auto const& adjacent{g.adjacent};
   auto const n = static_cast<int>(adjacent.size());
 
-  std::vector<std::vector<std::int_fast64_t>> f(
-      n, std::vector<std::int_fast64_t>(n, infinity));
+  adjacent_matrix_t f(n, std::vector<std::int_fast64_t>(n, infinity));
 
-  // Initialize data
+  // Initializes data
   for (int u = 0; u != n; ++u) {
     f[u][u] = 0;
     for (auto const& [w, v] : adjacent[u]) {
@@ -279,7 +279,7 @@ struct tarjan_bridges {
   int const n;
   int idx{};
   std::vector<int> low, dfn;
-  std::vector<puu> bridges;
+  std::vector<std::pair<int, int>> bridges;
   void run(int u, int p)
   {
     low[u] = dfn[u] = ++idx;

@@ -195,7 +195,7 @@ void solve_all_cases(auto solve_case)
 template <typename F> void solve_all_cases(F solve_case)
 #endif
 {
-  constexpr auto my_precision{10};
+  constexpr auto my_precision{15};
   [[maybe_unused]] auto const default_precision{
       std::cout.precision(my_precision)};
   std::cout << std::fixed;
@@ -234,35 +234,23 @@ auto solve_case()
   using namespace std;
   int n;
   cin >> n;
-  vector<vector<double>> p(n, vector<double>(n));
+  vector<vector<long double>> p(n, vector<long double>(n));
   cin >> p;
-  vector<vector<double>> f(n, vector<double>(1 << n, 2));
-  for (int i{}; i != n; ++i) {
-    f[i][1 << i] = 1;
-  }
-  function<double(int, int)> calc{[&](int x, int used) {
-    debug("state", bitset<3>(used));
-    if (abs(f[x][used] - 2) >= eps) {
-      return f[x][used];
-    }
-    double res{};
+  vector<long double> f(1 << n, -1);
+  f[1] = 1;
+  for (int mask{2}; mask != 1 << n; ++mask) {
     for (int i{}; i != n; ++i) {
-      if (i != x && used & (1 << i)) {
-        check_max(res,
-                  p[x][i] * (calc(x, used ^ 1 << i) + calc(i, used ^ 1 << x)));
+      if (1 << i & mask) {
+        for (int j{}; j != n; ++j) {
+          if (1 << j & mask) {
+            check_max(f[mask],
+                      f[mask ^ 1 << j] * p[i][j] + f[mask ^ 1 << i] * p[j][i]);
+          }
+        }
       }
     }
-    debug("x used", pair{x, bitset<3>{static_cast<unsigned long long>(used)}});
-    debug("res", res);
-    return f[x][used] = res;
-  }};
-  for (int i{}; i != n; ++i) {
-    for (int j{}; j != 1 << n; ++j) {
-      cout << (abs(f[i][j] - 2) < eps ? 0 : f[i][j]) << ' ';
-    }
-    cout << '\n';
   }
-  cout << calc(0, (1 << n) - 1) << '\n';
+  cout << f[(1 << n) - 1] << '\n';
 }
 
 int main()

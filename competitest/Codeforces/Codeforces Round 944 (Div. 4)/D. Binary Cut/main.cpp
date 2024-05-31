@@ -231,29 +231,17 @@ auto solve_case()
   using namespace std;
   string s;
   cin >> s;
-  int cnt{};
-  auto cut{[&]() {
-    vector<string> pieces;
-    int l{};
-    for (int i{1}; i != s.size(); ++i) {
-      if (s[i] == '0' && s[i - 1] == '1') {
-        pieces.push_back(s.substr(l, i - l));
-        l = i;
-      }
+  int ans{1};
+  int carry{};
+  for (int i{}; i != s.size() - 1; ++i) {
+    if (s[i] != s[i + 1]) {
+      ++ans;
     }
-    pieces.push_back(s.substr(l, s.size() - 1 - l));
-    sort(pieces.begin(), pieces.end());
-    string buf;
-    for (auto const& e : pieces) {
-      buf += e;
+    if (s[i] == '0' && s[i + 1] == '1') {
+      carry = -1;
     }
-    cnt += pieces.size() - 1;
-    s = buf;
-  }};
-  while (!is_sorted(s.begin(), s.end())) {
-    cut();
   }
-  cout << cnt + 1 << '\n';
+  cout << ans + carry << '\n';
 }
 
 int main()

@@ -1,11 +1,11 @@
 #pragma once
-#include "/home/shelpam/competitive-programming/libs/generics.h"
+#include "generics.h"
 
 class fenwick_tree {
- public:
-  fenwick_tree(u64 const size): tree_(size) {}
+public:
+  fenwick_tree(u64 const size) : tree_(size) {}
   // The input array should start from the index 1.
-  fenwick_tree(vi coll): tree_{std::move(coll)}
+  fenwick_tree(vi coll) : tree_{std::move(coll)}
   {
     for (size_t i = 1; i != tree_.size(); ++i) {
       auto parent_index = i + lsb(static_cast<i64>(i));
@@ -30,6 +30,7 @@ class fenwick_tree {
       index += lsb(static_cast<i64>(index));
     }
   }
- private:
+
+private:
   vi tree_;
 };

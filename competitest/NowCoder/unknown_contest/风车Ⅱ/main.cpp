@@ -236,11 +236,11 @@ auto solve_case()
   cin >> n >> m;
   vector<vector<int>> a(n, vector<int>(m));
   vector<vector<int>> c(n, vector<int>(m));
-  unordered_map<int, map<int, map<int, u64>>> type;
+  unordered_map<int, map<int, u64>> type;
   for (auto& e : a) {
     for (auto& e : e) {
       cin >> e;
-      type[e][0][0] = 0;
+      type[e][0] = 0;
     }
   }
   for (auto& e : c) {
@@ -252,25 +252,15 @@ auto solve_case()
   for (int i{}; i != n; ++i) {
     for (int j{}; j != m; ++j) {
       auto& mp{type[a[i][j]]};
-      int prev_j{-1};
-      for (auto _it{mp.upper_bound(i)}; _it != mp.begin(); --_it) {
-        auto const it{prev(_it)};
-        auto const inline_jt{it->second.upper_bound(j)};
-        if (inline_jt != it->second.begin()) {
-          auto const [col, val]{*prev(inline_jt)};
-          if (prev_j >= col) {
-            break;
-          }
-          check_max(mp[i][j], val + c[i][j]);
-          prev_j = col;
+      auto it{mp.upper_bound(j)};
+      if (auto const neo{prev(it)->second + c[i][j]}; check_max(mp[j], neo)) {
+        check_max(ans, neo);
+        while (it != mp.end() && it->second <= neo) {
+          it = mp.erase(it);
         }
-        else {
-        }
-        check_max(ans, mp[i][j]);
       }
     }
   }
-  debug("type", type);
   cout << ans << '\n';
 }
 

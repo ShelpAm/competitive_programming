@@ -232,7 +232,8 @@ template <typename F> void solve_all_cases(F solve_case)
 auto solve_case()
 {
   using namespace std;
-  cout << '|' << string{"\x12"} << '|';
+  string s{"\u{E5952}"};
+  cout << '|' << s << '|';
 }
 
 int main()
