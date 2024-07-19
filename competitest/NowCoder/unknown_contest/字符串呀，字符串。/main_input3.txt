@@ -1,7 +1,0 @@
-6
-abc
-acd
-abd
-acc
-abd
-aadd

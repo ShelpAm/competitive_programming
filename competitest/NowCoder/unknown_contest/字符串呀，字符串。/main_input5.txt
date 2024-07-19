@@ -1,6 +1,0 @@
-6
-abcde
-abcd
-a
-abc
-ab
