@@ -1,41 +1,38 @@
 #pragma once
 #include "generics.h"
 
-class disjoint_set_union {
+class Disjoint_set_union {
 public:
-  explicit disjoint_set_union(int size) : parent_(size), size_(size, 1)
+  explicit Disjoint_set_union(int size) : _parent(size), _size(size, 1)
   {
-    std::iota(parent_.begin(), parent_.end(), 0);
+    std::iota(_parent.begin(), _parent.end(), 0);
   }
   // with path compression
-  int find(int const x)
+  auto find(int x) -> int
   {
-    return parent_[x] == x ? x : parent_[x] = find(parent_[x]);
+    return _parent[x] == x ? x : _parent[x] = find(_parent[x]);
   }
   /// @return:
   /// false if there has been pair x,y in the set.
   /// true successfully united
-  bool unite(int x, int y)
+  auto unite(int x, int y) -> bool
   {
     x = find(x), y = find(y);
     if (x == y) {
       return false;
     }
-    if (size_[x] < size_[y]) {
+    if (_size[x] < _size[y]) {
       std::swap(x, y);
     }
-    parent_[y] = x;
-    size_[x] += size_[y];
+    _parent[y] = x;
+    _size[x] += _size[y];
     return true;
   }
-  [[nodiscard]] bool united(int const x, int const y)
-  {
-    return find(x) == find(y);
-  }
-  [[nodiscard]] std::size_t size(int x) { return size_[find(x)]; }
+  [[nodiscard]] auto united(int x, int y) -> bool { return find(x) == find(y); }
+  [[nodiscard]] auto size(int x) -> int { return _size[find(x)]; }
 
 private:
-  std::vector<int> parent_;
-  std::vector<int> size_;
+  std::vector<int> _parent;
+  std::vector<int> _size;
 };
-using dsu = disjoint_set_union;
+using Dsu = Disjoint_set_union;

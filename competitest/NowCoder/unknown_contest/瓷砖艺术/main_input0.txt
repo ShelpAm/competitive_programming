@@ -1,0 +1,6 @@
+5 5
+bb##b
+#bg#b
+##bb#
+yg#bb
+#g##b

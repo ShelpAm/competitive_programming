@@ -1,144 +1,69 @@
-#include <algorithm>
-#include <array>
-#include <cmath>
-#include <cstddef>
-#include <iostream>
-#include <ranges>
-#include <set>
-#include <string_view>
-#include <vector>
+#include<bits/stdc++.h> 
 
-using ::std::size_t;
+using namespace std;
 
-// constexpr bool debug{false};
-
-template<typename T> T read()
+int main( )
 {
-  T tmp;
-  std::cin >> tmp;
-  return tmp;
-}
-template<typename value_t> class input_value {
-public:
-  input_value(): value_(read<value_t>()) {}
-  input_value(const input_value&) = delete;
-  input_value(input_value&&) = delete;
-  input_value& operator=(const input_value&) = delete;
-  input_value& operator=(input_value&&) = delete;
-  ~input_value() = default;
-  operator value_t&() { return value(); }
-  value_t& value() { return value_; }
-private:
-  value_t value_;
-};
-template<size_t i, size_t j, typename value_type> using arr2
-    = std::array<std::array<value_type, j>, i>;
-template<size_t i, size_t j> using arr2uz = arr2<i, j, size_t>;
-template<size_t i, size_t j> using arr2ll = arr2<i, j, long long>;
-template<typename value_type> using vec2_impl
-    = std::vector<std::vector<value_type>>;
-template<typename value_t> class vec2 : public vec2_impl<value_t> {
-public:
-  vec2(size_t const i, size_t const j)
-      : vec2_impl<value_t>(i, std::vector<value_t>(j))
-  {}
-};
-using vec2uz = vec2<size_t>;
-using vec2ll = vec2<long long>;
-template<typename T> concept is_pair = requires(T t) {
-  t.first;
-  t.second;
-};
-void print(auto&& t)
-{
-  if constexpr (std::ranges::range<decltype(t)>) {
-    for (auto&& ele: t) {
-      print(ele);
+    int n,k;cin>>n>>k;
+    vector<vector<int>> a(n+1, vector<int>(n+1));
+    for (int i{}; i!=n; ++i) {
+        for (int j{}; j!=n; ++j) {
+            cin >> a[i+1][j+1];
+            a[i+1][j+1] += a[i][j+1] + a[i+1][j] - a[i][j];
+        }
     }
-    std::cout << '\n';
-  }
-  else if constexpr (is_pair<decltype(t)>) {
-    std::cout << t.first << ": " << t.second << ", ";
-  }
-  else {
-    std::cout << t << ' ';
-  }
-}
-void debug(std::string_view const& sv, auto&& t)
-{
-  std::cout << sv << ": ";
-  print(t);
-}
-void input(auto&& t)
-{
-  if constexpr (std::ranges::range<decltype(t)>) {
-    for (auto&& ele: t) {
-      input(ele);
+    auto sum{[&](int u, int v, int x, int y) {
+        return a[x][y] - a[x][v-1] - a[u-1][y] + a[u-1][v-1];
+    }};
+    auto check{[&](auto s) {
+        cout << "FUCK" << (1<<(n-1));
+        for (int mask{}; mask!=(1<<(n-1)); ++mask) {
+            auto cnt{__builtin_popcount(mask)};
+            cout << bitset<10>(mask) << ' ' << cnt << '\n';
+            if (cnt > k) {
+                continue;
+            }
+            vector<int> p;
+            for (int i{}; i!=n-1; ++i) {
+                if (mask & 1 << i) {
+                    p.push_back(i+1);
+                }
+            }
+            p.insert(p.begin(), 1);
+            // for (auto e : p)cout<<e<< ' ';
+            auto left{k - cnt};
+            auto ok{[&] {
+                int c{};
+                int prevx{1};
+                for (int i{1}; i!=n+1; ++i) {
+                    for (int j{1}; j!=p.size(); ++j) {
+                        auto t{sum(p[j-1], prevx, p[j], i)};
+                        cout << "T is " << t << '\n';
+                        if (t > s) {
+                            ++c;
+                            prevx = i;
+                            break;
+                        }
+                    }
+                }
+                cout << "C is " << c << '\n';
+                return c <= left;
+            }};
+            if (ok()) {
+                return true;
+            }
+        }
+        return false;
+    }};
+    int l{}, r{1000000};
+    while (l < r) {
+        auto mid{l + r >> 1};
+        if (check(mid)) {
+            r = mid;
+        } else {
+            l = mid + 1;
+        }
     }
-  }
-  else if constexpr (is_pair<decltype(t)>) {
-    std::cin >> t.first >> t.second;
-  }
-  else {
-    std::cin >> t;
-  }
-}
-auto&& operator>>(auto&& is, auto&& t)
-{
-  if constexpr (std::ranges::range<decltype(t)>) {
-    for (auto&& ele: t) {
-      is >> ele;
-    }
-  }
-  else if constexpr (is_pair<decltype(t)>) {
-    is >> t.first >> t.second;
-  }
-  else {
-    is >> t;
-  }
-  return is;
-}
-class hash_t {
-public:
-  hash_t() = default;
-  size_t operator()(std::string_view const s) const
-  {
-    size_t res{};
-    for (size_t i{}; i != s.size(); ++i) {
-      res <<= 8;
-      res += s[i];
-    }
-    return res;
-  }
-};
-inline hash_t const hash;
-void solve_case()
-{
-  std::string s;
-  std::set<size_t> set;
-  std::vector<std::string> v(1e1 + 3);
-  while (std::getline(std::cin, s), !s.empty()) {
-    auto hash_val{hash(s) % v.size()};
-    if (set.contains(hash_val)) {
-      std::cout << "Existing string." << std::endl;
-    }
-    else {
-      set.emplace(hash_val);
-      v[hash_val] = s;
-      std::cout << "hash_val: " << hash_val << std::endl;
-    }
-  }
-}
-int main()
-{
-  std::ios::sync_with_stdio(false);
-  std::cin.tie(nullptr);
-  // std::cout.tie(nullptr);
-
-  size_t n{1};
-  // n = read<size_t>();
-  for (size_t i{}; i != n; ++i) {
-    solve_case();
-  }
-  return 0;
+    cout << l;
+    return 0;
 }
