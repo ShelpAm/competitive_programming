@@ -1,10 +1,10 @@
-// Problem: $(PROBLEM)
-// Contest: $(CONTEST)
-// Judge: $(JUDGE)
-// URL: $(URL)
-// Memory Limit: $(MEMLIM)
-// Time Limit: $(TIMELIM)
-// Start: $(DATE)
+// Problem: I. Digit Problem
+// Contest: JXNU Summer Train 2
+// Judge: Codeforces
+// URL: https://codeforces.com/gym/537049/problem/I
+// Memory Limit: 256
+// Time Limit: 1000
+// Start: Fri 19 Jul 2024 01:16:30 PM CST
 // Author: ShelpAm
 
 #include <bits/stdc++.h>
@@ -23,6 +23,8 @@ using vu = std::vector<u64>;
 using vvu = std::vector<vu>;
 using vvvu = std::vector<vvu>;
 using vvvvu = std::vector<vvvu>;
+using vb = std::vector<bool>;
+using vvb = std::vector<vb>;
 using vc = std::vector<char>;
 using vvc = std::vector<vc>;
 using vd = std::vector<double>;
@@ -219,6 +221,56 @@ namespace {
 void solve_case()
 {
   using namespace std;
-  /*return;*/
+  int a, b, c;
+  cin >> a >> b >> c;
+
+  if (c >= a + b) {
+    cout << -1;
+    return;
+  }
+
+  auto ones{[](int num) { return string(num, '1'); }};
+  auto zeros{[](int num) { return string(num, '0'); }};
+
+  if (a == 0 || b == 0) {
+    if (c == 0) {
+      auto const same{a == 0 ? zeros(b) : ones(a)};
+      cout << same << '\n' << same;
+    }
+    else {
+      cout << -1;
+    }
+    return;
+  }
+
+  auto x{zeros(a + b)};
+  auto y{zeros(a + b)};
+  x[0] = '1';
+  y[c] = '1';
+  int left_ones{a - 1};
+  for (int i{}; i != a + b; ++i) {
+    if (left_ones == 0) {
+      break;
+    }
+    if (i == 0 || i == c) {
+      continue;
+    }
+    x[i] = y[i] = '1';
+    --left_ones;
+  }
+  cout << x << '\n' << y;
+
+  /*map<int, vector<pair<int, int>>> s;*/
+  /*for (unsigned x{}; x != 1 << (a + b); ++x) {*/
+  /*  for (unsigned y{}; y != 1 << (a + b); ++y) {*/
+  /*    if (x >= y && popcount(y) == a) {*/
+  /*      s[popcount(x - y)].push_back({x, y});*/
+  /*    }*/
+  /*  }*/
+  /*}*/
+  /*for (auto const &[x, y] : s[7]) {*/
+  /*  cout << bitset<8>{static_cast<unsigned long long>(x)} << ' '*/
+  /*       << bitset<8>{static_cast<unsigned long long>(y)} << '\n';*/
+  /*}*/
 }
 } // namespace

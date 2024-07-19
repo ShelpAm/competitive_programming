@@ -1,10 +1,10 @@
-// Problem: $(PROBLEM)
-// Contest: $(CONTEST)
-// Judge: $(JUDGE)
-// URL: $(URL)
-// Memory Limit: $(MEMLIM)
-// Time Limit: $(TIMELIM)
-// Start: $(DATE)
+// Problem: E. Cutting with Lines Ⅱ
+// Contest: JXNU Summer Train 2
+// Judge: Codeforces
+// URL: https://codeforces.com/gym/537049/problem/E
+// Memory Limit: 256
+// Time Limit: 3000
+// Start: Fri 19 Jul 2024 01:16:30 PM CST
 // Author: ShelpAm
 
 #include <bits/stdc++.h>
@@ -23,6 +23,8 @@ using vu = std::vector<u64>;
 using vvu = std::vector<vu>;
 using vvvu = std::vector<vvu>;
 using vvvvu = std::vector<vvvu>;
+using vb = std::vector<bool>;
+using vvb = std::vector<vb>;
 using vc = std::vector<char>;
 using vvc = std::vector<vc>;
 using vd = std::vector<double>;

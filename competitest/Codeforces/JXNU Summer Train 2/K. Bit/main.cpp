@@ -1,10 +1,10 @@
-// Problem: $(PROBLEM)
-// Contest: $(CONTEST)
-// Judge: $(JUDGE)
-// URL: $(URL)
-// Memory Limit: $(MEMLIM)
-// Time Limit: $(TIMELIM)
-// Start: $(DATE)
+// Problem: K. Bit
+// Contest: JXNU Summer Train 2
+// Judge: Codeforces
+// URL: https://codeforces.com/gym/537049/problem/K
+// Memory Limit: 256
+// Time Limit: 1000
+// Start: Fri 19 Jul 2024 01:16:30 PM CST
 // Author: ShelpAm
 
 #include <bits/stdc++.h>
@@ -23,6 +23,8 @@ using vu = std::vector<u64>;
 using vvu = std::vector<vu>;
 using vvvu = std::vector<vvu>;
 using vvvvu = std::vector<vvvu>;
+using vb = std::vector<bool>;
+using vvb = std::vector<vb>;
 using vc = std::vector<char>;
 using vvc = std::vector<vc>;
 using vd = std::vector<double>;
@@ -219,6 +221,55 @@ namespace {
 void solve_case()
 {
   using namespace std;
-  /*return;*/
+  int n, q;
+  cin >> n >> q;
+  vector<pair<int, int>> a(n);
+  cin >> a;
+  vector<vector<int>> f(31);
+  for (int i{}; i != f.size(); ++i) {
+    f[i] = vector<int>{0, 1 << i};
+  }
+  for (int b{}; b != 31; ++b) {
+    for (auto [t, e] : a) {
+      e &= 1 << b;
+      if (t == 1) {
+        for (auto &r : f[b]) {
+          r &= e;
+        }
+      }
+      else if (t == 2) {
+        for (auto &r : f[b]) {
+          r |= e;
+        }
+      }
+      else if (t == 3) {
+        for (auto &r : f[b]) {
+          r ^= e;
+        }
+      }
+    }
+  }
+  for (int i{}; i != q; ++i) {
+    int r;
+    cin >> r;
+    int ans{};
+    bool arbitrary{};
+    for (int b{30}; b != -1; --b) {
+      if (arbitrary) {
+        ans += (ranges::max_element(f[b]) - f[b].begin()) << b;
+      }
+      else {
+        if (r & 1 << b) {
+          if (f[b][0] >= f[b][1]) {
+            arbitrary = true;
+          }
+          else {
+            ans += 1 << b;
+          }
+        }
+      }
+    }
+    cout << ans << '\n';
+  }
 }
 } // namespace

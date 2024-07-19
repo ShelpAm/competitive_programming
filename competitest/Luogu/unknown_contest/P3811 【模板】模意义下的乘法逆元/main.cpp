@@ -1,10 +1,10 @@
-// Problem: $(PROBLEM)
-// Contest: $(CONTEST)
-// Judge: $(JUDGE)
-// URL: $(URL)
-// Memory Limit: $(MEMLIM)
-// Time Limit: $(TIMELIM)
-// Start: $(DATE)
+// Problem: P3811 【模板】模意义下的乘法逆元
+// Contest: unknown_contest
+// Judge: Luogu
+// URL: https://www.luogu.com.cn/problem/P3811
+// Memory Limit: 125
+// Time Limit: 500000
+// Start: Fri 19 Jul 2024 04:10:50 PM CST
 // Author: ShelpAm
 
 #include <bits/stdc++.h>
@@ -216,9 +216,110 @@ auto main() -> int
   return 0;
 }
 namespace {
+// The following are function-like-objects classes.
+
+/// Time complexity:
+/// - initialization: O(upper_bound)
+/// - query:          O(1)
+class Inverse {
+public:
+  /// @param
+  /// upper_bound maximal number whose inverse can be queried.
+  Inverse(int upper_bound, std::int_fast64_t const mod)
+      : _inverse(upper_bound + 1), _factorial(upper_bound + 1),
+        _prefix_inverse(upper_bound + 1), _upper_bound(upper_bound)
+  {
+    _inverse[0] = _inverse[1] = _factorial[0] = _factorial[1] =
+        _prefix_inverse[0] = _prefix_inverse[1] = 1;
+    for (std::int_fast64_t i{2}; i != upper_bound + 1; ++i) {
+      _factorial[i] = _factorial[i - 1] * i % mod;
+      _inverse[i] = (mod - mod / i) * _inverse[mod % i] % mod;
+      _prefix_inverse[i] = _prefix_inverse[i - 1] * _inverse[i] % mod;
+    }
+  }
+  auto operator()(int const n) const -> std::int_fast64_t
+  {
+    assert(n >= 0);
+    assert(n <= _upper_bound);
+    return _inverse[n];
+  }
+  [[nodiscard]] auto factorial(int const n) const -> std::int_fast64_t
+  {
+    assert(n >= 0);
+    assert(n <= _upper_bound);
+    return _factorial[n];
+  }
+  [[nodiscard]] auto prefix_inverse(int const n) const -> std::int_fast64_t
+  {
+    assert(n >= 0);
+    assert(n <= _upper_bound);
+    return _prefix_inverse[n];
+  }
+  [[nodiscard]] auto upper_bound() const -> std::int_fast64_t
+  {
+    return _upper_bound;
+  }
+
+private:
+  std::vector<std::int_fast64_t> _inverse;
+  std::vector<std::int_fast64_t> _factorial;
+  std::vector<std::int_fast64_t> _prefix_inverse;
+  std::int_fast64_t _upper_bound;
+};
+
+class Combination {
+  friend class Arrangement;
+
+public:
+  /// @param
+  /// upper_bound max(n, m) in `c(n, m)`
+  Combination(int const upper_bound, int const mod)
+      : _inverse(upper_bound, mod), _mod(mod)
+  {
+  }
+  auto operator()(int const n, int const m) -> std::int_fast64_t
+  {
+    assert(n >= 0);
+    assert(n <= _inverse.upper_bound());
+    if (n < m) {
+      return 0;
+    }
+    return _inverse.factorial(n) * _inverse.prefix_inverse(m) % _mod *
+           _inverse.prefix_inverse(n - m) % _mod;
+  }
+
+private:
+  Inverse _inverse;
+  std::int_fast64_t _mod;
+};
+
+class Arrangement {
+public:
+  /// @param
+  /// upper_bound max(n, m) in `a(n, m)`
+  Arrangement(int const upper_bound, int const mod)
+      : _combination(upper_bound, mod)
+  {
+  }
+  auto operator()(int const n, int const m) -> std::int_fast64_t
+  {
+    if (n < m) {
+      return 0;
+    }
+    return _combination(n, m) * _combination._inverse.factorial(n - m);
+  }
+
+private:
+  Combination _combination;
+};
 void solve_case()
 {
   using namespace std;
-  /*return;*/
+  int n, p;
+  cin >> n >> p;
+  Inverse inv{n, p};
+  for (int i{1}; i != n + 1; ++i) {
+    cout << inv(i) << '\n';
+  }
 }
 } // namespace
