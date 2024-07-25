@@ -1,8 +1,8 @@
-/*Problem: $(PROBLEM)*/
-/*Contest: $(CONTEST)*/
-/*Judge: $(JUDGE)*/
-/*URL: $(URL)*/
-/*Start: $(DATE)*/
+/*Problem: Sort4*/
+/*Contest: unknown_contest*/
+/*Judge: NowCoder*/
+/*URL: https://ac.nowcoder.com/acm/contest/81599/C*/
+/*Start: Thu 25 Jul 2024 12:37:18 PM CST*/
 /*Author: ShelpAm*/
 
 #include <bits/stdc++.h>
@@ -58,8 +58,12 @@ constexpr auto operator>>(std::istream &istream, auto &&t) -> std::istream &
 #else
 #define debug(...)
 #endif
-template <typename T, typename U>
-constexpr auto check_max(T &value, U const &other) noexcept -> bool
+#ifdef __cpp_lib_ranges
+constexpr auto check_max(auto &value, auto const &other) noexcept -> bool
+#else
+template <typename T, typename S>
+constexpr bool check_max(T &value, S const &other) noexcept
+#endif
 {
   if (value < other) {
     value = other;
@@ -67,8 +71,12 @@ constexpr auto check_max(T &value, U const &other) noexcept -> bool
   }
   return false;
 }
-template <typename T, typename U>
-constexpr auto check_min(T &value, U const &other) noexcept -> bool
+#ifdef __cpp_concepts
+constexpr auto check_min(auto &value, auto const &other) noexcept -> bool
+#else
+template <typename T, typename S>
+constexpr bool check_min(T &value, S const &other) noexcept
+#endif
 {
   if (value > other) {
     value = other;
@@ -76,14 +84,20 @@ constexpr auto check_min(T &value, U const &other) noexcept -> bool
   }
   return false;
 }
-template <typename T> constexpr auto sum_of(T const &coll) noexcept
+#ifdef __cpp_concepts
+constexpr auto sum_of(auto const &coll) noexcept
+#else
+template <typename Range> constexpr auto sum_of(Range const &coll) noexcept
+#endif
 {
   return std::accumulate(coll.begin(), coll.end(), std::int_fast64_t{});
 }
-constexpr auto pow(int a, std::int_fast64_t b,
-                   std::uint_fast64_t p) noexcept = delete;
+#ifdef __cpp_concepts
+constexpr auto pow(auto a, std::int_fast64_t b, std::int_fast64_t p) noexcept
+#else
 template <typename T>
 constexpr auto pow(T a, std::int_fast64_t b, std::uint_fast64_t p) noexcept
+#endif
 {
   assert(b >= 0);
   decltype(a) res{1};
@@ -96,32 +110,18 @@ constexpr auto pow(T a, std::int_fast64_t b, std::uint_fast64_t p) noexcept
   }
   return res;
 }
-template <typename F>
-auto binary_search(F check, std::int_fast64_t ok, std::int_fast64_t ng,
-                   bool check_ok = true) -> std::int_fast64_t
-{
-  if (check_ok) {
-    assert(check(ok));
-  }
-  while (std::abs(ok - ng) > 1) {
-    auto const x{(ok + ng) / 2};
-    (check(x) ? ok : ng) = x;
-  }
-  return ok;
-}
-template <typename T> constexpr auto lsb(T i) -> T
+template <typename T> [[maybe_unused]] constexpr auto lsb(T i) -> T
 {
   static_assert(std::is_signed_v<T>,
                 "lsb is implemented based on signed integers.");
-  return i & -i;
+  return i & (-i);
 }
 // i mustn't be 0
-template <typename T> constexpr auto msb(T i) -> int
+[[maybe_unused]] constexpr auto msb(std::uint_fast64_t i) -> int
 {
-  static_assert(!std::is_signed_v<T>,
-                "msb is implemented based on unsigned integers");
   assert(i != 0);
-  return static_cast<int>(sizeof(T) * CHAR_BIT - 1 - __builtin_clzll(i));
+  return static_cast<int>(sizeof(decltype(i)) * CHAR_BIT - 1 -
+                          __builtin_clzll(i));
 }
 [[maybe_unused]] auto gen_rand()
 {
@@ -138,7 +138,7 @@ auto main() -> int
   constexpr auto my_precision{10};
   std::cout << std::fixed << std::setprecision(my_precision);
   int t{1};
-  /*std::cin >> t;*/
+  std::cin >> t;
   for (int i{}; i != t; ++i) {
     solve_case();
   }
@@ -149,6 +149,67 @@ using i64 = std::int_fast64_t;
 using u64 = std::uint_fast64_t;
 void solve_case()
 {
-  /*return;*/
+  int n;
+  std::cin >> n;
+  std::vector<int> a(n);
+  bool ok{true};
+  for (int i{}; i != n; ++i) {
+    std::cin >> a[i];
+    --a[i];
+    if (a[i] != i) {
+      ok = false;
+    }
+  }
+  if (n <= 4) {
+    std::cout << (!ok ? 1 : 0) << '\n';
+    return;
+  }
+  std::priority_queue<int> q;
+  std::vector<int> vis(n);
+
+  std::unordered_map<int, int> cnt;
+  for (int i{}; i != n; ++i) {
+    if (vis[i]) {
+      continue;
+    }
+    int sz{1};
+    vis[i] = 1;
+    int cur{i};
+    while (a[cur] != i) {
+      cur = a[cur];
+      vis[cur] = 1;
+      ++sz;
+    }
+    ++cnt[sz];
+    if (sz >= 2) {
+      q.push(sz);
+    }
+  }
+
+  /*debug("sz", cnt);*/
+  /*int ans{(cnt[2] + 1) / 2};*/
+  /*cnt.erase(2);*/
+  /*for (auto const &[k, v] : cnt) {*/
+  /*  ans += (k + 1) / 3 * v;*/
+  /*}*/
+
+  int ans{};
+  while (!q.empty()) {
+    int x = q.top();
+    q.pop();
+    if (x >= 5) {
+      q.push(x - 3);
+    }
+    else if (x >= 3) {
+    }
+    else {
+      if (!q.empty()) {
+        q.pop();
+      }
+    }
+    ans++;
+  }
+
+  std::cout << ans << '\n';
 }
 } // namespace

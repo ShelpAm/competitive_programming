@@ -1,8 +1,8 @@
-/*Problem: $(PROBLEM)*/
-/*Contest: $(CONTEST)*/
-/*Judge: $(JUDGE)*/
-/*URL: $(URL)*/
-/*Start: $(DATE)*/
+/*Problem: 狼狼的备忘录*/
+/*Contest: unknown_contest*/
+/*Judge: NowCoder*/
+/*URL: https://ac.nowcoder.com/acm/contest/87255/H*/
+/*Start: Wed 24 Jul 2024 03:00:55 PM CST*/
 /*Author: ShelpAm*/
 
 #include <bits/stdc++.h>
@@ -33,7 +33,7 @@ template <typename... Ts>
 concept tuple = is_tuple_t<Ts...>::value;
 } // namespace shelpam::concepts
 
-constexpr auto operator>>(std::istream &istream, auto &&t) -> std::istream &
+constexpr auto operator>>(auto &istream, auto &&t) -> std::istream &
 {
   using T = std::remove_cvref_t<decltype(t)>;
   static_assert(!shelpam::concepts::tuple<T>, "tuple: not implemented yet.\n");
@@ -58,8 +58,12 @@ constexpr auto operator>>(std::istream &istream, auto &&t) -> std::istream &
 #else
 #define debug(...)
 #endif
-template <typename T, typename U>
-constexpr auto check_max(T &value, U const &other) noexcept -> bool
+#ifdef __cpp_lib_ranges
+constexpr auto check_max(auto &value, auto const &other) noexcept -> bool
+#else
+template <typename T, typename S>
+constexpr bool check_max(T &value, S const &other) noexcept
+#endif
 {
   if (value < other) {
     value = other;
@@ -67,8 +71,12 @@ constexpr auto check_max(T &value, U const &other) noexcept -> bool
   }
   return false;
 }
-template <typename T, typename U>
-constexpr auto check_min(T &value, U const &other) noexcept -> bool
+#ifdef __cpp_concepts
+constexpr auto check_min(auto &value, auto const &other) noexcept -> bool
+#else
+template <typename T, typename S>
+constexpr bool check_min(T &value, S const &other) noexcept
+#endif
 {
   if (value > other) {
     value = other;
@@ -76,14 +84,20 @@ constexpr auto check_min(T &value, U const &other) noexcept -> bool
   }
   return false;
 }
-template <typename T> constexpr auto sum_of(T const &coll) noexcept
+#ifdef __cpp_concepts
+constexpr auto sum_of(auto const &coll) noexcept
+#else
+template <typename Range> constexpr auto sum_of(Range const &coll) noexcept
+#endif
 {
   return std::accumulate(coll.begin(), coll.end(), std::int_fast64_t{});
 }
-constexpr auto pow(int a, std::int_fast64_t b,
-                   std::uint_fast64_t p) noexcept = delete;
+#ifdef __cpp_concepts
+constexpr auto pow(auto a, std::int_fast64_t b, std::int_fast64_t p) noexcept
+#else
 template <typename T>
 constexpr auto pow(T a, std::int_fast64_t b, std::uint_fast64_t p) noexcept
+#endif
 {
   assert(b >= 0);
   decltype(a) res{1};
@@ -96,32 +110,18 @@ constexpr auto pow(T a, std::int_fast64_t b, std::uint_fast64_t p) noexcept
   }
   return res;
 }
-template <typename F>
-auto binary_search(F check, std::int_fast64_t ok, std::int_fast64_t ng,
-                   bool check_ok = true) -> std::int_fast64_t
-{
-  if (check_ok) {
-    assert(check(ok));
-  }
-  while (std::abs(ok - ng) > 1) {
-    auto const x{(ok + ng) / 2};
-    (check(x) ? ok : ng) = x;
-  }
-  return ok;
-}
-template <typename T> constexpr auto lsb(T i) -> T
+template <typename T> [[maybe_unused]] constexpr auto lsb(T i) -> T
 {
   static_assert(std::is_signed_v<T>,
                 "lsb is implemented based on signed integers.");
-  return i & -i;
+  return i & (-i);
 }
 // i mustn't be 0
-template <typename T> constexpr auto msb(T i) -> int
+[[maybe_unused]] constexpr auto msb(std::uint_fast64_t i) -> int
 {
-  static_assert(!std::is_signed_v<T>,
-                "msb is implemented based on unsigned integers");
   assert(i != 0);
-  return static_cast<int>(sizeof(T) * CHAR_BIT - 1 - __builtin_clzll(i));
+  return static_cast<int>(sizeof(decltype(i)) * CHAR_BIT - 1 -
+                          __builtin_clzll(i));
 }
 [[maybe_unused]] auto gen_rand()
 {
@@ -149,6 +149,56 @@ using i64 = std::int_fast64_t;
 using u64 = std::uint_fast64_t;
 void solve_case()
 {
-  /*return;*/
+  int n;
+  std::cin >> n;
+  std::map<std::string, std::vector<std::string>> a;
+  for (int i{}; i != n; ++i) {
+    std::string s;
+    int k;
+    std::cin >> s >> k;
+    for (int j{}; j != k; ++j) {
+      std::string t;
+      std::cin >> t;
+      a[s].push_back(t);
+    }
+  }
+  std::cout << a.size() << '\n';
+  for (auto &[k, v] : a) {
+    std::sort(v.begin(), v.end());
+    std::vector<int> discarded(v.size());
+    for (int i{}; i != v.size(); ++i) {
+      for (int j{}; j != v.size(); ++j) {
+        if (i != j) {
+          if (v[i].size() < v[j].size()) {
+            if (v[j].substr(v[j].size() - v[i].size()) == v[i]) {
+              discarded[i] = 1;
+            }
+          }
+          else if (v[i].size() > v[j].size()) {
+            if (v[i].substr(v[i].size() - v[j].size()) == v[j]) {
+              discarded[j] = 1;
+            }
+          }
+          else if (v[i] == v[j]) {
+            discarded[std::max(i, j)] = 1;
+          }
+        }
+      }
+    }
+    for (auto const &e : v) {
+      std::cerr << e << ' ';
+    }
+    std::cerr << '\n';
+    debug("discarded", discarded);
+    std::cout << k << ' '
+              << v.size() - std::count(discarded.begin(), discarded.end(), 1)
+              << ' ';
+    for (int i{}; i != v.size(); ++i) {
+      if (!discarded[i]) {
+        std::cout << v[i] << ' ';
+      }
+    }
+    std::cout << '\n';
+  }
 }
 } // namespace

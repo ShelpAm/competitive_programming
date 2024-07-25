@@ -1,8 +1,8 @@
-/*Problem: $(PROBLEM)*/
-/*Contest: $(CONTEST)*/
-/*Judge: $(JUDGE)*/
-/*URL: $(URL)*/
-/*Start: $(DATE)*/
+/*Problem: F. 集合之和*/
+/*Contest: JXNU Summer Train 4*/
+/*Judge: Codeforces*/
+/*URL: https://codeforces.com/gym/538008/problem/F*/
+/*Start: Wed 24 Jul 2024 07:11:49 PM CST*/
 /*Author: ShelpAm*/
 
 #include <bits/stdc++.h>
@@ -58,8 +58,12 @@ constexpr auto operator>>(std::istream &istream, auto &&t) -> std::istream &
 #else
 #define debug(...)
 #endif
-template <typename T, typename U>
-constexpr auto check_max(T &value, U const &other) noexcept -> bool
+#ifdef __cpp_lib_ranges
+constexpr auto check_max(auto &value, auto const &other) noexcept -> bool
+#else
+template <typename T, typename S>
+constexpr bool check_max(T &value, S const &other) noexcept
+#endif
 {
   if (value < other) {
     value = other;
@@ -67,8 +71,12 @@ constexpr auto check_max(T &value, U const &other) noexcept -> bool
   }
   return false;
 }
-template <typename T, typename U>
-constexpr auto check_min(T &value, U const &other) noexcept -> bool
+#ifdef __cpp_concepts
+constexpr auto check_min(auto &value, auto const &other) noexcept -> bool
+#else
+template <typename T, typename S>
+constexpr bool check_min(T &value, S const &other) noexcept
+#endif
 {
   if (value > other) {
     value = other;
@@ -76,14 +84,20 @@ constexpr auto check_min(T &value, U const &other) noexcept -> bool
   }
   return false;
 }
-template <typename T> constexpr auto sum_of(T const &coll) noexcept
+#ifdef __cpp_concepts
+constexpr auto sum_of(auto const &coll) noexcept
+#else
+template <typename Range> constexpr auto sum_of(Range const &coll) noexcept
+#endif
 {
   return std::accumulate(coll.begin(), coll.end(), std::int_fast64_t{});
 }
-constexpr auto pow(int a, std::int_fast64_t b,
-                   std::uint_fast64_t p) noexcept = delete;
+#ifdef __cpp_concepts
+constexpr auto pow(auto a, std::int_fast64_t b, std::int_fast64_t p) noexcept
+#else
 template <typename T>
 constexpr auto pow(T a, std::int_fast64_t b, std::uint_fast64_t p) noexcept
+#endif
 {
   assert(b >= 0);
   decltype(a) res{1};
@@ -96,32 +110,18 @@ constexpr auto pow(T a, std::int_fast64_t b, std::uint_fast64_t p) noexcept
   }
   return res;
 }
-template <typename F>
-auto binary_search(F check, std::int_fast64_t ok, std::int_fast64_t ng,
-                   bool check_ok = true) -> std::int_fast64_t
-{
-  if (check_ok) {
-    assert(check(ok));
-  }
-  while (std::abs(ok - ng) > 1) {
-    auto const x{(ok + ng) / 2};
-    (check(x) ? ok : ng) = x;
-  }
-  return ok;
-}
-template <typename T> constexpr auto lsb(T i) -> T
+template <typename T> [[maybe_unused]] constexpr auto lsb(T i) -> T
 {
   static_assert(std::is_signed_v<T>,
                 "lsb is implemented based on signed integers.");
-  return i & -i;
+  return i & (-i);
 }
 // i mustn't be 0
-template <typename T> constexpr auto msb(T i) -> int
+[[maybe_unused]] constexpr auto msb(std::uint_fast64_t i) -> int
 {
-  static_assert(!std::is_signed_v<T>,
-                "msb is implemented based on unsigned integers");
   assert(i != 0);
-  return static_cast<int>(sizeof(T) * CHAR_BIT - 1 - __builtin_clzll(i));
+  return static_cast<int>(sizeof(decltype(i)) * CHAR_BIT - 1 -
+                          __builtin_clzll(i));
 }
 [[maybe_unused]] auto gen_rand()
 {
@@ -149,6 +149,45 @@ using i64 = std::int_fast64_t;
 using u64 = std::uint_fast64_t;
 void solve_case()
 {
-  /*return;*/
+  int n;
+  std::cin >> n;
+  if (n == 2 || n == 4) {
+    std::cout << -1;
+    return;
+  }
+  std::vector<int> a((n + 1) / 2);
+  std::iota(a.begin(), a.end(), 0);
+  if (n % 2 == 0) {
+    ++a.back();
+  }
+  std::cout << a.size() << '\n';
+  for (auto const e : a) {
+    std::cout << e << ' ';
+  }
+  /*auto f{[](std::set<int> const &a) {*/
+  /*  std::set<int> c;*/
+  /*  for (auto e : a) {*/
+  /*    for (auto h : a) {*/
+  /*      c.insert(e + h);*/
+  /*    }*/
+  /*  }*/
+  /*  return c.size();*/
+  /*}};*/
+  /*std::map<std::pair<int, int>, std::set<int>> a;*/
+  /*std::set<int> ans;*/
+  /*for (unsigned i{}; i != 1 << 16; ++i) {*/
+  /*  auto const cnt{std::popcount(i)};*/
+  /*  std::set<int> s;*/
+  /*  for (int j{}; j != 16; ++j) {*/
+  /*    if (i & 1 << j) {*/
+  /*      s.insert(j);*/
+  /*    }*/
+  /*  }*/
+  /*  auto const res{f(s)};*/
+  /*  ans.insert(res);*/
+  /*  a.insert({{cnt, res}, s});*/
+  /*}*/
+  /*debug("a", a);*/
+  /*debug("ans", ans);*/
 }
 } // namespace

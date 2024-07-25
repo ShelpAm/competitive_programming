@@ -1,8 +1,11 @@
 #pragma once
 #include <cassert>
 #include <cstdint>
+#include <memory>
 #include <vector>
 
+namespace math {
+namespace {
 // The following are function-like-objects classes.
 
 /// Time complexity:
@@ -55,28 +58,26 @@ private:
 };
 
 class Combination {
-  friend class Arrangement;
-
 public:
   /// @param
   /// upper_bound max(n, m) in `c(n, m)`
   Combination(int const upper_bound, int const mod)
-      : _inverse(upper_bound, mod), _mod(mod)
+      : _inverse(std::make_shared<Inverse>(upper_bound, mod)), _mod(mod)
   {
   }
   auto operator()(int const n, int const m) -> std::int_fast64_t
   {
     assert(n >= 0);
-    assert(n <= _inverse.upper_bound());
+    assert(n <= _inverse->upper_bound());
     if (n < m) {
       return 0;
     }
-    return _inverse.factorial(n) * _inverse.prefix_inverse(m) % _mod *
-           _inverse.prefix_inverse(n - m) % _mod;
+    return _inverse->factorial(n) * _inverse->prefix_inverse(m) % _mod *
+           _inverse->prefix_inverse(n - m) % _mod;
   }
 
 private:
-  Inverse _inverse;
+  std::shared_ptr<Inverse> _inverse;
   std::int_fast64_t _mod;
 };
 
@@ -85,7 +86,7 @@ public:
   /// @param
   /// upper_bound max(n, m) in `a(n, m)`
   Arrangement(int const upper_bound, int const mod)
-      : _combination(upper_bound, mod)
+      : _combination(std::make_shared<Combination>(upper_bound, mod))
   {
   }
   auto operator()(int const n, int const m) -> std::int_fast64_t
@@ -93,9 +94,29 @@ public:
     if (n < m) {
       return 0;
     }
-    return _combination(n, m) * _combination._inverse.factorial(n - m);
+    return _combination(n, m) * _combination->_inverse.factorial(n - m);
   }
 
 private:
-  Combination _combination;
+  std::shared_ptr<Combination> _combination;
 };
+class Comb {
+public:
+  auto arrangement(int const n, int const m) -> std::int_fast64_t
+  {
+    return _arrangement(n, m);
+  }
+  auto inverse(int const n) -> std::int_fast64_t
+  {
+    return _arrangement._combination._inverse(n);
+  }
+  auto combination(int const n, int const m)
+  {
+    return _arrangement._combination;
+  }
+
+private:
+  Arrangement _arrangement;
+};
+} // namespace
+} // namespace math
