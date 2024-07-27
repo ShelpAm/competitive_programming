@@ -1,8 +1,8 @@
-/*Problem: $(PROBLEM)*/
-/*Contest: $(CONTEST)*/
-/*Judge: $(JUDGE)*/
-/*URL: $(URL)*/
-/*Start: $(DATE)*/
+/*Problem: C. Coffee Overdose*/
+/*Contest: JXNU Summer Train 5*/
+/*Judge: Codeforces*/
+/*URL: https://codeforces.com/gym/538532/problem/C*/
+/*Start: Fri 26 Jul 2024 01:19:47 PM CST*/
 /*Author: ShelpAm*/
 
 #include <bits/stdc++.h>
@@ -33,7 +33,7 @@ template <typename... Ts>
 concept tuple = is_tuple_t<Ts...>::value;
 } // namespace shelpam::concepts
 
-constexpr auto operator>>(auto &istream, auto &&t) -> std::istream &
+constexpr auto operator>>(std::istream &istream, auto &&t) -> std::istream &
 {
   using T = std::remove_cvref_t<decltype(t)>;
   static_assert(!shelpam::concepts::tuple<T>, "tuple: not implemented yet.\n");
@@ -138,7 +138,7 @@ auto main() -> int
   constexpr auto my_precision{10};
   std::cout << std::fixed << std::setprecision(my_precision);
   int t{1};
-  /*std::cin >> t;*/
+  std::cin >> t;
   for (int i{}; i != t; ++i) {
     solve_case();
   }
@@ -149,6 +149,30 @@ using i64 = std::int_fast64_t;
 using u64 = std::uint_fast64_t;
 void solve_case()
 {
-  /*return;*/
+  i64 s, c;
+  std::cin >> s >> c;
+  if (c == 1) {
+    std::cout << (s + 1) * s / 2 << '\n';
+    return;
+  }
+  if (s <= c - 1) {
+    std::cout << s * c << '\n';
+    return;
+  }
+  auto f{[&](i64 const t) {
+    auto const k{t / (c + 1)};
+    return (s * s + s - t * t - t + c * k * (2 * t - (k - 1) * (c + 1))) / 2;
+  }};
+  i64 lo{}, hi{s};
+  while (lo < hi) {
+    auto const l{(2 * lo + hi) / 3}, r{(lo + 2 * hi) / 3};
+    if (f(l) < f(r)) {
+      lo = l + 1;
+    }
+    else {
+      hi = r - 1;
+    }
+  }
+  std::cout << f(lo) << '\n';
 }
 } // namespace

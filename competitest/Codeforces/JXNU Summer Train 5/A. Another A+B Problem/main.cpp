@@ -1,8 +1,8 @@
-/*Problem: $(PROBLEM)*/
-/*Contest: $(CONTEST)*/
-/*Judge: $(JUDGE)*/
-/*URL: $(URL)*/
-/*Start: $(DATE)*/
+/*Problem: A. Another A+B Problem*/
+/*Contest: JXNU Summer Train 5*/
+/*Judge: Codeforces*/
+/*URL: https://codeforces.com/gym/538532/problem/A*/
+/*Start: Fri 26 Jul 2024 03:24:48 PM CST*/
 /*Author: ShelpAm*/
 
 #include <bits/stdc++.h>
@@ -149,6 +149,79 @@ using i64 = std::int_fast64_t;
 using u64 = std::uint_fast64_t;
 void solve_case()
 {
-  /*return;*/
+  std::string s, t;
+  std::cin >> s >> t;
+  std::vector<int> need(10);
+  std::vector<int> disabled(10);
+  for (int i{}; i != t.size(); ++i) {
+    if (t[i] == 'P') {
+      ++need[s[i] - '0'];
+    }
+    else if (t[i] == 'B') {
+      disabled[s[i] - '0'] = 1;
+    }
+  }
+  std::vector<std::vector<int>> ans;
+  auto const index = std::vector{0, 1, 3, 4, 6, 7};
+  constexpr auto end{pow(10ULL, 4ULL, inf<u64>)};
+  for (int i{}; i != end; ++i) {
+    std::vector<int> bits;
+    auto k{i};
+    for (int j{}; j != 4; ++j) {
+      bits.push_back(k % 10);
+      k /= 10;
+    }
+    auto const r{(bits[0] + bits[2]) * 10 + bits[1] + bits[3]};
+    if (r >= 100) {
+      continue;
+    }
+    bits.push_back(r / 10);
+    bits.push_back(r % 10);
+    auto ok{[&] {
+      std::vector<int> cnt(10);
+      for (int i{}; i != 6; ++i) {
+        if (t[index[i]] != 'G') {
+          ++cnt[bits[i]];
+        }
+      }
+      for (int i{}; i != 6; ++i) {
+        auto const idx{index[i]};
+        if (disabled[s[idx] - '0']) {
+          if (need[s[idx] - '0'] != cnt[s[idx] - '0']) {
+            return false;
+          }
+        }
+        else {
+          if (need[s[idx] - '0'] > cnt[s[idx] - '0']) {
+            return false;
+          }
+        }
+        if (t[idx] == 'G' && bits[i] != s[idx] - '0') {
+          return false;
+        }
+        if ((t[idx] == 'P' || t[idx] == 'B') && bits[i] == s[idx] - '0') {
+          return false;
+        }
+      }
+      return true;
+    }};
+    if (ok()) {
+      ans.push_back(bits);
+    }
+  }
+  std::cout << ans.size() << '\n';
+  /*std::sort(ans.begin(), ans.end());*/
+  for (auto const &bits : ans) {
+    for (int j{}; j != 6; ++j) {
+      std::cout << bits[j];
+      if (j == 1) {
+        std::cout << "+";
+      }
+      else if (j == 3) {
+        std::cout << "=";
+      }
+    }
+    std::cout << '\n';
+  }
 }
 } // namespace
