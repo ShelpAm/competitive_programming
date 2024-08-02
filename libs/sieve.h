@@ -1,29 +1,30 @@
 #pragma once
 #include "../templates/main.cpp"
 
-struct Sieve {
-  Sieve(std::size_t const upper_bound) : min_factor(upper_bound + 1, 0)
+class Sieve {
+public:
+  Sieve(int const upper_bound) : _min_factor(upper_bound + 1, 0)
   {
-    for (size_t i = 2; i != min_factor.size(); ++i) {
-      if (min_factor[i] == 0) {
-        primes.push_back(i);
-        min_factor[i] = i;
+    for (int i = 2; i != upper_bound + 1; ++i) {
+      if (_min_factor[i] == 0) {
+        _primes.push_back(i);
+        _min_factor[i] = i;
       }
-      for (auto const p : primes) {
-        if (i * p > upper_bound || p > min_factor[i]) {
+      for (auto const p : _primes) {
+        if (i * p > upper_bound || p > _min_factor[i]) {
           break;
         }
-        min_factor[i * p] = p;
+        _min_factor[i * p] = p;
       }
     }
   }
 
   // Time complexity: O(sqrt(x))
-  [[nodiscard]] std::map<u64, u64> factorize(u64 x) const
+  [[nodiscard]] auto factorize(u64 x) const -> std::map<u64, u64>
   {
     std::map<u64, u64> res;
-    assert(x <= (min_factor.size() - 1) * (min_factor.size() - 1));
-    for (auto const p : primes) {
+    assert(x <= (_min_factor.size() - 1) * (_min_factor.size() - 1));
+    for (auto const p : _primes) {
       if (p > x) {
         break;
       }
@@ -32,12 +33,23 @@ struct Sieve {
         ++res[p];
       }
     }
-    if (x >= min_factor.size()) {
+    if (x >= _min_factor.size()) {
       ++res[x];
     }
     return res;
   }
 
-  vu primes;
-  vu min_factor;
+  [[nodiscard]] auto is_prime(int x) const -> bool
+  {
+    return _min_factor[x] == x;
+  }
+
+  [[nodiscard]] auto primes() const -> std::vector<int>
+  {
+    return _primes;
+  }
+
+private:
+  std::vector<int> _primes;
+  std::vector<int> _min_factor;
 };

@@ -6,21 +6,23 @@ constexpr std::int_fast64_t infinity{
     std::numeric_limits<std::int_fast64_t>::max() / 2};
 struct Graph {
 public:
-  Graph(std::size_t max_num_of_vertices) : adjacent(max_num_of_vertices) {}
+  Graph(std::size_t const max_num_of_vertices) : adjacent(max_num_of_vertices)
+  {
+  }
   void add_edge(int u, int v, std::int_fast64_t w)
   {
     adjacent[u].emplace_back(w, v);
   }
-  [[nodiscard]] auto edges_of(int u) const
+  [[nodiscard]] auto edges_of(std::size_t const u) const
       -> std::vector<std::pair<std::int_fast64_t, int>> const &
   {
     return adjacent[u];
   }
   std::vector<std::vector<std::pair<std::int_fast64_t, int>>> adjacent;
 };
-auto read_graph(int const num_of_vertices, int const num_of_edges,
-                bool const directed, bool const contains_w,
-                bool const read_from_1) -> Graph
+auto read(int const num_of_vertices, int const num_of_edges,
+          bool const directed, bool const contains_w,
+          bool const read_from_1 = true) -> Graph
 {
   Graph g(num_of_vertices);
   for (int i = 0; i != num_of_edges; ++i) {
@@ -47,7 +49,7 @@ auto to_edges(Graph const &g)
     -> std::vector<std::tuple<std::int_fast64_t, int, int>>
 {
   std::vector<std::tuple<std::int_fast64_t, int, int>> edges;
-  for (int u{}; u != g.adjacent.size(); ++u) {
+  for (std::size_t u{}; u != g.adjacent.size(); ++u) {
     for (auto const &[w, v] : g.edges_of(u)) {
       edges.emplace_back(w, u, v);
     }
@@ -144,7 +146,7 @@ auto prim(Graph const &g) -> std::int_fast64_t
     if (visited[u]) {
       continue;
     }
-    visited[u] = true;
+    visited[u] = 1;
     weight += w;
     if (++num_visited == g.adjacent.size()) {
       return weight;
@@ -175,7 +177,7 @@ auto bellman_ford(Graph const &g, int const source,
   // std::vector<int> vis(g.adjacent.size());
 
   dist[source] = 0;
-  visited[source] = true;
+  visited[source] = 1;
   // Only those in `q` could lead to relaxation.
   std::deque<int> q{source};
   auto swap_smaller_to_front{[](std::deque<int> &q) {
@@ -187,7 +189,7 @@ auto bellman_ford(Graph const &g, int const source,
     auto const u{q.front()};
     q.pop_front();
     swap_smaller_to_front(q);
-    visited[u] = false;
+    visited[u] = 0;
 
     for (auto const [w, v] : g.edges_of(u)) {
       if (auto const alt{dist[u] + w}; check_min(dist[v], alt)) {
@@ -196,7 +198,7 @@ auto bellman_ford(Graph const &g, int const source,
           return {true, {}};
         }
         if (!visited[v]) {
-          visited[v] = true;
+          visited[v] = 1;
           q.push_back(v);
           swap_smaller_to_front(q);
         }
@@ -233,7 +235,7 @@ auto dijkstra(Graph const &graph, int const source) -> Dijkstra_result
     if (visited[u]) {
       continue;
     }
-    visited[u] = true;
+    visited[u] = 1;
 
     for (auto const &[w, v] : graph.edges_of(u)) {
       if (auto const alt{distance[u] + w}; check_min(distance[v], alt)) {
@@ -366,7 +368,7 @@ auto maximum_matching(Graph const &g, int left_size, int right_size) -> int
 struct Tarjan_cuts {
   Tarjan_cuts(Graph const &g) : g(g), n(g.adjacent.size()), low(n), dfn(n) {}
   Graph g;
-  int n;
+  std::size_t n;
   int idx{};
   // You can check dfn[i] to identify if vertex i has been visited.
   std::vector<int> low, dfn;
@@ -393,7 +395,7 @@ struct Tarjan_cuts {
 struct Tarjan_bridges {
   Tarjan_bridges(Graph const &g) : g(g), n(g.adjacent.size()), low(n), dfn(n) {}
   Graph g;
-  int n;
+  std::size_t n;
   int idx{};
   std::vector<int> low, dfn;
   std::vector<std::pair<int, int>> bridges;

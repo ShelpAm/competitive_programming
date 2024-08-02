@@ -14,9 +14,9 @@
 namespace {
 [[maybe_unused]] constexpr std::int_fast64_t mod998244353{998'244'353LL};
 [[maybe_unused]] constexpr std::int_fast64_t mod1e9p7{1'000'000'007LL};
+[[maybe_unused]] constexpr double eps{1e-8};
 template <typename T>
 [[maybe_unused]] constexpr T inf{std::numeric_limits<T>::max() / 2};
-[[maybe_unused]] constexpr double eps{1e-8};
 
 #ifdef __cpp_concepts
 // Concepts.
@@ -59,7 +59,7 @@ constexpr auto operator>>(auto &istream, auto &&t) -> std::istream &
 #define debug(...)
 #endif
 template <typename T, typename U>
-constexpr auto check_max(T &value, U const &other) noexcept -> bool
+constexpr auto chmax(T &value, U const &other) noexcept -> bool
 {
   if (value < other) {
     value = other;
@@ -68,7 +68,7 @@ constexpr auto check_max(T &value, U const &other) noexcept -> bool
   return false;
 }
 template <typename T, typename U>
-constexpr auto check_min(T &value, U const &other) noexcept -> bool
+constexpr auto chmin(T &value, U const &other) noexcept -> bool
 {
   if (value > other) {
     value = other;
@@ -116,12 +116,27 @@ template <typename T> constexpr auto lsb(T i) -> T
   return i & -i;
 }
 // i mustn't be 0
-template <typename T> constexpr auto msb(T i) -> int
+template <typename T> constexpr auto count_leading_zeros(T const &i) -> int
 {
+  assert(i != 0);
+  if constexpr (std::is_same_v<T, unsigned long long>) {
+    return __builtin_clzll(i);
+  }
+  if constexpr (std::is_same_v<T, unsigned long>) {
+    return __builtin_clzl(i);
+  }
+  if constexpr (std::is_same_v<T, unsigned int>) {
+    return __builtin_clz(i);
+  }
+  /*static_assert(false, "Unsupported type");*/
   static_assert(!std::is_signed_v<T>,
                 "msb is implemented based on unsigned integers");
-  assert(i != 0);
-  return static_cast<int>(sizeof(T) * CHAR_BIT - 1 - __builtin_clzll(i));
+  return -1; // Unreachable.
+}
+// i mustn't be 0
+template <typename T> constexpr auto msb(T i) -> int
+{
+  return static_cast<int>(sizeof(T) * CHAR_BIT - 1 - count_leading_zeros(i));
 }
 [[maybe_unused]] auto gen_rand()
 {

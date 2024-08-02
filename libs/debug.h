@@ -47,4 +47,5 @@ constexpr auto debug(std::string_view s, auto &&t) -> void
     std::cerr << '\n';
   }
   print(t, 0, std::cerr);
+  /*std::cerr.flush();*/
 }

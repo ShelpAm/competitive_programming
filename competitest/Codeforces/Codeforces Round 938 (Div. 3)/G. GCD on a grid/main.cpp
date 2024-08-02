@@ -54,7 +54,7 @@ concept pair = requires(T t) {
 template <typename T>
 concept string_like = std::same_as<std::string, std::remove_cvref_t<T>> ||
                       std::same_as<std::string_view, std::remove_cvref_t<T>> ||
-                      std::convertible_to<std::remove_cvref_t<T>, char const*>;
+                      std::convertible_to<std::remove_cvref_t<T>, char const *>;
 template <typename> struct is_tuple_t : std::false_type {};
 template <typename... T>
 struct is_tuple_t<std::tuple<T...>> : std::true_type {};
@@ -62,12 +62,12 @@ template <typename... T>
 concept tuple = is_tuple_t<T...>::value;
 } // namespace impl
 
-constexpr auto& operator>>(auto& istream, auto&& t)
+constexpr auto &operator>>(auto &istream, auto &&t)
 {
   using T = std::remove_cvref_t<decltype(t)>;
 #ifdef __cpp_lib_ranges
   if constexpr (std::ranges::range<T>) {
-    for (auto& ele : t) {
+    for (auto &ele : t) {
       istream >> ele;
     }
   }
@@ -83,7 +83,7 @@ constexpr auto& operator>>(auto& istream, auto&& t)
   }
   return istream;
 }
-constexpr void print(auto const& t, int const depth = 0)
+constexpr void print(auto const &t, int const depth = 0)
 {
   using T = std::remove_cvref_t<decltype(t)>;
   if constexpr (impl::string_like<T>) {
@@ -91,7 +91,7 @@ constexpr void print(auto const& t, int const depth = 0)
   }
 #ifdef __cpp_lib_ranges
   else if constexpr (std::ranges::range<T>) {
-    for (auto const& ele : t) {
+    for (auto const &ele : t) {
       print(ele, depth + 1);
     }
     if (depth != 0) {
@@ -116,7 +116,7 @@ constexpr void print(auto const& t, int const depth = 0)
   }
 }
 constexpr void debug([[maybe_unused]] std::string_view s,
-                     [[maybe_unused]] auto const& t)
+                     [[maybe_unused]] auto const &t)
 {
 #ifndef ONLINE_JUDGE
   std::cout << "[debug] " << s << ": ";
@@ -127,9 +127,9 @@ constexpr void debug([[maybe_unused]] std::string_view s,
   std::cout.flush();
 #endif
 }
-constexpr bool check_max(auto& value, auto const& other)
+constexpr bool check_max(auto &value, auto const &other)
 #else
-template <typename T> constexpr bool check_max(T& value, T const& other)
+template <typename T> constexpr bool check_max(T &value, T const &other)
 #endif
 {
   if (value < other) {
@@ -139,9 +139,9 @@ template <typename T> constexpr bool check_max(T& value, T const& other)
   return false;
 }
 #ifdef __cpp_concepts
-constexpr bool check_min(auto& value, auto const& other)
+constexpr bool check_min(auto &value, auto const &other)
 #else
-template <typename T> constexpr bool check_min(T& value, T const& other)
+template <typename T> constexpr bool check_min(T &value, T const &other)
 #endif
 {
   if (value > other) {
@@ -151,9 +151,9 @@ template <typename T> constexpr bool check_min(T& value, T const& other)
   return false;
 }
 #ifdef __cpp_concepts
-constexpr auto sum_of(auto const& coll) noexcept
+constexpr auto sum_of(auto const &coll) noexcept
 #else
-template <typename Range> constexpr auto sum(Range const& coll) noexcept
+template <typename Range> constexpr auto sum(Range const &coll) noexcept
 #endif
 {
   return std::accumulate(coll.begin(), coll.end(), std::int_fast64_t{});
@@ -241,7 +241,7 @@ auto solve_case()
       continue;
     }
     for (auto const e : {x, d / x}) {
-      for (auto& fe : f) {
+      for (auto &fe : f) {
         fe.assign(m, 0);
       }
       f[0][0] = 1;
