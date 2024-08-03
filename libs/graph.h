@@ -376,7 +376,7 @@ struct Tarjan_cuts {
   void run(int u, bool isroot = true)
   {
     low[u] = dfn[u] = ++idx;
-    u64 cnt{};
+    int cnt{};
     for (auto const [_, v] : g.edges_of(u)) {
       if (!dfn[v]) {
         run(v, false);
@@ -478,13 +478,12 @@ auto contract_edges(Graph const &g) -> Graph
 
   std::vector<int> scc_id(g.adjacent.size());
   Graph h(scc.size());
-  scc_id.resize(scc.size());
   for (int i{}; i != scc.size(); ++i) {
     for (auto const u : scc[i]) {
       scc_id[u] = i;
     }
   }
-  for (std::size_t i{}; i != scc.size(); ++i) {
+  for (int i{}; i != scc.size(); ++i) {
     for (auto const u : scc[i]) {
       for (auto const &[_, v] : g.edges_of(u)) {
         if (i != scc_id[v]) {

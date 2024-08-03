@@ -639,7 +639,6 @@ auto contract_edges(Graph const &g) -> Graph
 
   std::vector<int> scc_id(g.adjacent.size());
   Graph h(scc.size());
-  scc_id.resize(scc.size());
   for (int i{}; i != scc.size(); ++i) {
     for (auto const u : scc[i]) {
       scc_id[u] = i;

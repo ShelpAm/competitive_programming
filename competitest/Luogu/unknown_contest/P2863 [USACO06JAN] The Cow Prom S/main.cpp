@@ -1,8 +1,8 @@
-/*Problem: P2002 消息扩散*/
+/*Problem: P2863 [USACO06JAN] The Cow Prom S*/
 /*Contest: unknown_contest*/
 /*Judge: Luogu*/
-/*URL: https://www.luogu.com.cn/problem/P2002*/
-/*Start: Sat 03 Aug 2024 10:12:00 PM CST*/
+/*URL: https://www.luogu.com.cn/problem/P2863*/
+/*Start: Sat 03 Aug 2024 11:44:50 PM CST*/
 /*Author: ShelpAm*/
 
 #include <bits/stdc++.h>
@@ -661,13 +661,10 @@ void solve_case()
 {
   int n, m;
   std::cin >> n >> m;
-  auto const h{graph::contract_edges(graph::read(n, m, true, false))};
-  std::vector<int> in(h.adjacent.size());
-  for (int i{}; i != h.adjacent.size(); ++i) {
-    for (auto const &[_, v] : h.edges_of(i)) {
-      ++in[v];
-    }
-  }
-  std::cout << std::count(in.begin(), in.end(), 0);
+  auto const g{graph::read(n, m, true, false)};
+
+  graph::Tarjan_scc scc(g);
+  std::cout << std::count_if(scc.scc.begin(), scc.scc.end(),
+                             [](auto const &e) { return e.size() > 1; });
 }
 } // namespace
