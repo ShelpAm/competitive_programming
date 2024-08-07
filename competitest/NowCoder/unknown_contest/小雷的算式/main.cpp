@@ -1,8 +1,8 @@
-/*Problem: $(PROBLEM)*/
-/*Contest: $(CONTEST)*/
-/*Judge: $(JUDGE)*/
-/*URL: $(URL)*/
-/*Start: $(DATE)*/
+/*Problem: 小雷的算式*/
+/*Contest: unknown_contest*/
+/*Judge: NowCoder*/
+/*URL: https://ac.nowcoder.com/acm/contest/88269/F*/
+/*Start: Wed 07 Aug 2024 01:09:13 PM CST*/
 /*Author: ShelpAm*/
 
 #include <bits/stdc++.h>
@@ -165,6 +165,28 @@ using i64 = std::int_fast64_t;
 using u64 = std::uint_fast64_t;
 void solve_case() noexcept
 {
-  /*return;*/
+  std::string s;
+  std::cin >> s;
+  s += '+';
+  std::vector<int> a;
+  int t{};
+  for (auto const e : s) {
+    if (e == '+') {
+      a.push_back(t);
+      t = 0;
+    }
+    else {
+      t = t * 10 + e - '0';
+    }
+  }
+  std::sort(a.begin(), a.end(), std::greater<>());
+  for (int i{}; i != a.size(); ++i) {
+    std::cout << a[i];
+    if (i != a.size() - 1) {
+      std::cout << '+';
+    }
+  }
+  std::cout << "\n";
+  std::cout << sum_of(a);
 }
 } // namespace

@@ -1,8 +1,8 @@
-/*Problem: $(PROBLEM)*/
-/*Contest: $(CONTEST)*/
-/*Judge: $(JUDGE)*/
-/*URL: $(URL)*/
-/*Start: $(DATE)*/
+/*Problem: Fight Against the Monster*/
+/*Contest: unknown_contest*/
+/*Judge: NowCoder*/
+/*URL: https://ac.nowcoder.com/acm/contest/81602/I*/
+/*Start: Tue 06 Aug 2024 12:24:35 PM CST*/
 /*Author: ShelpAm*/
 
 #include <bits/stdc++.h>
@@ -154,7 +154,7 @@ auto main() -> int
   constexpr auto my_precision{10};
   std::cout << std::fixed << std::setprecision(my_precision);
   int t{1};
-  /*std::cin >> t;*/
+  std::cin >> t;
   for (int i{}; i != t; ++i) {
     solve_case();
   }
@@ -165,6 +165,22 @@ using i64 = std::int_fast64_t;
 using u64 = std::uint_fast64_t;
 void solve_case() noexcept
 {
-  /*return;*/
+  i64 m, k, h;
+  std::cin >> m >> k >> h;
+  if (m == k) {
+    std::cout << std::min(m, h) << '\n';
+    return;
+  }
+  if (h == 0) {
+    std::cout << "0\n";
+    return;
+  }
+  std::cout << binary_search(
+                   [&](auto const x) {
+                     auto const t{(x - k) / (m - k)};
+                     return x + t * k >= h;
+                   },
+                   h, -1)
+            << '\n';
 }
 } // namespace

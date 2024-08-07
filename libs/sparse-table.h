@@ -1,11 +1,12 @@
 #pragma once
+
 #include "../templates/main.cpp"
 
 namespace sparse_table {
 // Note: 0-indexed
 template <typename T, typename F> class Sparse_table {
 public:
-  Sparse_table(std::vector<T> table)
+  constexpr Sparse_table(std::vector<T> table) noexcept
       : _table(msb(table.size()) + 1, std::move(table))
   {
     for (std::size_t i{1}; i != _table.size(); ++i) {
@@ -15,7 +16,8 @@ public:
     }
   }
 
-  [[nodiscard]] auto query(unsigned const l, unsigned const r) const -> int
+  [[nodiscard]] constexpr auto query(unsigned const l,
+                                     unsigned const r) const noexcept -> T
   {
     assert(r >= l);
     auto const k{msb(r - l + 1)};
@@ -29,13 +31,15 @@ private:
 
 namespace details {
 template <typename T> struct Min {
-  constexpr auto operator()(T const &lhs, T const &rhs) const -> T const &
+  constexpr auto operator()(T const &lhs,
+                            T const &rhs) const noexcept -> T const &
   {
     return std::min(lhs, rhs);
   }
 };
 template <typename T> struct Max {
-  constexpr auto operator()(T const &lhs, T const &rhs) const -> T const &
+  constexpr auto operator()(T const &lhs,
+                            T const &rhs) const noexcept -> T const &
   {
     return std::max(lhs, rhs);
   }

@@ -1,6 +1,7 @@
 #pragma once
 
-#include "../templates/main.cpp"
+#include <numeric>
+#include <vector>
 
 namespace disjoint_set_union {
 class Disjoint_set_union {

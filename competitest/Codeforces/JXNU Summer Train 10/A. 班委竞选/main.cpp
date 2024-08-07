@@ -1,8 +1,8 @@
-/*Problem: $(PROBLEM)*/
-/*Contest: $(CONTEST)*/
-/*Judge: $(JUDGE)*/
-/*URL: $(URL)*/
-/*Start: $(DATE)*/
+/*Problem: A. 班委竞选*/
+/*Contest: JXNU Summer Train 10*/
+/*Judge: Codeforces*/
+/*URL: https://codeforces.com/gym/541349/problem/A*/
+/*Start: Wed 07 Aug 2024 07:10:19 PM CST*/
 /*Author: ShelpAm*/
 
 #include <bits/stdc++.h>

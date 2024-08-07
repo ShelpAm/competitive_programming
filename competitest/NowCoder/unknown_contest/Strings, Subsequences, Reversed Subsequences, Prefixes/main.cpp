@@ -1,8 +1,8 @@
-/*Problem: $(PROBLEM)*/
-/*Contest: $(CONTEST)*/
-/*Judge: $(JUDGE)*/
-/*URL: $(URL)*/
-/*Start: $(DATE)*/
+/*Problem: Strings, Subsequences, Reversed Subsequences, Prefixes*/
+/*Contest: unknown_contest*/
+/*Judge: NowCoder*/
+/*URL: https://ac.nowcoder.com/acm/contest/81602/K*/
+/*Start: Tue 06 Aug 2024 01:30:38 PM CST*/
 /*Author: ShelpAm*/
 
 #include <bits/stdc++.h>
@@ -163,8 +163,125 @@ auto main() -> int
 namespace {
 using i64 = std::int_fast64_t;
 using u64 = std::uint_fast64_t;
+namespace hash {
+// note: zero-indexed
+template <std::size_t Base> class Hash {
+public:
+  template <typename R>
+  constexpr Hash(R const &range)
+      : _hash_value(range.size() + 1), _pow_base(range.size() + 1)
+  {
+    for (std::size_t i{1}; i != _hash_value.size(); ++i) {
+      _hash_value[i] = _hash_value[i - 1] * Base + range[i - 1];
+    }
+
+    _pow_base[0] = 1;
+    for (std::size_t i{1}; i != _pow_base.size(); ++i) {
+      _pow_base[i] = _pow_base[i - 1] * Base;
+    }
+  }
+
+  [[nodiscard]] auto query(std::size_t const l,
+                           std::size_t const r) const -> std::size_t
+  {
+    return _hash_value[r + 1] - _hash_value[l] * _pow_base[r - l + 1];
+  }
+
+  std::vector<std::size_t> _hash_value;
+  std::vector<std::size_t> _pow_base;
+};
+} // namespace hash
+auto work(std::string t) -> std::vector<int>
+{
+  /*std::cerr << "Finding palindrome of " << t << '\n';*/
+  hash::Hash<131> hash{t};
+  std::reverse(t.begin(), t.end());
+  hash::Hash<131> hashr{t};
+  std::reverse(t.begin(), t.end());
+  /*debug("hash", hash._hash_value);*/
+  /*debug("hashr", hashr._hash_value);*/
+  std::vector<int> pos;
+  for (int i{}; i != t.size(); ++i) {
+    /*std::cerr << i << ' ' << hashr.query(0, i) << ' '*/
+    /*          << hash.query(t.size() - 1 - i, t.size() - 1) << '\n';*/
+    if (hashr.query(0, i) == hash.query(t.size() - 1 - i, t.size() - 1)) {
+      pos.push_back(t.size() - 1 - i);
+    }
+  }
+  return pos;
+}
+auto get(int r, std::string s, std::string t) -> int
+{
+  int j = 0;
+  for (int i = 0; i < r; i++) {
+    if (s[i] == t[j]) {
+      j++;
+    }
+  }
+  return j;
+}
 void solve_case() noexcept
 {
-  /*return;*/
+  auto find_prefix{[](std::string_view const s, std::string_view const t) {
+    int i{}, j{};
+    while (i != s.size() && j != t.size()) {
+      if (t[j] == s[i]) {
+        if (++j == t.size()) {
+          return i;
+        }
+      }
+      ++i;
+    }
+    return -1;
+  }};
+
+  auto count_subsequences{[](std::string_view const s) {
+    /*std::cerr << "s: " << s << '\n';*/
+    std::vector<i64> f(s.size() + 1);
+    std::unordered_map<char, int> last;
+    f[0] = 1;
+    for (int i{}; i != s.size(); ++i) {
+      f[i + 1] = f[i] * 2 % mod1e9p7;
+      if (last.count(s[i])) {
+        f[i + 1] -= f[last[s[i]]];
+        f[i + 1] %= mod1e9p7;
+        f[i + 1] += mod1e9p7;
+        f[i + 1] %= mod1e9p7;
+      }
+      last[s[i]] = i;
+    }
+    return f[s.size()];
+  }};
+
+  int n, m;
+  std::cin >> n >> m;
+  std::string s, t;
+  std::cin >> s >> t;
+
+  auto const l{find_prefix(s, t)};
+  std::reverse(s.begin(), s.end());
+  auto const r{n - find_prefix(s, t) - 1};
+  std::reverse(s.begin(), s.end());
+  if (l == -1 || r == n) {
+    std::cout << 0 << '\n';
+    return;
+  }
+
+  auto const pos{work(t)};
+  auto const num_available_left{get(r, s, t)};
+  /*std::cerr << "r: " << r << '\n';*/
+  /*for (auto const e : pos) {*/
+  /*  std::cerr << e << ' ';*/
+  /*}*/
+  /*std::cerr << '\n' << num_available_left << '\n';*/
+  i64 ans{std::count_if(pos.begin(), pos.end(), [&](auto const e) {
+    return e <= num_available_left;
+  })}; // overlapping
+  if (l < r) {
+    ans += count_subsequences(s.substr(l + 1, r - l - 1)); // Non-overlapping
+    ans %= mod1e9p7;
+  }
+  ans = (ans % mod1e9p7 + mod1e9p7) % mod1e9p7;
+  std::cout << ans << '\n';
 }
 } // namespace

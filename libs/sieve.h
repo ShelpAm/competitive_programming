@@ -20,9 +20,10 @@ public:
   }
 
   // Time complexity: O(sqrt(x))
-  [[nodiscard]] auto factorize(u64 x) const -> std::map<u64, u64>
+  [[nodiscard]] auto factorize(std::uint_fast64_t x) const
+      -> std::map<std::uint_fast64_t, std::uint_fast64_t>
   {
-    std::map<u64, u64> res;
+    std::map<std::uint_fast64_t, std::uint_fast64_t> res;
     assert(x <= (_min_factor.size() - 1) * (_min_factor.size() - 1));
     for (auto const p : _primes) {
       if (p > x) {
@@ -44,7 +45,7 @@ public:
     return _min_factor[x] == x;
   }
 
-  [[nodiscard]] auto primes() const -> std::vector<int>
+  [[nodiscard]] auto primes() const -> std::vector<int> const &
   {
     return _primes;
   }

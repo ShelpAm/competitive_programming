@@ -1,8 +1,8 @@
-/*Problem: $(PROBLEM)*/
-/*Contest: $(CONTEST)*/
-/*Judge: $(JUDGE)*/
-/*URL: $(URL)*/
-/*Start: $(DATE)*/
+/*Problem: 简单的素数*/
+/*Contest: unknown_contest*/
+/*Judge: NowCoder*/
+/*URL: https://ac.nowcoder.com/acm/contest/88269/D*/
+/*Start: Wed 07 Aug 2024 01:05:38 PM CST*/
 /*Author: ShelpAm*/
 
 #include <bits/stdc++.h>
@@ -154,7 +154,7 @@ auto main() -> int
   constexpr auto my_precision{10};
   std::cout << std::fixed << std::setprecision(my_precision);
   int t{1};
-  /*std::cin >> t;*/
+  std::cin >> t;
   for (int i{}; i != t; ++i) {
     solve_case();
   }
@@ -165,6 +165,19 @@ using i64 = std::int_fast64_t;
 using u64 = std::uint_fast64_t;
 void solve_case() noexcept
 {
-  /*return;*/
+  i64 x;
+  std::cin >> x;
+  auto is_prime{[](auto const x) {
+    if (x == 2) {
+      return true;
+    }
+    for (i64 i{2}; i * i <= x; ++i) {
+      if (x % i == 0) {
+        return false;
+      }
+    }
+    return true;
+  }};
+  std::cout << (is_prime(x) ? "Yes" : "No") << '\n';
 }
 } // namespace

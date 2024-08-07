@@ -1,35 +1,184 @@
-#pragma once
+/*Problem: P8287 「DAOI R1」Flame*/
+/*Contest: unknown_contest*/
+/*Judge: Luogu*/
+/*URL: https://www.luogu.com.cn/problem/P8287*/
+/*Start: Sun 04 Aug 2024 05:07:46 PM CST*/
+/*Author: ShelpAm*/
 
-#include "../templates/main.cpp"
+#include <bits/stdc++.h>
 
+#ifdef __cpp_lib_ranges
+#include <ranges>
+#endif
+
+namespace {
+[[maybe_unused]] constexpr std::int_fast64_t mod998244353{998'244'353LL};
+[[maybe_unused]] constexpr std::int_fast64_t mod1e9p7{1'000'000'007LL};
+[[maybe_unused]] constexpr double eps{1e-8};
+template <typename T>
+[[maybe_unused]] constexpr T inf{std::numeric_limits<T>::max() / 2};
+
+#ifdef __cpp_concepts
+// Concepts.
+namespace shelpam::concepts {
+template <typename> struct is_pair_t : std::false_type {};
+template <typename T, typename U>
+struct is_pair_t<std::pair<T, U>> : std::true_type {};
+template <typename T>
+concept pair = is_pair_t<T>::value;
+template <typename> struct is_tuple_t : std::false_type {};
+template <typename... Ts>
+struct is_tuple_t<std::tuple<Ts...>> : std::true_type {};
+template <typename... Ts>
+concept tuple = is_tuple_t<Ts...>::value;
+} // namespace shelpam::concepts
+
+constexpr auto operator>>(auto &istream, auto &&t) -> std::istream &
+{
+  using T = std::remove_cvref_t<decltype(t)>;
+  static_assert(!shelpam::concepts::tuple<T>, "tuple: not implemented yet.\n");
+#ifdef __cpp_lib_ranges
+  if constexpr (std::ranges::range<T>) {
+    for (auto &ele : t) {
+      istream >> ele;
+    }
+  }
+#endif
+  else if constexpr (shelpam::concepts::pair<T>) {
+    istream >> t.first >> t.second;
+  }
+  else {
+    istream >> t;
+  }
+  return istream;
+}
+#endif
+#ifndef ONLINE_JUDGE
+#include "/home/shelpam/Documents/projects/competitive-programming/libs/debug.h"
+#else
+#define debug(...)
+#endif
+template <typename T, typename U>
+constexpr auto chmax(T &value, U const &other) noexcept -> bool
+{
+  if (value < other) {
+    value = other;
+    return true;
+  }
+  return false;
+}
+template <typename T, typename U>
+constexpr auto chmin(T &value, U const &other) noexcept -> bool
+{
+  if (value > other) {
+    value = other;
+    return true;
+  }
+  return false;
+}
+template <typename T> constexpr auto sum_of(T const &coll) noexcept
+{
+  return std::accumulate(coll.begin(), coll.end(), std::int_fast64_t{});
+}
+constexpr auto pow(int a, std::int_fast64_t b,
+                   std::uint_fast64_t p) noexcept = delete;
+template <typename T>
+constexpr auto pow(T a, std::int_fast64_t b, std::uint_fast64_t p) noexcept
+{
+  assert(b >= 0);
+  decltype(a) res{1};
+  while (b != 0) {
+    if ((b & 1) == 1) {
+      res = res * a % p;
+    }
+    a = a * a % p;
+    b >>= 1;
+  }
+  return res;
+}
+template <typename F>
+auto binary_search(F check, std::int_fast64_t ok, std::int_fast64_t ng,
+                   bool check_ok = true) -> std::int_fast64_t
+{
+  if (check_ok) {
+    assert(check(ok));
+  }
+  while (std::abs(ok - ng) > 1) {
+    auto const x{(ok + ng) / 2};
+    (check(x) ? ok : ng) = x;
+  }
+  return ok;
+}
+template <typename T> constexpr auto lsb(T i) -> T
+{
+  static_assert(std::is_signed_v<T>,
+                "lsb is implemented based on signed integers.");
+  return i & -i;
+}
+// i mustn't be 0
+template <typename T> constexpr auto count_leading_zeros(T const &i) -> int
+{
+  assert(i != 0);
+  if constexpr (std::is_same_v<T, unsigned long long>) {
+    return __builtin_clzll(i);
+  }
+  if constexpr (std::is_same_v<T, unsigned long>) {
+    return __builtin_clzl(i);
+  }
+  if constexpr (std::is_same_v<T, unsigned int>) {
+    return __builtin_clz(i);
+  }
+  /*static_assert(false, "Unsupported type");*/
+  static_assert(!std::is_signed_v<T>,
+                "msb is implemented based on unsigned integers");
+  return -1; // Unreachable.
+}
+// i mustn't be 0
+template <typename T> constexpr auto msb(T i) -> int
+{
+  return static_cast<int>(sizeof(T) * CHAR_BIT - 1 - count_leading_zeros(i));
+}
+[[maybe_unused]] auto gen_rand()
+{
+  static std::mt19937_64 rng(
+      std::chrono::steady_clock::now().time_since_epoch().count());
+  return rng();
+}
+void solve_case();
+} // namespace
+auto main() -> int
+{
+  std::ios::sync_with_stdio(false);
+  std::cin.tie(nullptr);
+  constexpr auto my_precision{10};
+  std::cout << std::fixed << std::setprecision(my_precision);
+  int t{1};
+  /*std::cin >> t;*/
+  for (int i{}; i != t; ++i) {
+    solve_case();
+  }
+  return 0;
+}
+namespace {
+using i64 = std::int_fast64_t;
+using u64 = std::uint_fast64_t;
 namespace graph {
 constexpr std::int_fast64_t infinity{
     std::numeric_limits<std::int_fast64_t>::max() / 2};
-class Graph {
+struct Graph {
 public:
-  explicit Graph(std::size_t const max_num_of_vertices)
-      : adjacent(max_num_of_vertices)
+  Graph(std::size_t const max_num_of_vertices) : adjacent(max_num_of_vertices)
   {
   }
-
-  void add_edge(std::size_t const u, std::size_t const v,
-                std::int_fast64_t const w)
+  void add_edge(int u, int v, std::int_fast64_t w)
   {
     adjacent[u].emplace_back(w, v);
   }
-
   [[nodiscard]] auto edges_of(std::size_t const u) const
       -> std::vector<std::pair<std::int_fast64_t, int>> const &
   {
     return adjacent[u];
   }
-
-  [[nodiscard]] auto size() const -> std::size_t
-  {
-    return adjacent.size();
-  }
-
-private:
   std::vector<std::vector<std::pair<std::int_fast64_t, int>>> adjacent;
 };
 auto read(int const num_of_vertices, int const num_of_edges,
@@ -61,7 +210,7 @@ auto to_edges(Graph const &g)
     -> std::vector<std::tuple<std::int_fast64_t, int, int>>
 {
   std::vector<std::tuple<std::int_fast64_t, int, int>> edges;
-  for (std::size_t u{}; u != g.size(); ++u) {
+  for (std::size_t u{}; u != g.adjacent.size(); ++u) {
     for (auto const &[w, v] : g.edges_of(u)) {
       edges.emplace_back(w, u, v);
     }
@@ -105,42 +254,42 @@ auto kruskal(Graph const &g) -> std::int_fast64_t
     {
       return find(x) == find(y);
     }
-    [[nodiscard]] auto size(int x) -> std::size_t
+    [[nodiscard]] auto size(int x) -> int
     {
       return _size[find(x)];
     }
 
   private:
     std::vector<int> _parent;
-    std::vector<std::size_t> _size;
+    std::vector<int> _size;
   };
   auto edges{to_edges(g)};
   std::sort(edges.begin(), edges.end());
-  Disjoint_set_union dsu(static_cast<int>(g.size()));
-  std::int_fast64_t sum_weights{};
+  Disjoint_set_union dsu(static_cast<int>(g.adjacent.size()));
+  std::int_fast64_t weight{};
   for (auto const &[w, u, v] : edges) {
     if (dsu.unite(u, v)) {
-      sum_weights += w;
+      weight += w;
     }
   }
-  if (dsu.size(0) != g.size()) {
+  if (dsu.size(0) != g.adjacent.size()) {
     return -1;
   }
-  return sum_weights;
+  return weight;
 }
 // Tested in https://www.luogu.com.cn/problem/P3366
 auto prim(Graph const &g) -> std::int_fast64_t
 {
   // `distance[i]` means the distance from connected block to unconnected
   // block (aka i), not from source to i.
-  std::vector<std::int_fast64_t> distance(g.size(), infinity);
+  std::vector<std::int_fast64_t> distance(g.adjacent.size(), infinity);
 
   constexpr auto defined_source{0};
   distance[defined_source] = 0;
 
-  // `visited[u]` is true means u had been a start point, and it shouldn't be
+  // `visited[u]` is true means u has been a start point, and it shouldn't be
   // start point once more.
-  std::vector<int> visited(g.size());
+  std::vector<int> visited(g.adjacent.size());
   std::size_t num_visited{};
 
   std::priority_queue<std::pair<std::int_fast64_t, int>,
@@ -149,20 +298,19 @@ auto prim(Graph const &g) -> std::int_fast64_t
       q;
   q.emplace(distance[defined_source], defined_source);
 
-  std::int_fast64_t sum_weights{};
-  while (!q.empty()) {
-    auto const [w, u]{q.top()}; // Extract unvisited closest vertex to sources.
+  std::int_fast64_t weight{};
+  while (!q.empty()) {          // The main loop
+    auto const [w, u]{q.top()}; // Extract the closest vertex. (Get and remove
+                                // the best vertex)
     q.pop();
 
-    // If some vertex was set visited, then it has had been start point to its
-    // neighbours, hence there is no need to begin edges with that.
     if (visited[u]) {
       continue;
     }
     visited[u] = 1;
-    sum_weights += w;
-    if (++num_visited == g.size()) {
-      return sum_weights;
+    weight += w;
+    if (++num_visited == g.adjacent.size()) {
+      return weight;
     }
 
     for (auto const &[w, v] : g.edges_of(u)) {
@@ -178,23 +326,23 @@ auto prim(Graph const &g) -> std::int_fast64_t
 }
 struct Bellman_ford_result {
   bool contains_negative_circle;
-  // When `no_negative_circle` is true, this is invalid.
-  std::vector<std::int_fast64_t> distance;
+  std::vector<std::int_fast64_t>
+      distance; // When `no_negative_circle` is false, this is usable.
 };
 auto bellman_ford(Graph const &g, int const source,
                   std::vector<int> &visited) -> Bellman_ford_result
 {
-  int const n{static_cast<int>(g.size())};
-  std::vector<std::int_fast64_t> dist(g.size(), infinity);
-  std::vector<int> num_intermediates(g.size());
-  // std::vector<int> vis(g.size());
+  int const n{static_cast<int>(g.adjacent.size())};
+  std::vector<std::int_fast64_t> dist(g.adjacent.size(), infinity);
+  std::vector<int> num_intermediates(g.adjacent.size());
+  // std::vector<int> vis(g.adjacent.size());
 
   dist[source] = 0;
   visited[source] = 1;
   // Only those in `q` could lead to relaxation.
   std::deque<int> q{source};
-  auto swap_smaller_to_front{[&](std::deque<int> &q) {
-    if (dist[q.back()] < dist[q.front()]) {
+  auto swap_smaller_to_front{[](std::deque<int> &q) {
+    if (q.back() < q.front()) {
       std::swap(q.back(), q.front());
     }
   }};
@@ -208,7 +356,7 @@ auto bellman_ford(Graph const &g, int const source,
       if (auto const alt{dist[u] + w}; chmin(dist[v], alt)) {
         num_intermediates[v] = num_intermediates[u] + 1;
         if (num_intermediates[v] >= n) {
-          return {.contains_negative_circle = true, .distance = {}};
+          return {true, {}};
         }
         if (!visited[v]) {
           visited[v] = 1;
@@ -218,7 +366,7 @@ auto bellman_ford(Graph const &g, int const source,
       }
     }
   }
-  return {.contains_negative_circle = false, .distance = dist};
+  return {false, dist};
 }
 struct Dijkstra_result {
   std::vector<std::int_fast64_t> distance;
@@ -227,12 +375,12 @@ struct Dijkstra_result {
 auto dijkstra(Graph const &graph,
               std::vector<int> const &sources) -> Dijkstra_result
 {
-  std::vector<std::int_fast64_t> distance(graph.size(), infinity);
-  std::vector<std::int_fast64_t> previous(graph.size());
+  std::vector<std::int_fast64_t> distance(graph.adjacent.size(), infinity);
+  std::vector<std::int_fast64_t> previous(graph.adjacent.size());
 
   // `visited[u]` is true means u has been a start point, and it shouldn't be
   // start point once more.
-  std::vector<int> visited(graph.size());
+  std::vector<int> visited(graph.adjacent.size());
 
   std::priority_queue<std::pair<std::int_fast64_t, int>,
                       std::vector<std::pair<std::int_fast64_t, int>>,
@@ -271,14 +419,15 @@ auto dijkstra(Graph const &graph, int const source) -> Dijkstra_result
 using adjacent_matrix_t = std::vector<std::vector<std::int_fast64_t>>;
 auto floyd(Graph const &g) -> adjacent_matrix_t
 {
-  auto const n = static_cast<int>(g.size());
+  auto const &adjacent{g.adjacent};
+  auto const n = static_cast<int>(adjacent.size());
 
   adjacent_matrix_t f(n, std::vector<std::int_fast64_t>(n, infinity));
 
   // Initializes data
   for (int u = 0; u != n; ++u) {
     f[u][u] = 0;
-    for (auto const &[w, v] : g.edges_of(u)) {
+    for (auto const &[w, v] : adjacent[u]) {
       f[u][v] = w;
     }
   }
@@ -302,10 +451,10 @@ struct Toposort_result {
 auto toposort(Graph const &g, bool directed) -> Toposort_result
 {
   assert(directed && "haven't implement undirected");
-  int const n{static_cast<int>(g.size())};
+  int const n{static_cast<int>(g.adjacent.size())};
   std::vector<int> in(n);
-  for (std::size_t u{}; u != g.size(); ++u) {
-    for (auto const [_, v] : g.edges_of(u)) {
+  for (auto const &edges : g.adjacent) {
+    for (auto const [_, v] : edges) {
       ++in[v];
     }
   }
@@ -328,20 +477,19 @@ auto toposort(Graph const &g, bool directed) -> Toposort_result
       }
     }
   }
-  if (order.size() != g.size()) {
-    return {.acyclic = false, .order = {}};
+  if (order.size() != g.adjacent.size()) {
+    return {false, {}};
   }
-  return {.acyclic = true, .order = order};
+  return {true, order};
 };
 // The graph should only contains left-to-right edges, and should not
 // convert/transform the vertices' ID. For example, if you want to make a edge
 // from left vertex x to right vertex y, you should use
 // `g.add_edge(x, y, 1);` rather than `g.add_edge(x, y + n, 1);`.
-auto maximum_matching(Graph const &g, int const left_size,
-                      int const right_size) -> int
+auto maximum_matching(Graph const &g, int left_size, int right_size) -> int
 {
   assert(left_size >= 0 && right_size >= 0);
-  assert(g.size() == static_cast<std::size_t>(left_size));
+  assert(g.adjacent.size() == static_cast<std::size_t>(left_size));
   int res{};
   int idx{}; // dfs order, identifying if a vertex was visited in current round
   std::vector<int> dfn(left_size);
@@ -387,14 +535,14 @@ auto maximum_matching(Graph const &g, int const left_size,
   return res;
 }
 struct Tarjan_cuts {
-  Tarjan_cuts(Graph const &g) : g(g), n(g.size()), low(n), dfn(n) {}
+  Tarjan_cuts(Graph const &g) : g(g), n(g.adjacent.size()), low(n), dfn(n) {}
   Graph g;
   std::size_t n;
   int idx{};
   // You can check dfn[i] to identify if vertex i has been visited.
   std::vector<int> low, dfn;
   std::vector<int> cuts;
-  void run(int const u, bool const isroot = true)
+  void run(int u, bool isroot = true)
   {
     low[u] = dfn[u] = ++idx;
     int cnt{};
@@ -414,13 +562,13 @@ struct Tarjan_cuts {
   }
 };
 struct Tarjan_bridges {
-  Tarjan_bridges(Graph g) : g(std::move(g)), n(g.size()), low(n), dfn(n) {}
+  Tarjan_bridges(Graph const &g) : g(g), n(g.adjacent.size()), low(n), dfn(n) {}
   Graph g;
   std::size_t n;
   int idx{};
   std::vector<int> low, dfn;
   std::vector<std::pair<int, int>> bridges;
-  void run(int const u, int const p)
+  void run(int u, int p)
   {
     low[u] = dfn[u] = ++idx;
     for (auto const [_, v] : g.edges_of(u)) {
@@ -442,7 +590,7 @@ struct Tarjan_bridges {
 struct Tarjan_scc {
 public:
   Tarjan_scc(Graph g)
-      : _g{std::move(g)}, _n(static_cast<int>(_g.size())), _index(_n),
+      : _g{std::move(g)}, _n(static_cast<int>(_g.adjacent.size())), _index(_n),
         _lowlink(_n), _on_stack(_n)
   {
     for (int i{}; i != _n; ++i) {
@@ -495,20 +643,20 @@ private:
 };
 struct Contract_edges_result {
   Graph h;
-  std::vector<std::size_t> scc_id;
+  std::vector<int> scc_id;
 };
 auto contract_edges(Graph const &g) -> Contract_edges_result
 {
   auto const scc{std::move(Tarjan_scc(g).scc)};
 
-  std::vector<std::size_t> scc_id(g.size());
+  std::vector<int> scc_id(g.adjacent.size());
   Graph h(scc.size());
-  for (std::size_t i{}; i != scc.size(); ++i) {
+  for (int i{}; i != scc.size(); ++i) {
     for (auto const u : scc[i]) {
       scc_id[u] = i;
     }
   }
-  for (std::size_t i{}; i != scc.size(); ++i) {
+  for (int i{}; i != scc.size(); ++i) {
     for (auto const u : scc[i]) {
       for (auto const &[w, v] : g.edges_of(u)) {
         if (i != scc_id[v]) {
@@ -517,6 +665,52 @@ auto contract_edges(Graph const &g) -> Contract_edges_result
       }
     }
   }
-  return Contract_edges_result{.h = h, .scc_id = scc_id};
+  return {.h = h, .scc_id = scc_id};
 }
 } // namespace graph
+void solve_case()
+{
+  int n, m, k;
+  std::cin >> n >> m >> k;
+  auto const g{graph::read(n, m, false, false)};
+  std::vector<int> beg(k);
+  for (auto &e : beg) {
+    std::cin >> e;
+    --e;
+  }
+
+  int ok = 2e6;
+  auto res{binary_search(
+      [&](auto const t) {
+        auto dist{graph::dijkstra(g, beg).distance};
+
+        std::vector<int> vis(n);
+        std::function<bool(int, int)> dfs1{[&](int const u, int const p) {
+          vis[u] = 1;
+          for (auto const &[_, v] : g.edges_of(u)) {
+            if (v != p && dist[v] <= t) {
+              if (vis[v] || dfs1(v, u)) {
+                return true;
+              }
+            }
+          }
+          return false;
+        }};
+        for (int i{}; i != n; ++i) {
+          if (!vis[i] && dist[i] <= t) {
+            if (dfs1(i, i)) {
+              return true;
+            }
+          }
+        }
+        return false;
+      },
+      ok, -1, false)};
+  if (res == ok) {
+    std::cout << "Poor D!";
+  }
+  else {
+    std::cout << res;
+  }
+}
+} // namespace

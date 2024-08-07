@@ -76,7 +76,7 @@ constexpr auto chmin(T &value, U const &other) noexcept -> bool
   }
   return false;
 }
-template <typename C> constexpr auto sum_of(C const &coll) noexcept
+template <typename T> constexpr auto sum_of(T const &coll) noexcept
 {
   return std::accumulate(coll.begin(), coll.end(), std::int_fast64_t{});
 }
@@ -98,7 +98,7 @@ constexpr auto pow(T a, std::int_fast64_t b, std::uint_fast64_t p) noexcept
 }
 template <typename F>
 auto binary_search(F check, std::int_fast64_t ok, std::int_fast64_t ng,
-                   bool check_ok = true) noexcept -> std::int_fast64_t
+                   bool check_ok = true) -> std::int_fast64_t
 {
   if (check_ok) {
     assert(check(ok));
@@ -109,15 +109,14 @@ auto binary_search(F check, std::int_fast64_t ok, std::int_fast64_t ng,
   }
   return ok;
 }
-template <typename T> constexpr auto lsb(T i) noexcept -> T
+template <typename T> constexpr auto lsb(T i) -> T
 {
   static_assert(std::is_signed_v<T>,
                 "lsb is implemented based on signed integers.");
   return i & -i;
 }
 // i mustn't be 0
-template <typename T>
-constexpr auto count_leading_zeros(T const &i) noexcept -> int
+template <typename T> constexpr auto count_leading_zeros(T const &i) -> int
 {
   assert(i != 0);
   if constexpr (std::is_same_v<T, unsigned long long>) {
@@ -135,17 +134,17 @@ constexpr auto count_leading_zeros(T const &i) noexcept -> int
   return -1; // Unreachable.
 }
 // i mustn't be 0
-template <typename T> constexpr auto msb(T i) noexcept -> int
+template <typename T> constexpr auto msb(T i) -> int
 {
   return static_cast<int>(sizeof(T) * CHAR_BIT - 1 - count_leading_zeros(i));
 }
-/*[[maybe_unused]] auto gen_rand() noexcept*/
-/*{*/
-/*  static std::mt19937_64 rng(*/
-/*      std::chrono::steady_clock::now().time_since_epoch().count());*/
-/*  return rng();*/
-/*}*/
-void solve_case() noexcept;
+[[maybe_unused]] auto gen_rand()
+{
+  static std::mt19937_64 rng(
+      std::chrono::steady_clock::now().time_since_epoch().count());
+  return rng();
+}
+void solve_case();
 } // namespace
 auto main() -> int
 {
@@ -163,8 +162,87 @@ auto main() -> int
 namespace {
 using i64 = std::int_fast64_t;
 using u64 = std::uint_fast64_t;
-void solve_case() noexcept
+class Sieve {
+public:
+  Sieve(int const upper_bound) : _min_factor(upper_bound + 1, 0)
+  {
+    for (int i = 2; i != upper_bound + 1; ++i) {
+      if (_min_factor[i] == 0) {
+        _primes.push_back(i);
+        _min_factor[i] = i;
+      }
+      for (auto const p : _primes) {
+        if (i * p > upper_bound || p > _min_factor[i]) {
+          break;
+        }
+        _min_factor[i * p] = p;
+      }
+    }
+  }
+
+  // Time complexity: O(sqrt(x))
+  [[nodiscard]] auto factorize(u64 x) const -> std::map<u64, u64>
+  {
+    std::map<u64, u64> res;
+    assert(x <= (_min_factor.size() - 1) * (_min_factor.size() - 1));
+    for (auto const p : _primes) {
+      if (p > x) {
+        break;
+      }
+      while (x % p == 0) {
+        x /= p;
+        ++res[p];
+      }
+    }
+    if (x >= _min_factor.size()) {
+      ++res[x];
+    }
+    return res;
+  }
+
+  [[nodiscard]] auto is_prime(int x) const -> bool
+  {
+    return _min_factor[x] == x;
+  }
+
+  [[nodiscard]] auto primes() const -> std::vector<int>
+  {
+    return _primes;
+  }
+
+private:
+  std::vector<int> _primes;
+  std::vector<int> _min_factor;
+};
+void solve_case()
 {
-  /*return;*/
+  i64 p, x, k;
+  std::cin >> p >> x >> k;
+  Sieve sieve(1e7);
+  auto kfactors{sieve.factorize(k)};
+
+  auto factors{sieve.factorize(k)};
+  factors.merge(sieve.factorize(p));
+
+  i64 ans{};
+  using it = decltype(factors)::iterator;
+  std::function<void(__int128_t, it)> dfs{[&](__int128_t y, it i) {
+    if (i == factors.end()) {
+      ++ans;
+      return;
+    }
+    if (kfactors.contains(i->first)) {
+      chmax(i->second, inf<int>);
+    }
+    for (i64 j{}; j != i->second + 1; ++j) {
+      if (y > x) {
+        break;
+      }
+      dfs(y, std::next(i));
+      y *= i->first;
+    }
+  }};
+  dfs(1, factors.begin());
+  std::cout << ans;
 }
 } // namespace

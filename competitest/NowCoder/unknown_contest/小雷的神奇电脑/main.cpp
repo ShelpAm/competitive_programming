@@ -1,8 +1,8 @@
-/*Problem: $(PROBLEM)*/
-/*Contest: $(CONTEST)*/
-/*Judge: $(JUDGE)*/
-/*URL: $(URL)*/
-/*Start: $(DATE)*/
+/*Problem: 小雷的神奇电脑*/
+/*Contest: unknown_contest*/
+/*Judge: NowCoder*/
+/*URL: https://ac.nowcoder.com/acm/contest/88269/B*/
+/*Start: Wed 07 Aug 2024 01:40:47 PM CST*/
 /*Author: ShelpAm*/
 
 #include <bits/stdc++.h>
@@ -165,6 +165,34 @@ using i64 = std::int_fast64_t;
 using u64 = std::uint_fast64_t;
 void solve_case() noexcept
 {
-  /*return;*/
+  int n, m;
+  std::cin >> n >> m;
+  std::vector<u64> a(n);
+  for (auto &e : a) {
+    std::cin >> e;
+  }
+  u64 ans{};
+  std::function<void(std::vector<u64> const &, int, u64)> dfs{
+      [&](std::vector<u64> const &a, int const i, u64 const res) {
+        if (i == -1 || a.size() <= 1) {
+          chmax(ans, res);
+          return;
+        }
+        std::vector<u64> zero, one;
+        for (auto const e : a) {
+          (e & 1 << i ? one : zero).push_back(e);
+        }
+        if (zero.size() < 2 && one.size() < 2) {
+          for (auto const u : zero) {
+            for (auto const v : one) {
+              chmax(ans, ~(u ^ v) & ((1 << m) - 1));
+            }
+          }
+        }
+        dfs(zero, i - 1, (zero.size() >= 2 ? 1 << i : 0) | res);
+        dfs(one, i - 1, (one.size() >= 2 ? 1 << i : 0) | res);
+      }};
+  dfs(a, m - 1, 0);
+  std::cout << ans;
 }
 } // namespace

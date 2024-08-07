@@ -1,8 +1,8 @@
-/*Problem: $(PROBLEM)*/
-/*Contest: $(CONTEST)*/
-/*Judge: $(JUDGE)*/
-/*URL: $(URL)*/
-/*Start: $(DATE)*/
+/*Problem: Ball*/
+/*Contest: unknown_contest*/
+/*Judge: NowCoder*/
+/*URL: https://ac.nowcoder.com/acm/contest/81602/J*/
+/*Start: Tue 06 Aug 2024 12:01:37 PM CST*/
 /*Author: ShelpAm*/
 
 #include <bits/stdc++.h>
@@ -154,7 +154,7 @@ auto main() -> int
   constexpr auto my_precision{10};
   std::cout << std::fixed << std::setprecision(my_precision);
   int t{1};
-  /*std::cin >> t;*/
+  std::cin >> t;
   for (int i{}; i != t; ++i) {
     solve_case();
   }
@@ -165,6 +165,16 @@ using i64 = std::int_fast64_t;
 using u64 = std::uint_fast64_t;
 void solve_case() noexcept
 {
-  /*return;*/
+  i64 l, x, y;
+  std::cin >> l >> x >> y;
+  if (l * l >= x * x + y * y) {
+    std::cout << "Yes\n0\n";
+  }
+  else if (l * l >= (x - l) * (x - l) + y * y) {
+    std::cout << "Yes\n" << l << "\n";
+  }
+  else {
+    std::cout << "No\n";
+  }
 }
 } // namespace

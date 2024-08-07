@@ -1,8 +1,8 @@
-/*Problem: $(PROBLEM)*/
-/*Contest: $(CONTEST)*/
-/*Judge: $(JUDGE)*/
-/*URL: $(URL)*/
-/*Start: $(DATE)*/
+/*Problem: A. Paper Watering*/
+/*Contest: JXNU Summer Train 9*/
+/*Judge: Codeforces*/
+/*URL: https://codeforces.com/gym/540470/problem/A*/
+/*Start: Sun 04 Aug 2024 06:31:56 PM CST*/
 /*Author: ShelpAm*/
 
 #include <bits/stdc++.h>
@@ -76,7 +76,7 @@ constexpr auto chmin(T &value, U const &other) noexcept -> bool
   }
   return false;
 }
-template <typename C> constexpr auto sum_of(C const &coll) noexcept
+template <typename T> constexpr auto sum_of(T const &coll) noexcept
 {
   return std::accumulate(coll.begin(), coll.end(), std::int_fast64_t{});
 }
@@ -98,7 +98,7 @@ constexpr auto pow(T a, std::int_fast64_t b, std::uint_fast64_t p) noexcept
 }
 template <typename F>
 auto binary_search(F check, std::int_fast64_t ok, std::int_fast64_t ng,
-                   bool check_ok = true) noexcept -> std::int_fast64_t
+                   bool check_ok = true) -> std::int_fast64_t
 {
   if (check_ok) {
     assert(check(ok));
@@ -109,15 +109,14 @@ auto binary_search(F check, std::int_fast64_t ok, std::int_fast64_t ng,
   }
   return ok;
 }
-template <typename T> constexpr auto lsb(T i) noexcept -> T
+template <typename T> constexpr auto lsb(T i) -> T
 {
   static_assert(std::is_signed_v<T>,
                 "lsb is implemented based on signed integers.");
   return i & -i;
 }
 // i mustn't be 0
-template <typename T>
-constexpr auto count_leading_zeros(T const &i) noexcept -> int
+template <typename T> constexpr auto count_leading_zeros(T const &i) -> int
 {
   assert(i != 0);
   if constexpr (std::is_same_v<T, unsigned long long>) {
@@ -135,17 +134,17 @@ constexpr auto count_leading_zeros(T const &i) noexcept -> int
   return -1; // Unreachable.
 }
 // i mustn't be 0
-template <typename T> constexpr auto msb(T i) noexcept -> int
+template <typename T> constexpr auto msb(T i) -> int
 {
   return static_cast<int>(sizeof(T) * CHAR_BIT - 1 - count_leading_zeros(i));
 }
-/*[[maybe_unused]] auto gen_rand() noexcept*/
-/*{*/
-/*  static std::mt19937_64 rng(*/
-/*      std::chrono::steady_clock::now().time_since_epoch().count());*/
-/*  return rng();*/
-/*}*/
-void solve_case() noexcept;
+[[maybe_unused]] auto gen_rand()
+{
+  static std::mt19937_64 rng(
+      std::chrono::steady_clock::now().time_since_epoch().count());
+  return rng();
+}
+void solve_case();
 } // namespace
 auto main() -> int
 {
@@ -163,8 +162,23 @@ auto main() -> int
 namespace {
 using i64 = std::int_fast64_t;
 using u64 = std::uint_fast64_t;
-void solve_case() noexcept
+void solve_case()
 {
-  /*return;*/
+  i64 x, k;
+  std::cin >> x >> k;
+  i64 ans{};
+  i64 prev{-1};
+  int idx{};
+  while (x != 1 && idx != k) {
+    ans += 1;
+    if (prev != x * x) {
+      ans += k - idx;
+    }
+    prev = x;
+    x = std::sqrt(x);
+    ++idx;
+  }
+  ans += 1;
+  std::cout << ans;
 }
 } // namespace

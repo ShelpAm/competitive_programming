@@ -1,8 +1,8 @@
-/*Problem: $(PROBLEM)*/
-/*Contest: $(CONTEST)*/
-/*Judge: $(JUDGE)*/
-/*URL: $(URL)*/
-/*Start: $(DATE)*/
+/*Problem: AND*/
+/*Contest: unknown_contest*/
+/*Judge: NowCoder*/
+/*URL: https://ac.nowcoder.com/acm/contest/88269/E*/
+/*Start: Wed 07 Aug 2024 02:22:24 PM CST*/
 /*Author: ShelpAm*/
 
 #include <bits/stdc++.h>
@@ -147,14 +147,30 @@ template <typename T> constexpr auto msb(T i) noexcept -> int
 /*}*/
 void solve_case() noexcept;
 } // namespace
+const int N = 1e8 + 10;
+int primes[N], cnt;
+bool st[N];
+void init()
+{
+  for (int i = 2; i <= N; i++) {
+    if (!st[i])
+      primes[cnt++] = i;
+    for (int j = 0; primes[j] <= N / i; j++) {
+      st[i * primes[j]] = true;
+      if (i % primes[j] == 0)
+        break;
+    }
+  }
+}
 auto main() -> int
 {
   std::ios::sync_with_stdio(false);
   std::cin.tie(nullptr);
   constexpr auto my_precision{10};
   std::cout << std::fixed << std::setprecision(my_precision);
+  init();
   int t{1};
-  /*std::cin >> t;*/
+  std::cin >> t;
   for (int i{}; i != t; ++i) {
     solve_case();
   }
@@ -165,6 +181,10 @@ using i64 = std::int_fast64_t;
 using u64 = std::uint_fast64_t;
 void solve_case() noexcept
 {
-  /*return;*/
+  int x, y;
+  std::cin >> x >> y;
+  auto const k{std::upper_bound(primes, primes + cnt, y) -
+               std::lower_bound(primes, primes + cnt, x)};
+  std::cout << k << ' ' << (x <= 2 && y >= 5 ? k - 2 : 0) << '\n';
 }
 } // namespace

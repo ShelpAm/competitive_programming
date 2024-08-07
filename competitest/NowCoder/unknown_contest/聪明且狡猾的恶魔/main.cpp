@@ -1,8 +1,8 @@
-/*Problem: $(PROBLEM)*/
-/*Contest: $(CONTEST)*/
-/*Judge: $(JUDGE)*/
-/*URL: $(URL)*/
-/*Start: $(DATE)*/
+/*Problem: 聪明且狡猾的恶魔*/
+/*Contest: unknown_contest*/
+/*Judge: NowCoder*/
+/*URL: https://ac.nowcoder.com/acm/contest/88269/H*/
+/*Start: Wed 07 Aug 2024 01:17:45 PM CST*/
 /*Author: ShelpAm*/
 
 #include <bits/stdc++.h>
@@ -154,7 +154,7 @@ auto main() -> int
   constexpr auto my_precision{10};
   std::cout << std::fixed << std::setprecision(my_precision);
   int t{1};
-  /*std::cin >> t;*/
+  std::cin >> t;
   for (int i{}; i != t; ++i) {
     solve_case();
   }
@@ -165,6 +165,8 @@ using i64 = std::int_fast64_t;
 using u64 = std::uint_fast64_t;
 void solve_case() noexcept
 {
-  /*return;*/
+  int x, n;
+  std::cin >> x >> n;
+  std::cout << x - (n - 1) / 2 << '\n';
 }
 } // namespace
