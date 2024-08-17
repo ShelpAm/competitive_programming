@@ -1,8 +1,8 @@
-/*Problem: E. Multigate*/
-/*Contest: JXNU Summer Train 8*/
-/*Judge: Codeforces*/
-/*URL: https://codeforces.com/gym/539980/problem/E*/
-/*Start: Fri 02 Aug 2024 01:23:34 PM CST*/
+/*Problem: E - Manhattan Multifocal Ellipse*/
+/*Contest: AtCoder Beginner Contest 366*/
+/*Judge: AtCoder*/
+/*URL: https://atcoder.jp/contests/abc366/tasks/abc366_e*/
+/*Start: Sat 10 Aug 2024 10:35:50 PM CST*/
 /*Author: ShelpAm*/
 
 #include <bits/stdc++.h>
@@ -12,7 +12,7 @@
 #endif
 
 namespace {
-[[maybe_unused]] constexpr std::int_fast64_t mod998244853{998'244'353LL};
+[[maybe_unused]] constexpr std::int_fast64_t mod998244353{998'244'353LL};
 [[maybe_unused]] constexpr std::int_fast64_t mod1e9p7{1'000'000'007LL};
 [[maybe_unused]] constexpr double eps{1e-8};
 template <typename T>
@@ -59,7 +59,7 @@ constexpr auto operator>>(auto &istream, auto &&t) -> std::istream &
 #define debug(...)
 #endif
 template <typename T, typename U>
-constexpr auto check_max(T &value, U const &other) noexcept -> bool
+constexpr auto chmax(T &value, U const &other) noexcept -> bool
 {
   if (value < other) {
     value = other;
@@ -68,7 +68,7 @@ constexpr auto check_max(T &value, U const &other) noexcept -> bool
   return false;
 }
 template <typename T, typename U>
-constexpr auto check_min(T &value, U const &other) noexcept -> bool
+constexpr auto chmin(T &value, U const &other) noexcept -> bool
 {
   if (value > other) {
     value = other;
@@ -76,7 +76,7 @@ constexpr auto check_min(T &value, U const &other) noexcept -> bool
   }
   return false;
 }
-template <typename T> constexpr auto sum_of(T const &coll) noexcept
+template <typename C> constexpr auto sum_of(C const &coll) noexcept
 {
   return std::accumulate(coll.begin(), coll.end(), std::int_fast64_t{});
 }
@@ -98,7 +98,7 @@ constexpr auto pow(T a, std::int_fast64_t b, std::uint_fast64_t p) noexcept
 }
 template <typename F>
 auto binary_search(F check, std::int_fast64_t ok, std::int_fast64_t ng,
-                   bool check_ok = true) -> std::int_fast64_t
+                   bool check_ok = true) noexcept -> std::int_fast64_t
 {
   if (check_ok) {
     assert(check(ok));
@@ -109,14 +109,15 @@ auto binary_search(F check, std::int_fast64_t ok, std::int_fast64_t ng,
   }
   return ok;
 }
-template <typename T> constexpr auto lsb(T i) -> T
+template <typename T> constexpr auto lsb(T i) noexcept -> T
 {
   static_assert(std::is_signed_v<T>,
                 "lsb is implemented based on signed integers.");
   return i & -i;
 }
 // i mustn't be 0
-template <typename T> constexpr auto count_leading_zeros(T const &i) -> int
+template <typename T>
+constexpr auto count_leading_zeros(T const &i) noexcept -> int
 {
   assert(i != 0);
   if constexpr (std::is_same_v<T, unsigned long long>) {
@@ -134,17 +135,17 @@ template <typename T> constexpr auto count_leading_zeros(T const &i) -> int
   return -1; // Unreachable.
 }
 // i mustn't be 0
-template <typename T> constexpr auto msb(T i) -> int
+template <typename T> constexpr auto msb(T i) noexcept -> int
 {
   return static_cast<int>(sizeof(T) * CHAR_BIT - 1 - count_leading_zeros(i));
 }
-[[maybe_unused]] auto gen_rand()
-{
-  static std::mt19937_64 rng(
-      std::chrono::steady_clock::now().time_since_epoch().count());
-  return rng();
-}
-void solve_case();
+/*[[maybe_unused]] auto gen_rand() noexcept*/
+/*{*/
+/*  static std::mt19937_64 rng(*/
+/*      std::chrono::steady_clock::now().time_since_epoch().count());*/
+/*  return rng();*/
+/*}*/
+void solve_case() noexcept;
 } // namespace
 auto main() -> int
 {
@@ -162,50 +163,49 @@ auto main() -> int
 namespace {
 using i64 = std::int_fast64_t;
 using u64 = std::uint_fast64_t;
-void solve_case()
+void solve_case() noexcept
 {
-  int n, q;
-  std::cin >> n >> q;
-  std::vector<int> a(n), b(n);
-  std::cin >> a >> b;
-  a.insert(a.begin(), 0);
-  b.insert(b.begin(), 0);
-
-  std::vector<int> f(31);
-  std::vector<int> right(31);
-  std::vector<std::vector<int>> pref(31, std::vector<int>(n + 1));
-  for (int i{}; i != f.size(); ++i) {
-    for (int j{1}; j != n + 1; ++j) {
-      pref[i][j] = pref[i][j - 1] + ((a[j] >> i & 1) | b[j]);
+  int n, d;
+  std::cin >> n >> d;
+  std::vector<int> x(n);
+  std::vector<int> y(n);
+  for (int i{}; i != n; ++i) {
+    std::cin >> x[i] >> y[i];
+    x[i] += 2e6;
+    y[i] += 2e6;
+  }
+  auto solve{[](std::vector<int> const &a) {
+    std::vector<int> cnt(4e6 + 2);
+    std::vector<i64> dist(4e6 + 2);
+    for (auto const e : a) {
+      ++cnt[e];
     }
-    for (int j{n}; j != 0; --j) {
-      f[i] += !b[j] && !right[i];
-      if (a[j] & 1 << i) {
-        if (!right[i]) {
-          right[i] = j;
-        }
-        if (b[j] & 1 << i &&
-            pref[i][right[i]] - pref[i][j - 1] == right[i] - j + 1) {
-          --f[i];
-          break;
-        }
-      }
+    for (i64 i{1}; i != cnt.size(); ++i) {
+      dist[i] = dist[i - 1] + i * cnt[i];
+      cnt[i] += cnt[i - 1];
+    }
+    std::vector<u64> f(4e6 + 2);
+    for (i64 i{}; i != f.size(); ++i) {
+      f[i] = dist.back() - i * cnt.back() + 2 * cnt[i] * i - 2 * dist[i];
+    }
+    return f;
+  }};
+
+  std::vector<int> cnt(d + 1);
+  for (auto const e : solve(x)) {
+    if (e < cnt.size()) {
+      ++cnt[e];
     }
   }
-
-  for (int _{}; _ != q; ++_) {
-    int x, k;
-    std::cin >> x >> k;
-    int ans{};
-    for (int i{}; i != f.size(); ++i) {
-      if (x & 1 << i && pref[i][right[i]] == right[i] && k >= f[i] - 1) {
-        ans |= 1 << i;
-      }
-      else if (k >= f[i] && right[i]) {
-        ans |= 1 << i;
-      }
-    }
-    std::cout << ans << '\n';
+  for (int i{1}; i != cnt.size(); ++i) {
+    cnt[i] += cnt[i - 1];
   }
+  u64 ans{};
+  for (auto const e : solve(y)) {
+    if (e < cnt.size()) {
+      ans += cnt[d - e];
+    }
+  }
+  std::cout << ans << '\n';
 }
 } // namespace

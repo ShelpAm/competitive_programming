@@ -1,8 +1,8 @@
-/*Problem: A. 班委竞选*/
-/*Contest: JXNU Summer Train 10*/
-/*Judge: Codeforces*/
-/*URL: https://codeforces.com/gym/541349/problem/A*/
-/*Start: Thu 08 Aug 2024 02:10:32 AM CST*/
+/*Problem: 区间问题1*/
+/*Contest: unknown_contest*/
+/*Judge: NowCoder*/
+/*URL: https://ac.nowcoder.com/acm/contest/88527/D*/
+/*Start: Wed 14 Aug 2024 01:10:03 PM CST*/
 /*Author: ShelpAm*/
 
 #include <bits/stdc++.h>
@@ -163,8 +163,157 @@ auto main() -> int
 namespace {
 using i64 = std::int_fast64_t;
 using u64 = std::uint_fast64_t;
+class Segment_tree {
+  struct Lazy_tag {
+    auto operator+=(Lazy_tag const &rhs) -> Lazy_tag &
+    {
+      addition += rhs.addition;
+      return *this;
+    }
+
+    std::int_fast64_t addition{};
+  };
+
+  struct Node {
+    int left_end{};
+    int right_end{};
+  };
+
+  struct Info {
+    auto operator+=(Info const &rhs) -> Info &
+    {
+      sum += rhs.sum;
+      return *this;
+    }
+
+    void apply(Lazy_tag const &lazy_tag, int const segment_length)
+    {
+      sum += lazy_tag.addition * segment_length;
+    }
+
+    std::int_fast64_t sum{};
+  };
+
+public:
+  explicit Segment_tree(int const l, int const r)
+      : _nodes(4 * (r - l + 1) + 1), _info(4 * (r - l + 1) + 1),
+        _lazy_tags(4 * (r - l + 1) + 1)
+  {
+    build_tree(l, r, 1);
+  }
+
+  void apply(int const l, int const r, Lazy_tag const &tag)
+  {
+    apply_impl(l, r, 1, tag);
+  }
+
+  auto query(int const l, int const r) -> Info
+  {
+    return query_impl(l, r, 1);
+  }
+
+private:
+  // Sets up segments that nodes manage.
+  void build_tree(int const l, int const r, int const u)
+  {
+    _nodes[u].left_end = l;
+    _nodes[u].right_end = r;
+
+    if (l != r) {
+      auto const m{(l + r) / 2};
+      build_tree(l, m, u * 2);
+      build_tree(m + 1, r, u * 2 + 1);
+    }
+  }
+
+  void do_lazy_propagation(std::size_t const u)
+  {
+    if (!is_leaf(u)) {
+      _lazy_tags[u * 2] += _lazy_tags[u];
+      _lazy_tags[u * 2 + 1] += _lazy_tags[u];
+      _info[u * 2].apply(_lazy_tags[u],
+                         _nodes[u * 2].right_end - _nodes[u * 2].left_end + 1);
+      _info[u * 2 + 1].apply(_lazy_tags[u], _nodes[u * 2 + 1].right_end -
+                                                _nodes[u * 2 + 1].left_end + 1);
+    }
+
+    _lazy_tags[u] = {};
+  }
+
+  void apply_impl(int const l, int const r, std::size_t const u,
+                  Lazy_tag const &tag)
+  {
+    _info[u].apply(tag, r - l + 1);
+
+    if (l <= _nodes[u].left_end && _nodes[u].right_end <= r) {
+      _lazy_tags[u] += tag;
+      return;
+    }
+
+    if (_nodes[u * 2].right_end >= l) {
+      apply_impl(l, std::min(r, _nodes[u * 2].right_end), u * 2, tag);
+    }
+    if (_nodes[u * 2 + 1].left_end <= r) {
+      apply_impl(std::max(_nodes[u * 2 + 1].left_end, l), r, u * 2 + 1, tag);
+    }
+  }
+
+  // We assume that [l, r] contains [_nodes[u].left_end, _nodes[u].right_end].
+  [[nodiscard]] auto query_impl(int const l, int const r,
+                                std::size_t const u) -> Info
+  {
+    // If [l, r] nests node u, the segment node doesn't have to be divided
+    // anymore. So we direct return the info of this node.
+    if (l <= _nodes[u].left_end && _nodes[u].right_end <= r) {
+      return _info[u];
+    }
+
+    do_lazy_propagation(u);
+
+    Info res;
+    if (_nodes[u * 2].right_end >= l) {
+      res += query_impl(l, r, u * 2);
+    }
+    if (_nodes[u * 2 + 1].left_end <= r) {
+      res += query_impl(l, r, u * 2 + 1);
+    }
+    return res;
+  }
+
+  [[nodiscard]] auto is_leaf(std::size_t const u) const -> bool
+  {
+    return _nodes[u].left_end == _nodes[u].right_end;
+  }
+
+  std::vector<Node> _nodes;
+  std::vector<Info> _info;
+  std::vector<Lazy_tag> _lazy_tags;
+};
 void solve_case() noexcept
 {
-  /*return;*/
+  int n;
+  std::cin >> n;
+  Segment_tree seg(1, n);
+  for (int i{1}; i != n + 1; ++i) {
+    int x;
+    std::cin >> x;
+    seg.apply(i, i, {.addition = x});
+  }
+  int q;
+  std::cin >> q;
+  for (int i{}; i != q; ++i) {
+    int op;
+    std::cin >> op;
+    if (op == 1) {
+      int l, r, d;
+      std::cin >> l >> r >> d;
+      seg.apply(l, r, {.addition = d});
+    }
+    else if (op == 2) {
+      int x;
+      std::cin >> x;
+      std::cout << seg.query(x, x).sum << '\n';
+    }
+  }
 }
 } // namespace

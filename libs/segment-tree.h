@@ -21,20 +21,15 @@ class Segment_tree {
   };
 
   struct Info {
-    friend auto operator+(Info lhs, Info const &rhs) -> Info
-    {
-      return lhs += rhs;
-    }
-
     auto operator+=(Info const &rhs) -> Info &
     {
       sum += rhs.sum;
       return *this;
     }
 
-    void apply(Lazy_tag const &tag, int const segment_length)
+    void apply(Lazy_tag const &lazy_tag, int const segment_length)
     {
-      sum += tag.addition * segment_length;
+      sum += lazy_tag.addition * segment_length;
     }
 
     std::int_fast64_t sum{};
@@ -74,7 +69,6 @@ private:
 
   void do_lazy_propagation(std::size_t const u)
   {
-
     if (!is_leaf(u)) {
       _lazy_tags[u * 2] += _lazy_tags[u];
       _lazy_tags[u * 2 + 1] += _lazy_tags[u];
