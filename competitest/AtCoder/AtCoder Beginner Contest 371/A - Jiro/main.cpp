@@ -1,20 +1,17 @@
-/*Problem: $(PROBLEM)*/
-/*Contest: $(CONTEST)*/
-/*Judge: $(JUDGE)*/
-/*URL: $(URL)*/
-/*Start: $(DATE)*/
+/*Problem: A - Jiro*/
+/*Contest: AtCoder Beginner Contest 371*/
+/*Judge: AtCoder*/
+/*URL: https://atcoder.jp/contests/abc371/tasks/abc371_a*/
+/*Start: Sat 14 Sep 2024 08:00:39 PM CST*/
 /*Author: ShelpAm*/
 
 // #include <bits/stdc++.h>
 #include <algorithm>
 #include <bit>
-#include <cassert>
 #include <climits>
 #include <concepts>
-#include <cstddef>
 #include <cstdint>
 #include <deque>
-#include <functional>
 #include <iomanip>
 #include <iostream>
 #include <map>
@@ -22,7 +19,6 @@
 #include <queue>
 #include <ranges>
 #include <set>
-#include <stack>
 #include <tuple>
 #include <unordered_map>
 #include <unordered_set>
@@ -162,6 +158,33 @@ using i64 = std::int_fast64_t;
 using u64 = std::uint_fast64_t;
 void solve_case()
 {
-  /*return;*/
+  char ab, ac, bc;
+  std::cin >> ab >> ac >> bc;
+  if (ab == '>') {
+    if (ac == '>') {
+      if (bc == '>') {
+        std::cout << 'B';
+      }
+      else {
+        std::cout << 'C';
+      }
+    }
+    else {
+      std::cout << 'A';
+    }
+  }
+  else {
+    if (ac == '>') {
+      std::cout << 'A';
+    }
+    else {
+      if (bc == '>') {
+        std::cout << 'C';
+      }
+      else {
+        std::cout << 'B';
+      }
+    }
+  }
 }
 } // namespace

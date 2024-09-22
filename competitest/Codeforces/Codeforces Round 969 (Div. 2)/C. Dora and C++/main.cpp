@@ -1,31 +1,23 @@
-/*Problem: $(PROBLEM)*/
-/*Contest: $(CONTEST)*/
-/*Judge: $(JUDGE)*/
-/*URL: $(URL)*/
-/*Start: $(DATE)*/
+/*Problem: C. Dora and C++*/
+/*Contest: Codeforces Round 969 (Div. 2)*/
+/*Judge: Codeforces*/
+/*URL: https://codeforces.com/contest/2007/problem/C*/
+/*Start: Mon 02 Sep 2024 10:45:39 PM CST*/
 /*Author: ShelpAm*/
 
 // #include <bits/stdc++.h>
 #include <algorithm>
 #include <bit>
-#include <cassert>
 #include <climits>
 #include <concepts>
-#include <cstddef>
 #include <cstdint>
 #include <deque>
-#include <functional>
 #include <iomanip>
 #include <iostream>
-#include <map>
 #include <numeric>
-#include <queue>
 #include <ranges>
 #include <set>
-#include <stack>
 #include <tuple>
-#include <unordered_map>
-#include <unordered_set>
 #include <vector>
 
 namespace {
@@ -48,7 +40,7 @@ template <typename... Ts>
 concept tuple = is_tuple_t<Ts...>::value;
 } // namespace shelpam::concepts
 
-auto operator>>(auto &istream, auto &&t) -> decltype(istream)
+auto operator>>(auto &istream, auto &&t) -> std::istream &
 {
   using T = std::remove_cvref_t<decltype(t)>;
   static_assert(!shelpam::concepts::tuple<T>, "tuple: not implemented yet.\n");
@@ -146,7 +138,7 @@ auto main() -> int
   constexpr auto my_precision{10};
   std::cout << std::fixed << std::setprecision(my_precision);
   int t{1};
-  // std::cin >> t;
+  std::cin >> t;
   for (int i{}; i != t; ++i) {
     try {
       solve_case();
@@ -162,6 +154,21 @@ using i64 = std::int_fast64_t;
 using u64 = std::uint_fast64_t;
 void solve_case()
 {
-  /*return;*/
+  int n, a, b;
+  std::cin >> n >> a >> b;
+  auto const d{std::gcd(a, b)};
+  std::vector<int> s(n);
+  std::cin >> s;
+  auto sen{std::ranges::max(s)};
+  for (auto &e : s) {
+    e += (sen - e + d - 1) / d * d;
+  }
+  std::set<int> t{s.begin(), s.end()};
+  debug("t", t);
+  auto ans{*t.rbegin() - *t.begin()};
+  for (auto it{std::next(t.begin())}; it != t.end(); ++it) {
+    chmin(ans, *std::prev(it) + d - *it);
+  }
+  std::cout << ans << '\n';
 }
 } // namespace

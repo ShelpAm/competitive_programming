@@ -1,20 +1,17 @@
-/*Problem: $(PROBLEM)*/
-/*Contest: $(CONTEST)*/
-/*Judge: $(JUDGE)*/
-/*URL: $(URL)*/
-/*Start: $(DATE)*/
+/*Problem: xor序列*/
+/*Contest: unknown_contest*/
+/*Judge: NowCoder*/
+/*URL: https://ac.nowcoder.com/acm/problem/17968*/
+/*Start: Tue 10 Sep 2024 03:22:31 PM CST*/
 /*Author: ShelpAm*/
 
 // #include <bits/stdc++.h>
 #include <algorithm>
 #include <bit>
-#include <cassert>
 #include <climits>
 #include <concepts>
-#include <cstddef>
 #include <cstdint>
 #include <deque>
-#include <functional>
 #include <iomanip>
 #include <iostream>
 #include <map>
@@ -22,10 +19,7 @@
 #include <queue>
 #include <ranges>
 #include <set>
-#include <stack>
 #include <tuple>
-#include <unordered_map>
-#include <unordered_set>
 #include <vector>
 
 namespace {
@@ -160,8 +154,70 @@ auto main() -> int
 namespace {
 using i64 = std::int_fast64_t;
 using u64 = std::uint_fast64_t;
+namespace math {
+template <std::unsigned_integral Value_type> class Xor_basis {
+  static constexpr auto num_bits{sizeof(Value_type) * CHAR_BIT};
+
+public:
+  void insert(Value_type x)
+  {
+    for (int i{num_bits - 1}; i != -1; --i) {
+      if ((x & Value_type{1} << i) == 0) {
+        continue;
+      }
+
+      if (_bases.at(i) == 0) {
+        _bases.at(i) = x;
+        return;
+      }
+
+      x ^= _bases.at(i);
+    }
+  }
+
+  [[nodiscard]] auto find(Value_type x) const -> bool
+  {
+    for (int i{num_bits - 1}; i != -1; i--) {
+      if ((x & Value_type{1} << i) == 0) {
+        continue;
+      }
+
+      if (_bases.at(i) == 0) {
+        return false;
+      }
+
+      x ^= _bases.at(i);
+    }
+
+    return true;
+  }
+
+  [[nodiscard]] auto bases() const -> std::array<Value_type, num_bits> const &
+  {
+    return _bases;
+  }
+
+private:
+  std::array<Value_type, num_bits> _bases{};
+};
+} // namespace math
 void solve_case()
 {
-  /*return;*/
+  int n;
+  std::cin >> n;
+  std::vector<int> a(n);
+  std::cin >> a;
+  math::Xor_basis<u64> xb;
+  for (auto const e : a) {
+    xb.insert(e);
+  }
+
+  int q;
+  std::cin >> q;
+  for (int i{}; i != q; ++i) {
+    int x, y;
+    std::cin >> x >> y;
+    std::cout << (xb.find(x ^ y) ? "YES" : "NO") << '\n';
+  }
 }
 } // namespace

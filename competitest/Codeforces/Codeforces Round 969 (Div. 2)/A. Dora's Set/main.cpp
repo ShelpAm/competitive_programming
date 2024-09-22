@@ -1,32 +1,20 @@
-/*Problem: $(PROBLEM)*/
-/*Contest: $(CONTEST)*/
-/*Judge: $(JUDGE)*/
-/*URL: $(URL)*/
-/*Start: $(DATE)*/
+/*Problem: A. Dora's Set*/
+/*Contest: Codeforces Round 969 (Div. 2)*/
+/*Judge: Codeforces*/
+/*URL: https://codeforces.com/contest/2007/problem/A*/
+/*Start: Mon 02 Sep 2024 10:21:50 PM CST*/
 /*Author: ShelpAm*/
 
 // #include <bits/stdc++.h>
-#include <algorithm>
 #include <bit>
-#include <cassert>
 #include <climits>
 #include <concepts>
-#include <cstddef>
 #include <cstdint>
-#include <deque>
-#include <functional>
 #include <iomanip>
 #include <iostream>
-#include <map>
 #include <numeric>
-#include <queue>
 #include <ranges>
-#include <set>
-#include <stack>
 #include <tuple>
-#include <unordered_map>
-#include <unordered_set>
-#include <vector>
 
 namespace {
 [[maybe_unused]] constexpr std::uint_fast64_t mod998244353{998'244'353ULL};
@@ -48,7 +36,7 @@ template <typename... Ts>
 concept tuple = is_tuple_t<Ts...>::value;
 } // namespace shelpam::concepts
 
-auto operator>>(auto &istream, auto &&t) -> decltype(istream)
+auto operator>>(auto &istream, auto &&t) -> std::istream &
 {
   using T = std::remove_cvref_t<decltype(t)>;
   static_assert(!shelpam::concepts::tuple<T>, "tuple: not implemented yet.\n");
@@ -146,7 +134,7 @@ auto main() -> int
   constexpr auto my_precision{10};
   std::cout << std::fixed << std::setprecision(my_precision);
   int t{1};
-  // std::cin >> t;
+  std::cin >> t;
   for (int i{}; i != t; ++i) {
     try {
       solve_case();
@@ -162,6 +150,12 @@ using i64 = std::int_fast64_t;
 using u64 = std::uint_fast64_t;
 void solve_case()
 {
-  /*return;*/
+  int a, b;
+  std::cin >> a >> b;
+  int ans{};
+  for (int i{a}; i != b + 1; ++i) {
+    ans += i % 2 == 1;
+  }
+  std::cout << ans / 2 << '\n';
 }
 } // namespace

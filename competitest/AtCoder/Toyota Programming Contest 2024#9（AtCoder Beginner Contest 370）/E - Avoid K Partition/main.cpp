@@ -1,20 +1,17 @@
-/*Problem: $(PROBLEM)*/
-/*Contest: $(CONTEST)*/
-/*Judge: $(JUDGE)*/
-/*URL: $(URL)*/
-/*Start: $(DATE)*/
+/*Problem: E - Avoid K Partition*/
+/*Contest: Toyota Programming Contest 2024#9（AtCoder Beginner Contest 370）*/
+/*Judge: AtCoder*/
+/*URL: https://atcoder.jp/contests/abc370/tasks/abc370_e*/
+/*Start: Fri 13 Sep 2024 06:56:30 PM CST*/
 /*Author: ShelpAm*/
 
 // #include <bits/stdc++.h>
 #include <algorithm>
 #include <bit>
-#include <cassert>
 #include <climits>
 #include <concepts>
-#include <cstddef>
 #include <cstdint>
 #include <deque>
-#include <functional>
 #include <iomanip>
 #include <iostream>
 #include <map>
@@ -22,7 +19,6 @@
 #include <queue>
 #include <ranges>
 #include <set>
-#include <stack>
 #include <tuple>
 #include <unordered_map>
 #include <unordered_set>
@@ -162,6 +158,29 @@ using i64 = std::int_fast64_t;
 using u64 = std::uint_fast64_t;
 void solve_case()
 {
-  /*return;*/
+  int n;
+  i64 k;
+  std::cin >> n >> k;
+  std::vector<int> a(n);
+  std::cin >> a;
+
+  std::vector<i64> s(n + 1);
+  for (int i{1}; i != n + 1; ++i) {
+    s[i] = s[i - 1] + a[i - 1];
+  }
+
+  std::vector<i64> f(n + 1);
+  f[0] = 1;
+
+  std::unordered_map<i64, i64> o;
+  o[0] = 1;
+  i64 p{1};
+  for (int i{1}; i != n + 1; ++i) {
+    (f[i] = p - o[s[i] - k] + mod998244353) %= mod998244353;
+    (o[s[i]] += f[i]) %= mod998244353;
+    (p += f[i]) %= mod998244353;
+  }
+
+  std::cout << f[n] << '\n';
 }
 } // namespace

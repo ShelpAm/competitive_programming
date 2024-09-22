@@ -1,20 +1,17 @@
-/*Problem: $(PROBLEM)*/
-/*Contest: $(CONTEST)*/
-/*Judge: $(JUDGE)*/
-/*URL: $(URL)*/
-/*Start: $(DATE)*/
+/*Problem: C. Robin Hood in Town*/
+/*Contest: Codeforces Round 974 (Div. 3)*/
+/*Judge: Codeforces*/
+/*URL: https://codeforces.com/problemset/problem/2014/C*/
+/*Start: Sun 22 Sep 2024 07:35:47 PM CST*/
 /*Author: ShelpAm*/
 
 // #include <bits/stdc++.h>
 #include <algorithm>
 #include <bit>
-#include <cassert>
 #include <climits>
 #include <concepts>
-#include <cstddef>
 #include <cstdint>
 #include <deque>
-#include <functional>
 #include <iomanip>
 #include <iostream>
 #include <map>
@@ -22,7 +19,6 @@
 #include <queue>
 #include <ranges>
 #include <set>
-#include <stack>
 #include <tuple>
 #include <unordered_map>
 #include <unordered_set>
@@ -146,7 +142,7 @@ auto main() -> int
   constexpr auto my_precision{10};
   std::cout << std::fixed << std::setprecision(my_precision);
   int t{1};
-  // std::cin >> t;
+  std::cin >> t;
   for (int i{}; i != t; ++i) {
     try {
       solve_case();
@@ -162,6 +158,32 @@ using i64 = std::int_fast64_t;
 using u64 = std::uint_fast64_t;
 void solve_case()
 {
-  /*return;*/
+  int n;
+  std::cin >> n;
+  std::vector<i64> a(n);
+  std::cin >> a;
+
+  auto mx{std::ranges::max_element(a)};
+  auto s{sum_of(a)};
+  auto check{[&](auto x) {
+    *mx += x;
+    s += x;
+    int cnt{};
+    for (auto e : a) {
+      if (s > 2L * n * e) {
+        ++cnt;
+      }
+    }
+    s -= x;
+    *mx -= x;
+    return cnt * 2 > n;
+  }};
+  auto x{binary_search(check, inf<i64> / 4, -1, false)};
+  if (!check(x)) {
+    std::cout << -1 << '\n';
+  }
+  else {
+    std::cout << x << '\n';
+  }
 }
 } // namespace

@@ -1,20 +1,17 @@
-/*Problem: $(PROBLEM)*/
-/*Contest: $(CONTEST)*/
-/*Judge: $(JUDGE)*/
-/*URL: $(URL)*/
-/*Start: $(DATE)*/
+/*Problem: Cidoai的幂次序列*/
+/*Contest: unknown_contest*/
+/*Judge: NowCoder*/
+/*URL: https://ac.nowcoder.com/acm/contest/88880/A*/
+/*Start: Fri 13 Sep 2024 07:43:56 PM CST*/
 /*Author: ShelpAm*/
 
 // #include <bits/stdc++.h>
 #include <algorithm>
 #include <bit>
-#include <cassert>
 #include <climits>
 #include <concepts>
-#include <cstddef>
 #include <cstdint>
 #include <deque>
-#include <functional>
 #include <iomanip>
 #include <iostream>
 #include <map>
@@ -22,7 +19,6 @@
 #include <queue>
 #include <ranges>
 #include <set>
-#include <stack>
 #include <tuple>
 #include <unordered_map>
 #include <unordered_set>
@@ -162,6 +158,8 @@ using i64 = std::int_fast64_t;
 using u64 = std::uint_fast64_t;
 void solve_case()
 {
-  /*return;*/
+  i64 n, k;
+  std::cin >> n >> k;
+  std::cout << 2 << '\n' << 1 << ' ' << n - 1;
 }
 } // namespace

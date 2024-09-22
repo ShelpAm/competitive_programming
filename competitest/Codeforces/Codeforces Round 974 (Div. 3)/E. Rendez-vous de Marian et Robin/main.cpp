@@ -1,13 +1,82 @@
-#pragma once
+/*Problem: E. Rendez-vous de Marian et Robin*/
+/*Contest: Codeforces Round 974 (Div. 3)*/
+/*Judge: Codeforces*/
+/*URL: https://codeforces.com/contest/2014/problem/E*/
+/*Start: Sun 22 Sep 2024 08:14:10 PM CST*/
+/*Author: ShelpAm*/
 
+// #include <bits/stdc++.h>
+#include <algorithm>
+#include <bit>
 #include <cassert>
+#include <climits>
+#include <concepts>
 #include <cstdint>
+#include <deque>
 #include <functional>
+#include <iomanip>
 #include <iostream>
+#include <map>
 #include <numeric>
+#include <queue>
+#include <ranges>
+#include <set>
 #include <stack>
+#include <tuple>
+#include <unordered_map>
+#include <unordered_set>
 #include <vector>
 
+namespace {
+[[maybe_unused]] constexpr std::uint_fast64_t mod998244353{998'244'353ULL};
+[[maybe_unused]] constexpr std::uint_fast64_t mod1e9p7{1'000'000'007ULL};
+[[maybe_unused]] constexpr double eps{1e-8};
+template <typename T> constexpr T inf{std::numeric_limits<T>::max() / 2};
+
+// Concepts.
+namespace shelpam::concepts {
+template <typename> struct is_pair_t : std::false_type {};
+template <typename T, typename U>
+struct is_pair_t<std::pair<T, U>> : std::true_type {};
+template <typename T>
+concept pair = is_pair_t<T>::value;
+template <typename> struct is_tuple_t : std::false_type {};
+template <typename... Ts>
+struct is_tuple_t<std::tuple<Ts...>> : std::true_type {};
+template <typename... Ts>
+concept tuple = is_tuple_t<Ts...>::value;
+} // namespace shelpam::concepts
+
+auto operator>>(auto &istream, auto &&t) -> decltype(istream)
+{
+  using T = std::remove_cvref_t<decltype(t)>;
+  static_assert(!shelpam::concepts::tuple<T>, "tuple: not implemented yet.\n");
+  if constexpr (std::ranges::range<T>) {
+    for (auto &ele : t) {
+      istream >> ele;
+    }
+  }
+  else if constexpr (shelpam::concepts::pair<T>) {
+    istream >> t.first >> t.second;
+  }
+  else {
+    istream >> t;
+  }
+  return istream;
+}
+#ifndef ONLINE_JUDGE
+#include "/home/shelpam/Documents/projects/competitive-programming/libs/debug.h"
+#else
+#define debug(...)
+#endif
+auto chmax(auto &value, auto const &other) noexcept -> bool
+{
+  if (value < other) {
+    value = other;
+    return true;
+  }
+  return false;
+}
 auto chmin(auto &value, auto const &other) noexcept -> bool
 {
   if (value > other) {
@@ -16,7 +85,80 @@ auto chmin(auto &value, auto const &other) noexcept -> bool
   }
   return false;
 }
-
+constexpr auto sum_of(std::ranges::range auto const &coll) noexcept
+{
+  return std::accumulate(coll.begin(), coll.end(), std::int_fast64_t{});
+}
+constexpr auto pow(auto a, std::int_fast64_t b, std::uint_fast64_t p)
+{
+  static_assert(sizeof(a) > sizeof(int), "Use of int is bug-prone.");
+  if (b < 0) {
+    throw std::invalid_argument{"Invalid exponent. It should be positive."};
+  }
+  decltype(a) res{1};
+  while (b != 0) {
+    if ((b & 1) == 1) {
+      res = res * a % p;
+    }
+    a = a * a % p;
+    b >>= 1;
+  }
+  return res;
+}
+auto binary_search(std::invocable<std::int_fast64_t> auto check,
+                   std::int_fast64_t ok, std::int_fast64_t ng,
+                   bool check_ok = true) -> std::int_fast64_t
+{
+  if (check_ok && !check(ok)) {
+    throw std::invalid_argument{"check isn't true on 'ok'."};
+  }
+  while (std::abs(ok - ng) > 1) {
+    auto const x{(ok + ng) / 2};
+    (check(x) ? ok : ng) = x;
+  }
+  return ok;
+}
+constexpr auto lsb(std::signed_integral auto i) noexcept -> decltype(i)
+{
+  return i & -i;
+}
+// i mustn't be 0
+constexpr auto msb(std::unsigned_integral auto i) -> int
+{
+  if (i == 0) {
+    throw std::invalid_argument{"i must be positive."};
+  }
+  return sizeof(i) * CHAR_BIT - 1 - std::countl_zero(i);
+}
+/*[[maybe_unused]] auto gen_rand() noexcept*/
+/*{*/
+/*  static std::mt19937_64 rng(*/
+/*      std::chrono::steady_clock::now().time_since_epoch().count());*/
+/*  return rng();*/
+/*}*/
+void solve_case();
+} // namespace
+auto main() -> int
+{
+  std::ios::sync_with_stdio(false);
+  std::cin.tie(nullptr);
+  constexpr auto my_precision{10};
+  std::cout << std::fixed << std::setprecision(my_precision);
+  int t{1};
+  std::cin >> t;
+  for (int i{}; i != t; ++i) {
+    try {
+      solve_case();
+    }
+    catch (std::exception &e) {
+      std::cerr << "Exception: " << e.what() << '\n';
+    }
+  }
+  return 0;
+}
+namespace {
+using i64 = std::int_fast64_t;
+using u64 = std::uint_fast64_t;
 namespace graph {
 constexpr std::int_fast64_t infinity{
     std::numeric_limits<std::int_fast64_t>::max() / 2};
@@ -191,96 +333,56 @@ auto prim(Graph const &g) -> std::int_fast64_t
   // in the loop above.
   return -1;
 }
-struct Bellman_ford_result {
-  bool contains_negative_circle;
-  // When `no_negative_circle` is true, this is invalid.
-  std::vector<std::int_fast64_t> distance;
-};
-auto bellman_ford(Graph const &g, int const source,
-                  std::vector<int> &visited) -> Bellman_ford_result
-{
-  std::vector<std::int_fast64_t> dist(g.size(), infinity);
-  std::vector<std::size_t> num_intermediates(g.size());
-  // std::vector<int> vis(g.size());
-
-  dist[source] = 0;
-  visited[source] = 1;
-  // Only those in `q` could lead to relaxation.
-  std::deque<int> q{source};
-  auto swap_smaller_to_front{[&](std::deque<int> &q) {
-    if (dist[q.back()] < dist[q.front()]) {
-      std::swap(q.back(), q.front());
-    }
-  }};
-  while (!q.empty()) {
-    auto const u{q.front()};
-    q.pop_front();
-    swap_smaller_to_front(q);
-    visited[u] = 0;
-
-    for (auto const [w, v] : g.edges_of(u)) {
-      if (auto const alt{dist[u] + w}; chmin(dist[v], alt)) {
-        num_intermediates[v] = num_intermediates[u] + 1;
-        if (num_intermediates[v] >= g.size()) {
-          return {.contains_negative_circle = true, .distance = {}};
-        }
-        if (!visited[v]) {
-          visited[v] = 1;
-          q.push_back(v);
-          swap_smaller_to_front(q);
-        }
-      }
-    }
-  }
-  return {.contains_negative_circle = false, .distance = dist};
-}
 struct Dijkstra_result {
-  std::vector<std::int_fast64_t> distance;
+  std::vector<std::vector<std::int_fast64_t>> distance;
   std::vector<std::int_fast64_t> previous;
 };
-auto dijkstra(Graph const &graph,
-              std::vector<int> const &sources) -> Dijkstra_result
+auto dijkstra(Graph const &graph, std::vector<int> const &sources,
+              std::vector<int> const &is_h) -> Dijkstra_result
 {
-  std::vector<std::int_fast64_t> distance(graph.size(), infinity);
+  std::vector<std::vector<std::int_fast64_t>> distance(
+      2, std::vector<std::int_fast64_t>(graph.size(), infinity));
   std::vector<std::int_fast64_t> previous(graph.size());
 
   // `visited[u]` is true means u has been a start point, and it shouldn't be
   // start point once more.
-  std::vector<int> visited(graph.size());
+  std::vector<std::vector<int>> visited(2, std::vector<int>(graph.size()));
 
-  std::priority_queue<std::pair<std::int_fast64_t, int>,
-                      std::vector<std::pair<std::int_fast64_t, int>>,
+  std::priority_queue<std::tuple<std::int_fast64_t, bool, int>,
+                      std::vector<std::tuple<std::int_fast64_t, bool, int>>,
                       std::greater<>>
       q;
 
   for (auto const source : sources) {
-    distance[source] = 0;
-    q.emplace(distance[source], source);
+    distance[is_h[source]][source] = 0;
+    q.push({distance[is_h[source]][source], is_h[source], source});
   }
 
-  while (!q.empty()) {          // The main loop
-    auto const [_, u]{q.top()}; // Extract the closest vertex. (Get and remove
-                                // the best vertex)
+  while (!q.empty()) {             // The main loop
+    auto const [_, o, u]{q.top()}; // Extract the closest vertex. (Get and
+                                   // remove the best vertex)
     q.pop();
 
-    if (visited[u]) {
+    if (visited[o][u]) {
       continue;
     }
-    visited[u] = 1;
+    visited[o | is_h[u]][u] = 1;
 
     for (auto const &[w, v] : graph.edges_of(u)) {
-      if (auto const alt{distance[u] + w}; chmin(distance[v], alt)) {
+      if (auto const alt{distance[o][u] + (w / (o ? 2 : 1))};
+          chmin(distance[o | is_h[v]][v], alt)) {
         previous[v] = u;
-        q.emplace(alt, v);
+        q.push({alt, o | is_h[v], v});
       }
     }
   }
 
   return {.distance = distance, .previous = previous};
 }
-auto dijkstra(Graph const &graph, int const source) -> Dijkstra_result
+auto dijkstra(Graph const &graph, int const source,
+              auto const &is_h) -> Dijkstra_result
 {
-  return dijkstra(graph, std::vector<int>{source});
+  return dijkstra(graph, std::vector<int>{source}, is_h);
 }
 using adjacent_matrix_t = std::vector<std::vector<std::int_fast64_t>>;
 auto floyd(Graph const &g) -> adjacent_matrix_t
@@ -535,3 +637,28 @@ auto contract_edges(Graph const &g) -> Contract_edges_result
   return Contract_edges_result{.h = h, .scc_id = scc_id};
 }
 } // namespace graph
+void solve_case()
+{
+  int n, m, h;
+  std::cin >> n >> m >> h;
+  std::vector<int> a(h);
+  std::vector<int> is_h(n);
+  for (auto &e : a) {
+    std::cin >> e;
+    is_h[--e] = 1;
+  }
+  auto const g{graph::read(n, m, false, true)};
+  std::vector<int> vis(n);
+  auto dist1{graph::dijkstra(g, 0, is_h).distance};
+  auto dist2{graph::dijkstra(g, n - 1, is_h).distance};
+  debug("dist1", dist1);
+  debug("dist2", dist2);
+  auto ans{inf<i64>};
+  for (int i{}; i != n; ++i) {
+    debug("i", i);
+    chmin(ans, std::max(std::min(dist1[0][i], dist1[1][i]),
+                        std::min(dist2[0][i], dist2[1][i])));
+  }
+  std::cout << (ans < graph::infinity ? ans : -1) << '\n';
+}
+} // namespace

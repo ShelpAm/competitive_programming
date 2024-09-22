@@ -1,20 +1,17 @@
-/*Problem: $(PROBLEM)*/
-/*Contest: $(CONTEST)*/
-/*Judge: $(JUDGE)*/
-/*URL: $(URL)*/
-/*Start: $(DATE)*/
+/*Problem: B - Taro*/
+/*Contest: AtCoder Beginner Contest 371*/
+/*Judge: AtCoder*/
+/*URL: https://atcoder.jp/contests/abc371/tasks/abc371_b*/
+/*Start: Sat 14 Sep 2024 08:07:43 PM CST*/
 /*Author: ShelpAm*/
 
 // #include <bits/stdc++.h>
 #include <algorithm>
 #include <bit>
-#include <cassert>
 #include <climits>
 #include <concepts>
-#include <cstddef>
 #include <cstdint>
 #include <deque>
-#include <functional>
 #include <iomanip>
 #include <iostream>
 #include <map>
@@ -22,7 +19,6 @@
 #include <queue>
 #include <ranges>
 #include <set>
-#include <stack>
 #include <tuple>
 #include <unordered_map>
 #include <unordered_set>
@@ -162,6 +158,25 @@ using i64 = std::int_fast64_t;
 using u64 = std::uint_fast64_t;
 void solve_case()
 {
-  /*return;*/
+  int n, m;
+  std::cin >> n >> m;
+  std::vector<int> has_son(n + 1);
+  for (int i{}; i != m; ++i) {
+    int a;
+    char b;
+    std::cin >> a >> b;
+    if (b == 'M') {
+      if (has_son[a]) {
+        std::cout << "No\n";
+      }
+      else {
+        has_son[a] = 1;
+        std::cout << "Yes\n";
+      }
+    }
+    else {
+      std::cout << "No\n";
+    }
+  }
 }
 } // namespace

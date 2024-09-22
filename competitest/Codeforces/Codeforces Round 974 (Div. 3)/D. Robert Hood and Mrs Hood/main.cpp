@@ -1,20 +1,17 @@
-/*Problem: $(PROBLEM)*/
-/*Contest: $(CONTEST)*/
-/*Judge: $(JUDGE)*/
-/*URL: $(URL)*/
-/*Start: $(DATE)*/
+/*Problem: D. Robert Hood and Mrs Hood*/
+/*Contest: Codeforces Round 974 (Div. 3)*/
+/*Judge: Codeforces*/
+/*URL: https://codeforces.com/contest/2014/problem/D*/
+/*Start: Sun 22 Sep 2024 07:47:17 PM CST*/
 /*Author: ShelpAm*/
 
 // #include <bits/stdc++.h>
 #include <algorithm>
 #include <bit>
-#include <cassert>
 #include <climits>
 #include <concepts>
-#include <cstddef>
 #include <cstdint>
 #include <deque>
-#include <functional>
 #include <iomanip>
 #include <iostream>
 #include <map>
@@ -22,7 +19,6 @@
 #include <queue>
 #include <ranges>
 #include <set>
-#include <stack>
 #include <tuple>
 #include <unordered_map>
 #include <unordered_set>
@@ -146,7 +142,7 @@ auto main() -> int
   constexpr auto my_precision{10};
   std::cout << std::fixed << std::setprecision(my_precision);
   int t{1};
-  // std::cin >> t;
+  std::cin >> t;
   for (int i{}; i != t; ++i) {
     try {
       solve_case();
@@ -162,6 +158,33 @@ using i64 = std::int_fast64_t;
 using u64 = std::uint_fast64_t;
 void solve_case()
 {
-  /*return;*/
+  int n, d, k;
+  std::cin >> n >> d >> k;
+  std::multimap<int, int> rs;
+  for (int i{}; i != k; ++i) {
+    int l, r;
+    std::cin >> l >> r;
+    rs.insert({l, r});
+  }
+  std::multiset<int> o;
+
+  std::set<std::pair<int, int>> day_of_value;
+  for (int i{1}, j{1}; i + d - 1 != n + 1; ++i) {
+    while (j != i + d) {
+      for (auto it{rs.lower_bound(j)}, end{rs.upper_bound(j)}; it != end;
+           ++it) {
+        o.insert(it->second);
+      }
+      ++j;
+    }
+    day_of_value.insert({o.size(), i});
+    while (!o.empty() && *o.begin() == i) {
+      o.erase(o.begin());
+    }
+  }
+  std::cout << day_of_value
+                   .lower_bound({day_of_value.rbegin()->first, -inf<int>})
+                   ->second
+            << ' ' << day_of_value.begin()->second << '\n';
 }
 } // namespace

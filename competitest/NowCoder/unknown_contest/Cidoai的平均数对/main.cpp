@@ -1,20 +1,17 @@
-/*Problem: $(PROBLEM)*/
-/*Contest: $(CONTEST)*/
-/*Judge: $(JUDGE)*/
-/*URL: $(URL)*/
-/*Start: $(DATE)*/
+/*Problem: Cidoai的平均数对*/
+/*Contest: unknown_contest*/
+/*Judge: NowCoder*/
+/*URL: https://ac.nowcoder.com/acm/contest/88880/B*/
+/*Start: Fri 13 Sep 2024 07:47:17 PM CST*/
 /*Author: ShelpAm*/
 
 // #include <bits/stdc++.h>
 #include <algorithm>
 #include <bit>
-#include <cassert>
 #include <climits>
 #include <concepts>
-#include <cstddef>
 #include <cstdint>
 #include <deque>
-#include <functional>
 #include <iomanip>
 #include <iostream>
 #include <map>
@@ -22,7 +19,6 @@
 #include <queue>
 #include <ranges>
 #include <set>
-#include <stack>
 #include <tuple>
 #include <unordered_map>
 #include <unordered_set>
@@ -162,6 +158,17 @@ using i64 = std::int_fast64_t;
 using u64 = std::uint_fast64_t;
 void solve_case()
 {
-  /*return;*/
+  int n;
+  int k;
+  std::cin >> n >> k;
+  std::vector<std::pair<int, int>> v(n);
+  std::cin >> v;
+
+  std::vector<std::vector<int>> f(25001, std::vector<int>(501, -inf<int>));
+  for (int i{1}; i != f.size(); ++i) {
+    for (int j{1}; j != f[0].size(); ++j) {
+      f[i]
+    }
+  }
 }
 } // namespace

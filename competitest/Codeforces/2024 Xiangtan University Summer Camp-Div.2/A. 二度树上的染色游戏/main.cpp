@@ -1,14 +1,74 @@
-#pragma once
+/*Problem: A. 二度树上的染色游戏*/
+/*Contest: 2024 Xiangtan University Summer Camp-Div.2*/
+/*Judge: Codeforces*/
+/*URL: https://codeforces.com/gym/105323/problem/A*/
+/*Start: Fri 30 Aug 2024 12:17:27 PM CST*/
+/*Author: ShelpAm*/
 
-#include <cassert>
-#include <cstdint>
-#include <functional>
-#include <iostream>
-#include <numeric>
-#include <stack>
-#include <vector>
+#include <bits/stdc++.h>
 
-auto chmin(auto &value, auto const &other) noexcept -> bool
+#ifdef __cpp_lib_ranges
+#include <ranges>
+#endif
+
+namespace {
+[[maybe_unused]] constexpr std::int_fast64_t mod998244353{998'244'353LL};
+[[maybe_unused]] constexpr std::int_fast64_t mod1e9p7{1'000'000'007LL};
+[[maybe_unused]] constexpr double eps{1e-8};
+template <typename T>
+[[maybe_unused]] constexpr T inf{std::numeric_limits<T>::max() / 2};
+
+#ifdef __cpp_concepts
+// Concepts.
+namespace shelpam::concepts {
+template <typename> struct is_pair_t : std::false_type {};
+template <typename T, typename U>
+struct is_pair_t<std::pair<T, U>> : std::true_type {};
+template <typename T>
+concept pair = is_pair_t<T>::value;
+template <typename> struct is_tuple_t : std::false_type {};
+template <typename... Ts>
+struct is_tuple_t<std::tuple<Ts...>> : std::true_type {};
+template <typename... Ts>
+concept tuple = is_tuple_t<Ts...>::value;
+} // namespace shelpam::concepts
+
+constexpr auto operator>>(auto &istream, auto &&t) -> std::istream &
+{
+  using T = std::remove_cvref_t<decltype(t)>;
+  static_assert(!shelpam::concepts::tuple<T>, "tuple: not implemented yet.\n");
+#ifdef __cpp_lib_ranges
+  if constexpr (std::ranges::range<T>) {
+    for (auto &ele : t) {
+      istream >> ele;
+    }
+  }
+#endif
+  else if constexpr (shelpam::concepts::pair<T>) {
+    istream >> t.first >> t.second;
+  }
+  else {
+    istream >> t;
+  }
+  return istream;
+}
+#endif
+#ifndef ONLINE_JUDGE
+#include "/home/shelpam/Documents/projects/competitive-programming/libs/debug.h"
+#else
+#define debug(...)
+#endif
+template <typename T, typename U>
+constexpr auto chmax(T &value, U const &other) noexcept -> bool
+{
+  if (value < other) {
+    value = other;
+    return true;
+  }
+  return false;
+}
+template <typename T, typename U>
+constexpr auto chmin(T &value, U const &other) noexcept -> bool
 {
   if (value > other) {
     value = other;
@@ -16,7 +76,93 @@ auto chmin(auto &value, auto const &other) noexcept -> bool
   }
   return false;
 }
-
+template <typename C> constexpr auto sum_of(C const &coll) noexcept
+{
+  return std::accumulate(coll.begin(), coll.end(), std::int_fast64_t{});
+}
+constexpr auto pow(int a, std::int_fast64_t b,
+                   std::uint_fast64_t p) noexcept = delete;
+template <typename T>
+constexpr auto pow(T a, std::int_fast64_t b, std::uint_fast64_t p) noexcept
+{
+  assert(b >= 0);
+  decltype(a) res{1};
+  while (b != 0) {
+    if ((b & 1) == 1) {
+      res = res * a % p;
+    }
+    a = a * a % p;
+    b >>= 1;
+  }
+  return res;
+}
+template <typename F>
+auto binary_search(F check, std::int_fast64_t ok, std::int_fast64_t ng,
+                   bool check_ok = true) noexcept -> std::int_fast64_t
+{
+  if (check_ok) {
+    assert(check(ok));
+  }
+  while (std::abs(ok - ng) > 1) {
+    auto const x{(ok + ng) / 2};
+    (check(x) ? ok : ng) = x;
+  }
+  return ok;
+}
+template <typename T> constexpr auto lsb(T i) noexcept -> T
+{
+  static_assert(std::is_signed_v<T>,
+                "lsb is implemented based on signed integers.");
+  return i & -i;
+}
+// i mustn't be 0
+template <typename T>
+constexpr auto count_leading_zeros(T const &i) noexcept -> int
+{
+  assert(i != 0);
+  if constexpr (std::is_same_v<T, unsigned long long>) {
+    return __builtin_clzll(i);
+  }
+  if constexpr (std::is_same_v<T, unsigned long>) {
+    return __builtin_clzl(i);
+  }
+  if constexpr (std::is_same_v<T, unsigned int>) {
+    return __builtin_clz(i);
+  }
+  /*static_assert(false, "Unsupported type");*/
+  static_assert(!std::is_signed_v<T>,
+                "msb is implemented based on unsigned integers");
+  return -1; // Unreachable.
+}
+// i mustn't be 0
+template <typename T> constexpr auto msb(T i) noexcept -> int
+{
+  return static_cast<int>(sizeof(T) * CHAR_BIT - 1 - count_leading_zeros(i));
+}
+/*[[maybe_unused]] auto gen_rand() noexcept*/
+/*{*/
+/*  static std::mt19937_64 rng(*/
+/*      std::chrono::steady_clock::now().time_since_epoch().count());*/
+/*  return rng();*/
+/*}*/
+void solve_case() noexcept;
+} // namespace
+auto main() -> int
+{
+  std::ios::sync_with_stdio(false);
+  std::cin.tie(nullptr);
+  constexpr auto my_precision{10};
+  std::cout << std::fixed << std::setprecision(my_precision);
+  int t{1};
+  /*std::cin >> t;*/
+  for (int i{}; i != t; ++i) {
+    solve_case();
+  }
+  return 0;
+}
+namespace {
+using i64 = std::int_fast64_t;
+using u64 = std::uint_fast64_t;
 namespace graph {
 constexpr std::int_fast64_t infinity{
     std::numeric_limits<std::int_fast64_t>::max() / 2};
@@ -199,8 +345,9 @@ struct Bellman_ford_result {
 auto bellman_ford(Graph const &g, int const source,
                   std::vector<int> &visited) -> Bellman_ford_result
 {
+  int const n{static_cast<int>(g.size())};
   std::vector<std::int_fast64_t> dist(g.size(), infinity);
-  std::vector<std::size_t> num_intermediates(g.size());
+  std::vector<int> num_intermediates(g.size());
   // std::vector<int> vis(g.size());
 
   dist[source] = 0;
@@ -221,7 +368,7 @@ auto bellman_ford(Graph const &g, int const source,
     for (auto const [w, v] : g.edges_of(u)) {
       if (auto const alt{dist[u] + w}; chmin(dist[v], alt)) {
         num_intermediates[v] = num_intermediates[u] + 1;
-        if (num_intermediates[v] >= g.size()) {
+        if (num_intermediates[v] >= n) {
           return {.contains_negative_circle = true, .distance = {}};
         }
         if (!visited[v]) {
@@ -293,8 +440,7 @@ auto floyd(Graph const &g) -> adjacent_matrix_t
   for (int u = 0; u != n; ++u) {
     f[u][u] = 0;
     for (auto const &[w, v] : g.edges_of(u)) {
-      chmin(f[u][v], w); // Do not directly use `f[u][v] = w;` to fight against
-                         // multiple edges connecting the same vertices.
+      f[u][v] = w;
     }
   }
 
@@ -535,3 +681,36 @@ auto contract_edges(Graph const &g) -> Contract_edges_result
   return Contract_edges_result{.h = h, .scc_id = scc_id};
 }
 } // namespace graph
+void solve_case() noexcept
+{
+  int n;
+  std::cin >> n;
+  std::vector<int> a(n);
+  std::cin >> a;
+  auto const g{graph::read(n, n - 1, false, false)};
+  // f[1][i] represents the result value when set i to red.
+  std::vector<int> f(n, -inf<int>);
+  std::vector<int> sum(n);
+  auto dfs{[&](auto self, int u, int p) -> void {
+    sum[u] += a[u];
+    std::vector<int> sons;
+    for (auto [w, v] : g.edges_of(u)) {
+      if (v != p) {
+        self(self, v, u);
+        sum[u] += sum[v];
+        sons.push_back(v);
+      }
+    }
+    if (sons.size() <= 1) {
+      f[u] = -a[u] + (sons.size() ? sum[sons[0]] : 0);
+    }
+    else {
+      for (auto i : {0, 1}) {
+        chmax(f[u], -a[u] + f[sons[i]] + sum[sons[i ^ 1]]);
+      }
+    }
+  }};
+  dfs(dfs, 0, 0);
+  std::cout << f[0] << '\n';
+}
+} // namespace

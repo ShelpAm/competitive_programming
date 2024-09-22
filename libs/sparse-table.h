@@ -10,14 +10,14 @@ public:
       : _table(msb(table.size()) + 1, std::move(table))
   {
     for (std::size_t i{1}; i != _table.size(); ++i) {
-      for (std::size_t j{}; j != table.size(); ++j) {
+      for (std::size_t j{}; j != _table[0].size(); ++j) {
         _table[i][j] = _f(_table[i - 1][j], _table[i - 1][j + (1 << (i - 1))]);
       }
     }
   }
 
   [[nodiscard]] constexpr auto
-  query(unsigned const l, unsigned const r) const -> decltype(_f(T{}, T{}))
+  query(std::size_t l, std::size_t r) const -> decltype(F{}(T{}, T{}))
   {
     assert(r >= l);
     auto const k{msb(r - l + 1)};

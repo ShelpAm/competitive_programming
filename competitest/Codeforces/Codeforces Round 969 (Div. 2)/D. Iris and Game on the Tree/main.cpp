@@ -1,13 +1,80 @@
-#pragma once
+/*Problem: D. Iris and Game on the Tree*/
+/*Contest: Codeforces Round 969 (Div. 2)*/
+/*Judge: Codeforces*/
+/*URL: https://codeforces.com/contest/2007/problem/D*/
+/*Start: Tue 03 Sep 2024 06:29:57 AM CST*/
+/*Author: ShelpAm*/
 
+// #include <bits/stdc++.h>
+#include <algorithm>
+#include <bit>
 #include <cassert>
+#include <climits>
+#include <concepts>
 #include <cstdint>
+#include <deque>
 #include <functional>
+#include <iomanip>
 #include <iostream>
+#include <map>
 #include <numeric>
+#include <queue>
+#include <ranges>
+#include <set>
 #include <stack>
+#include <tuple>
 #include <vector>
 
+namespace {
+[[maybe_unused]] constexpr std::uint_fast64_t mod998244353{998'244'353ULL};
+[[maybe_unused]] constexpr std::uint_fast64_t mod1e9p7{1'000'000'007ULL};
+[[maybe_unused]] constexpr double eps{1e-8};
+template <typename T> constexpr T inf{std::numeric_limits<T>::max() / 2};
+
+// Concepts.
+namespace shelpam::concepts {
+template <typename> struct is_pair_t : std::false_type {};
+template <typename T, typename U>
+struct is_pair_t<std::pair<T, U>> : std::true_type {};
+template <typename T>
+concept pair = is_pair_t<T>::value;
+template <typename> struct is_tuple_t : std::false_type {};
+template <typename... Ts>
+struct is_tuple_t<std::tuple<Ts...>> : std::true_type {};
+template <typename... Ts>
+concept tuple = is_tuple_t<Ts...>::value;
+} // namespace shelpam::concepts
+
+auto operator>>(auto &istream, auto &&t) -> std::istream &
+{
+  using T = std::remove_cvref_t<decltype(t)>;
+  static_assert(!shelpam::concepts::tuple<T>, "tuple: not implemented yet.\n");
+  if constexpr (std::ranges::range<T>) {
+    for (auto &ele : t) {
+      istream >> ele;
+    }
+  }
+  else if constexpr (shelpam::concepts::pair<T>) {
+    istream >> t.first >> t.second;
+  }
+  else {
+    istream >> t;
+  }
+  return istream;
+}
+#ifndef ONLINE_JUDGE
+#include "/home/shelpam/Documents/projects/competitive-programming/libs/debug.h"
+#else
+#define debug(...)
+#endif
+auto chmax(auto &value, auto const &other) noexcept -> bool
+{
+  if (value < other) {
+    value = other;
+    return true;
+  }
+  return false;
+}
 auto chmin(auto &value, auto const &other) noexcept -> bool
 {
   if (value > other) {
@@ -16,7 +83,80 @@ auto chmin(auto &value, auto const &other) noexcept -> bool
   }
   return false;
 }
-
+constexpr auto sum_of(std::ranges::range auto const &coll) noexcept
+{
+  return std::accumulate(coll.begin(), coll.end(), std::int_fast64_t{});
+}
+constexpr auto pow(auto a, std::int_fast64_t b, std::uint_fast64_t p)
+{
+  static_assert(sizeof(a) > sizeof(int), "Use of int is bug-prone.");
+  if (b < 0) {
+    throw std::invalid_argument{"Invalid exponent. It should be positive."};
+  }
+  decltype(a) res{1};
+  while (b != 0) {
+    if ((b & 1) == 1) {
+      res = res * a % p;
+    }
+    a = a * a % p;
+    b >>= 1;
+  }
+  return res;
+}
+auto binary_search(std::invocable<std::int_fast64_t> auto check,
+                   std::int_fast64_t ok, std::int_fast64_t ng,
+                   bool check_ok = true) -> std::int_fast64_t
+{
+  if (check_ok && !check(ok)) {
+    throw std::invalid_argument{"check isn't true on 'ok'."};
+  }
+  while (std::abs(ok - ng) > 1) {
+    auto const x{(ok + ng) / 2};
+    (check(x) ? ok : ng) = x;
+  }
+  return ok;
+}
+constexpr auto lsb(std::signed_integral auto i) noexcept -> decltype(i)
+{
+  return i & -i;
+}
+// i mustn't be 0
+constexpr auto msb(std::unsigned_integral auto i) -> int
+{
+  if (i == 0) {
+    throw std::invalid_argument{"i must be positive."};
+  }
+  return sizeof(i) * CHAR_BIT - 1 - std::countl_zero(i);
+}
+/*[[maybe_unused]] auto gen_rand() noexcept*/
+/*{*/
+/*  static std::mt19937_64 rng(*/
+/*      std::chrono::steady_clock::now().time_since_epoch().count());*/
+/*  return rng();*/
+/*}*/
+void solve_case();
+} // namespace
+auto main() -> int
+{
+  std::ios::sync_with_stdio(false);
+  std::cin.tie(nullptr);
+  constexpr auto my_precision{10};
+  std::cout << std::fixed << std::setprecision(my_precision);
+  int t{1};
+  std::cin >> t;
+  for (int i{}; i != t; ++i) {
+    try {
+      solve_case();
+    }
+    catch (std::exception &e) {
+      std::cerr << "Exception: " << e.what() << '\n';
+    }
+  }
+  return 0;
+}
+namespace {
+using i64 = std::int_fast64_t;
+using u64 = std::uint_fast64_t;
 namespace graph {
 constexpr std::int_fast64_t infinity{
     std::numeric_limits<std::int_fast64_t>::max() / 2};
@@ -199,8 +339,9 @@ struct Bellman_ford_result {
 auto bellman_ford(Graph const &g, int const source,
                   std::vector<int> &visited) -> Bellman_ford_result
 {
+  int const n{static_cast<int>(g.size())};
   std::vector<std::int_fast64_t> dist(g.size(), infinity);
-  std::vector<std::size_t> num_intermediates(g.size());
+  std::vector<int> num_intermediates(g.size());
   // std::vector<int> vis(g.size());
 
   dist[source] = 0;
@@ -221,7 +362,7 @@ auto bellman_ford(Graph const &g, int const source,
     for (auto const [w, v] : g.edges_of(u)) {
       if (auto const alt{dist[u] + w}; chmin(dist[v], alt)) {
         num_intermediates[v] = num_intermediates[u] + 1;
-        if (num_intermediates[v] >= g.size()) {
+        if (num_intermediates[v] >= n) {
           return {.contains_negative_circle = true, .distance = {}};
         }
         if (!visited[v]) {
@@ -535,3 +676,51 @@ auto contract_edges(Graph const &g) -> Contract_edges_result
   return Contract_edges_result{.h = h, .scc_id = scc_id};
 }
 } // namespace graph
+void solve_case()
+{
+  int n;
+  std::cin >> n;
+  auto const g{graph::read(n, n - 1, false, false)};
+  std::string s;
+  std::cin >> s;
+
+  std::array<int, 2> cnt{};
+  int ques{};
+  auto dfs{[&](auto self, int u, int p) -> void {
+    bool leaf{true};
+    for (auto [_, v] : g.edges_of(u)) {
+      if (v != p) {
+        leaf = false;
+        self(self, v, u);
+      }
+    }
+    if (leaf) {
+      if (s[u] == '?') {
+        ++ques;
+      }
+      else {
+        ++cnt[s[u] - '0'];
+      }
+    }
+  }};
+  dfs(dfs, 0, 0);
+  int ans{};
+
+  if (s[0] == '?') {
+    if (auto const [mn, mx]{std::ranges::minmax(cnt)}; mx == 0) {
+      ans += mn;
+      ans += ques / 2;
+    }
+    else {
+      --ques;
+      ans += mx;
+      ans += (ques + 1) / 2;
+    }
+  }
+  else {
+    ans += cnt[(s[0] ^ 1) - '0'];
+    ans += (ques + 1) / 2;
+  }
+  std::cout << ans << '\n';
+}
+} // namespace
