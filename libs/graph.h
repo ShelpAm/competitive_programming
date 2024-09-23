@@ -5,6 +5,7 @@
 #include <functional>
 #include <iostream>
 #include <numeric>
+#include <set>
 #include <stack>
 #include <vector>
 
@@ -53,7 +54,8 @@ auto read(int const num_of_vertices, int const num_of_edges,
 {
   Graph g(num_of_vertices);
   for (int i = 0; i != num_of_edges; ++i) {
-    int u, v;
+    int u;
+    int v;
     std::int_fast64_t w;
     std::cin >> u >> v;
     if (contains_w) {
@@ -234,54 +236,52 @@ auto bellman_ford(Graph const &g, int const source,
   }
   return {.contains_negative_circle = false, .distance = dist};
 }
+
 struct Dijkstra_result {
   std::vector<std::int_fast64_t> distance;
-  std::vector<std::int_fast64_t> previous;
+  std::vector<int> previous;
 };
-auto dijkstra(Graph const &graph,
+auto dijkstra(Graph const &g,
               std::vector<int> const &sources) -> Dijkstra_result
 {
-  std::vector<std::int_fast64_t> distance(graph.size(), infinity);
-  std::vector<std::int_fast64_t> previous(graph.size());
+  std::vector<std::int_fast64_t> dist(g.size(), infinity);
+  std::vector<int> prev(g.size(), -1);
 
-  // `visited[u]` is true means u has been a start point, and it shouldn't be
-  // start point once more.
-  std::vector<int> visited(graph.size());
-
-  std::priority_queue<std::pair<std::int_fast64_t, int>,
-                      std::vector<std::pair<std::int_fast64_t, int>>,
-                      std::greater<>>
-      q;
-
+  // Nodes not in q had got the shortest distance from source(s)
+  auto by_dist{[&dist](int l, int r) {
+    if (dist[l] != dist[r]) {
+      return dist[l] < dist[r];
+    }
+    return l < r;
+  }};
+  std::set<int, decltype(by_dist)> q{by_dist};
   for (auto const source : sources) {
-    distance[source] = 0;
-    q.emplace(distance[source], source);
+    dist[source] = 0;
+    q.insert(source);
   }
 
-  while (!q.empty()) {          // The main loop
-    auto const [_, u]{q.top()}; // Extract the closest vertex. (Get and remove
-                                // the best vertex)
-    q.pop();
+  while (!q.empty()) { // The main loop
+    // Extract the closest vertex. (Get and remove the best vertex)
+    auto const u{*q.begin()};
+    q.erase(u);
 
-    if (visited[u]) {
-      continue;
-    }
-    visited[u] = 1;
-
-    for (auto const &[w, v] : graph.edges_of(u)) {
-      if (auto const alt{distance[u] + w}; chmin(distance[v], alt)) {
-        previous[v] = u;
-        q.emplace(alt, v);
+    for (auto const &[w, v] : g.edges_of(u)) {
+      if (auto const alt{dist[u] + w}; dist[v] > alt) {
+        q.erase(v);
+        dist[v] = alt;
+        prev[v] = u;
+        q.insert(v);
       }
     }
   }
 
-  return {.distance = distance, .previous = previous};
+  return {.distance{dist}, .previous{prev}};
 }
-auto dijkstra(Graph const &graph, int const source) -> Dijkstra_result
+auto dijkstra(Graph const &graph, int source) -> Dijkstra_result
 {
   return dijkstra(graph, std::vector<int>{source});
 }
+
 using adjacent_matrix_t = std::vector<std::vector<std::int_fast64_t>>;
 auto floyd(Graph const &g) -> adjacent_matrix_t
 {
