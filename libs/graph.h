@@ -19,8 +19,7 @@ auto chmin(auto &value, auto const &other) noexcept -> bool
 }
 
 namespace graph {
-constexpr std::int_fast64_t infinity{
-    std::numeric_limits<std::int_fast64_t>::max() / 2};
+constexpr auto infinity{std::numeric_limits<std::int_fast64_t>::max() / 2};
 class Graph {
 public:
   explicit Graph(std::size_t const max_num_of_vertices)
@@ -48,9 +47,8 @@ public:
 private:
   std::vector<std::vector<std::pair<std::int_fast64_t, int>>> adjacent;
 };
-auto read(int const num_of_vertices, int const num_of_edges,
-          bool const directed, bool const contains_w,
-          bool const read_from_1 = true) -> Graph
+auto read(int num_of_vertices, int num_of_edges, bool directed, bool contains_w,
+          bool read_from_1 = true) -> Graph
 {
   Graph g(num_of_vertices);
   for (int i = 0; i != num_of_edges; ++i) {
@@ -198,7 +196,7 @@ struct Bellman_ford_result {
   // When `no_negative_circle` is true, this is invalid.
   std::vector<std::int_fast64_t> distance;
 };
-auto bellman_ford(Graph const &g, int const source,
+auto bellman_ford(Graph const &g, int source,
                   std::vector<int> &visited) -> Bellman_ford_result
 {
   std::vector<std::int_fast64_t> dist(g.size(), infinity);
@@ -248,11 +246,8 @@ auto dijkstra(Graph const &g,
   std::vector<int> prev(g.size(), -1);
 
   // Nodes not in q had got the shortest distance from source(s)
-  auto by_dist{[&dist](int l, int r) {
-    if (dist[l] != dist[r]) {
-      return dist[l] < dist[r];
-    }
-    return l < r;
+  auto by_dist{[&](int l, int r) {
+    return std::tie(dist[l], l) < std::tie(dist[r], r);
   }};
   std::set<int, decltype(by_dist)> q{by_dist};
   for (auto const source : sources) {
@@ -261,7 +256,7 @@ auto dijkstra(Graph const &g,
   }
 
   while (!q.empty()) { // The main loop
-    // Extract the closest vertex. (Get and remove the best vertex)
+    // Extract and remove the closest vertex from queue.
     auto const u{*q.begin()};
     q.erase(u);
 
@@ -352,8 +347,7 @@ auto toposort(Graph const &g, bool directed) -> Toposort_result
 // convert/transform the vertices' ID. For example, if you want to make a edge
 // from left vertex x to right vertex y, you should use
 // `g.add_edge(x, y, 1);` rather than `g.add_edge(x, y + n, 1);`.
-auto maximum_matching(Graph const &g, int const left_size,
-                      int const right_size) -> int
+auto maximum_matching(Graph const &g, int left_size, int right_size) -> int
 {
   assert(left_size >= 0 && right_size >= 0);
   assert(g.size() == static_cast<std::size_t>(left_size));
