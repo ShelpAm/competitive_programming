@@ -1,7 +1,8 @@
 #include <bits/stdc++.h>
 
-[[maybe_unused]] constexpr std::int_fast64_t gcd(std::int_fast64_t a,
-                                                 std::int_fast64_t b) noexcept
+[[maybe_unused]] constexpr auto gcd(std::int_fast64_t a,
+                                    std::int_fast64_t b) noexcept
+    -> std::int_fast64_t
 {
   assert(a >= 0 && b >= 0);
   while (b != 0) {
@@ -11,8 +12,9 @@
   }
   return a;
 }
-[[maybe_unused]] constexpr std::int_fast64_t lcm(std::int_fast64_t a,
-                                                 std::int_fast64_t b) noexcept
+[[maybe_unused]] constexpr auto lcm(std::int_fast64_t a,
+                                    std::int_fast64_t b) noexcept
+    -> std::int_fast64_t
 {
   return a * b / gcd(a, b);
 }

@@ -7,7 +7,7 @@
 #include <string_view>
 #include <vector>
 
-namespace multiprecision {
+namespace shelpam::multiprecision {
 // Only supports positive numbers.
 template <int Base> class Multiprecision {
   friend constexpr auto operator<(Multiprecision const &lhs,
@@ -185,41 +185,41 @@ private:
 };
 
 template <int Base>
-[[nodiscard]] constexpr auto
-operator+(Multiprecision<Base> const &lhs,
-          Multiprecision<Base> const &rhs) -> Multiprecision<Base>
+[[nodiscard]] constexpr auto operator+(Multiprecision<Base> const &lhs,
+                                       Multiprecision<Base> const &rhs)
+    -> Multiprecision<Base>
 {
   return Multiprecision{lhs} += rhs;
 }
 
 template <int Base>
-[[nodiscard]] constexpr auto
-operator-(Multiprecision<Base> const &lhs,
-          Multiprecision<Base> const &rhs) -> Multiprecision<Base>
+[[nodiscard]] constexpr auto operator-(Multiprecision<Base> const &lhs,
+                                       Multiprecision<Base> const &rhs)
+    -> Multiprecision<Base>
 {
   return Multiprecision{lhs} -= rhs;
 }
 
 template <int Base>
-[[nodiscard]] constexpr auto
-operator*(Multiprecision<Base> const &lhs,
-          Multiprecision<Base> const &rhs) -> Multiprecision<Base>
+[[nodiscard]] constexpr auto operator*(Multiprecision<Base> const &lhs,
+                                       Multiprecision<Base> const &rhs)
+    -> Multiprecision<Base>
 {
   return Multiprecision{lhs} *= rhs;
 }
 
 template <int Base>
-[[nodiscard]] constexpr auto
-operator/(Multiprecision<Base> const &lhs,
-          Multiprecision<Base> const &rhs) -> Multiprecision<Base>
+[[nodiscard]] constexpr auto operator/(Multiprecision<Base> const &lhs,
+                                       Multiprecision<Base> const &rhs)
+    -> Multiprecision<Base>
 {
   return Multiprecision{lhs} /= rhs;
 }
 
 template <int Base>
-[[nodiscard]] constexpr auto
-operator%(Multiprecision<Base> const &lhs,
-          Multiprecision<Base> const &rhs) -> Multiprecision<Base>
+[[nodiscard]] constexpr auto operator%(Multiprecision<Base> const &lhs,
+                                       Multiprecision<Base> const &rhs)
+    -> Multiprecision<Base>
 {
   return Multiprecision{lhs} %= rhs;
 }
@@ -228,4 +228,4 @@ namespace details {
 constexpr auto default_base{10};
 }
 using Int = Multiprecision<details::default_base>;
-} // namespace multiprecision
+} // namespace shelpam::multiprecision

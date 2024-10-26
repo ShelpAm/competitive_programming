@@ -1,20 +1,23 @@
 #pragma once
 
-#include <numeric>
+#include <algorithm>
 #include <vector>
 
-namespace disjoint_set_union {
+namespace shelpam {
+
 class Disjoint_set_union {
 public:
-  explicit Disjoint_set_union(int const size) : _parent(size), _size(size, 1)
+  explicit Disjoint_set_union(int size) : _parent(size), _size(size, 1)
   {
-    std::iota(_parent.begin(), _parent.end(), 0);
+    std::ranges::iota(_parent, 0);
   }
-  // with path compression
-  auto find(int const x) -> int
+
+  // With path compression
+  auto find(int x) -> int
   {
     return _parent[x] == x ? x : _parent[x] = find(_parent[x]);
   }
+
   /// @return:
   /// false if there has been pair x,y in the set.
   /// true successfully united
@@ -31,7 +34,7 @@ public:
     _size[x] += _size[y];
     return true;
   }
-  [[nodiscard]] auto united(int const x, int const y) -> bool
+  [[nodiscard]] auto united(int x, int y) -> bool
   {
     return find(x) == find(y);
   }
@@ -44,5 +47,6 @@ private:
   std::vector<int> _parent;
   std::vector<int> _size;
 };
+
 using Dsu = Disjoint_set_union;
-} // namespace disjoint_set_union
+} // namespace shelpam

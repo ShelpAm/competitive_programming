@@ -2,7 +2,8 @@
 
 #include "../templates/main.cpp"
 
-namespace hash {
+namespace shelpam {
+
 // note: zero-indexed
 template <std::size_t Base> class Hash {
 public:
@@ -20,14 +21,14 @@ public:
     }
   }
 
-  [[nodiscard]] auto query(std::size_t const l,
-                           std::size_t const r) const -> std::size_t
+  [[nodiscard]] auto query(std::size_t l, std::size_t r) const -> std::size_t
   {
-    return _hash_value[r + 1] - _hash_value[l] * _pow_base[r - l + 1];
+    return _hash_value[r + 1] - (_hash_value[l] * _pow_base[r - l + 1]);
   }
 
 private:
   std::vector<std::size_t> _hash_value;
   std::vector<std::size_t> _pow_base;
 };
-} // namespace hash
+
+} // namespace shelpam

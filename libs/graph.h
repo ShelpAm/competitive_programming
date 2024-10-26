@@ -5,6 +5,7 @@
 #include <functional>
 #include <iostream>
 #include <numeric>
+#include <queue>
 #include <set>
 #include <stack>
 #include <vector>
@@ -18,22 +19,47 @@ auto chmin(auto &value, auto const &other) noexcept -> bool
   return false;
 }
 
-namespace graph {
-constexpr auto infinity{std::numeric_limits<std::int_fast64_t>::max() / 2};
+namespace shelpam::graph {
+constexpr auto infinity{std::numeric_limits<std::int_fast64_t>::max() / 4};
 class Graph {
 public:
-  explicit Graph(std::size_t const max_num_of_vertices)
+  static auto read(int num_of_vertices, int num_of_edges, bool directed,
+                   bool contains_w, bool read_from_1 = true) -> Graph
+  {
+    Graph g(num_of_vertices);
+    for (int i = 0; i != num_of_edges; ++i) {
+      int u;
+      int v;
+      std::int_fast64_t w;
+      std::cin >> u >> v;
+      if (contains_w) {
+        std::cin >> w;
+      }
+      else {
+        w = 1;
+      }
+      if (read_from_1) {
+        --u, --v;
+      }
+      g.add_edge(u, v, w);
+      if (!directed) {
+        g.add_edge(v, u, w);
+      }
+    }
+    return g;
+  }
+
+  explicit Graph(std::size_t max_num_of_vertices)
       : adjacent(max_num_of_vertices)
   {
   }
 
-  void add_edge(std::size_t const u, std::size_t const v,
-                std::int_fast64_t const w)
+  void add_edge(std::size_t u, std::size_t v, std::int_fast64_t w)
   {
     adjacent[u].emplace_back(w, v);
   }
 
-  [[nodiscard]] auto edges_of(std::size_t const u) const
+  [[nodiscard]] auto edges_of(std::size_t u) const
       -> std::vector<std::pair<std::int_fast64_t, int>> const &
   {
     return adjacent[u];
@@ -47,31 +73,7 @@ public:
 private:
   std::vector<std::vector<std::pair<std::int_fast64_t, int>>> adjacent;
 };
-auto read(int num_of_vertices, int num_of_edges, bool directed, bool contains_w,
-          bool read_from_1 = true) -> Graph
-{
-  Graph g(num_of_vertices);
-  for (int i = 0; i != num_of_edges; ++i) {
-    int u;
-    int v;
-    std::int_fast64_t w;
-    std::cin >> u >> v;
-    if (contains_w) {
-      std::cin >> w;
-    }
-    else {
-      w = 1;
-    }
-    if (read_from_1) {
-      --u, --v;
-    }
-    g.add_edge(u, v, w);
-    if (!directed) {
-      g.add_edge(v, u, w);
-    }
-  }
-  return g;
-}
+
 auto to_edges(Graph const &g)
     -> std::vector<std::tuple<std::int_fast64_t, int, int>>
 {
@@ -155,7 +157,7 @@ auto prim(Graph const &g) -> std::int_fast64_t
 
   // `visited[u]` is true means u had been a start point, and it shouldn't be
   // start point once more.
-  std::vector<int> visited(g.size());
+  std::deque<bool> visited(g.size());
   std::size_t num_visited{};
 
   std::priority_queue<std::pair<std::int_fast64_t, int>,
@@ -174,7 +176,7 @@ auto prim(Graph const &g) -> std::int_fast64_t
     if (visited[u]) {
       continue;
     }
-    visited[u] = 1;
+    visited[u] = true;
     sum_weights += w;
     if (++num_visited == g.size()) {
       return sum_weights;
@@ -196,15 +198,15 @@ struct Bellman_ford_result {
   // When `no_negative_circle` is true, this is invalid.
   std::vector<std::int_fast64_t> distance;
 };
-auto bellman_ford(Graph const &g, int source,
-                  std::vector<int> &visited) -> Bellman_ford_result
+auto bellman_ford(Graph const &g, int source, std::deque<bool> &visited)
+    -> Bellman_ford_result
 {
   std::vector<std::int_fast64_t> dist(g.size(), infinity);
   std::vector<std::size_t> num_intermediates(g.size());
   // std::vector<int> vis(g.size());
 
   dist[source] = 0;
-  visited[source] = 1;
+  visited[source] = true;
   // Only those in `q` could lead to relaxation.
   std::deque<int> q{source};
   auto swap_smaller_to_front{[&](std::deque<int> &q) {
@@ -216,7 +218,7 @@ auto bellman_ford(Graph const &g, int source,
     auto const u{q.front()};
     q.pop_front();
     swap_smaller_to_front(q);
-    visited[u] = 0;
+    visited[u] = false;
 
     for (auto const [w, v] : g.edges_of(u)) {
       if (auto const alt{dist[u] + w}; chmin(dist[v], alt)) {
@@ -225,7 +227,7 @@ auto bellman_ford(Graph const &g, int source,
           return {.contains_negative_circle = true, .distance = {}};
         }
         if (!visited[v]) {
-          visited[v] = 1;
+          visited[v] = true;
           q.push_back(v);
           swap_smaller_to_front(q);
         }
@@ -239,8 +241,8 @@ struct Dijkstra_result {
   std::vector<std::int_fast64_t> distance;
   std::vector<int> previous;
 };
-auto dijkstra(Graph const &g,
-              std::vector<int> const &sources) -> Dijkstra_result
+auto dijkstra(Graph const &g, std::vector<int> const &sources)
+    -> Dijkstra_result
 {
   std::vector<std::int_fast64_t> dist(g.size(), infinity);
   std::vector<int> prev(g.size(), -1);
@@ -351,11 +353,14 @@ auto maximum_matching(Graph const &g, int left_size, int right_size) -> int
 {
   assert(left_size >= 0 && right_size >= 0);
   assert(g.size() == static_cast<std::size_t>(left_size));
-  int res{};
+  int num_of_matches{};
+
   int idx{}; // dfs order, identifying if a vertex was visited in current round
   std::vector<int> dfn(left_size);
-  std::vector<int> pa(left_size, -1),
-      pb(right_size, -1); // matches from a and matches from b
+
+  // Matches from a and matches from b
+  std::vector<int> pa(left_size, -1);
+  std::vector<int> pb(right_size, -1);
 
   // All `u` will represent left side vertices.
   std::function<bool(int)> dfs{[&](int u) {
@@ -391,9 +396,9 @@ auto maximum_matching(Graph const &g, int left_size, int right_size) -> int
     if (cnt == 0) {
       break;
     }
-    res += cnt;
+    num_of_matches += cnt;
   }
-  return res;
+  return num_of_matches;
 }
 struct Tarjan_cuts {
   Tarjan_cuts(Graph const &g) : g(g), n(g.size()), low(n), dfn(n) {}
@@ -403,7 +408,7 @@ struct Tarjan_cuts {
   // You can check dfn[i] to identify if vertex i has been visited.
   std::vector<int> low, dfn;
   std::vector<int> cuts;
-  void run(int const u, bool const isroot = true)
+  void run(int u, bool isroot = true)
   {
     low[u] = dfn[u] = ++idx;
     int cnt{};
@@ -429,7 +434,7 @@ struct Tarjan_bridges {
   int idx{};
   std::vector<int> low, dfn;
   std::vector<std::pair<int, int>> bridges;
-  void run(int const u, int const p)
+  void run(int u, int p)
   {
     low[u] = dfn[u] = ++idx;
     for (auto const [_, v] : g.edges_of(u)) {
@@ -464,7 +469,7 @@ public:
   std::vector<std::vector<int>> scc;
 
 private:
-  void strong_connect(int const u)
+  void strong_connect(int u)
   {
     _lowlink[u] = _index[u] = ++_idx;
     _stack.push(u);
@@ -528,4 +533,4 @@ auto contract_edges(Graph const &g) -> Contract_edges_result
   }
   return Contract_edges_result{.h = h, .scc_id = scc_id};
 }
-} // namespace graph
+} // namespace shelpam::graph

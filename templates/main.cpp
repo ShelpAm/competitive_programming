@@ -8,7 +8,9 @@
 // #include <bits/stdc++.h>
 #include <algorithm>
 #include <bit>
+#include <bitset>
 #include <cassert>
+#include <chrono>
 #include <climits>
 #include <concepts>
 #include <cstddef>
@@ -18,11 +20,15 @@
 #include <iomanip>
 #include <iostream>
 #include <map>
+#include <numbers>
 #include <numeric>
 #include <queue>
+#include <random>
 #include <ranges>
 #include <set>
 #include <stack>
+#include <string>
+#include <string_view>
 #include <tuple>
 #include <unordered_map>
 #include <unordered_set>
@@ -32,7 +38,8 @@ namespace {
 [[maybe_unused]] constexpr std::uint_fast64_t mod998244353{998'244'353ULL};
 [[maybe_unused]] constexpr std::uint_fast64_t mod1e9p7{1'000'000'007ULL};
 [[maybe_unused]] constexpr double eps{1e-8};
-template <typename T> constexpr T inf{std::numeric_limits<T>::max() / 2};
+template <typename T> constexpr T inf{std::numeric_limits<T>::max() / 4};
+template <typename T> constexpr T max{std::numeric_limits<T>::max()};
 
 // Concepts.
 namespace shelpam::concepts {
@@ -149,6 +156,7 @@ auto main() -> int
   // std::cin >> t;
   for (int i{}; i != t; ++i) {
     try {
+      std::cerr << "Test case " << i << '\n';
       solve_case();
     }
     catch (std::exception &e) {

@@ -4,6 +4,8 @@
 #include <cstdint>
 #include <vector>
 
+namespace shelpam {
+
 class Segment_tree {
   struct Lazy_tag {
     auto operator+=(Lazy_tag const &rhs) -> Lazy_tag &
@@ -100,8 +102,8 @@ private:
   }
 
   // We assume that [l, r] contains [_nodes[u].left_end, _nodes[u].right_end].
-  [[nodiscard]] auto query_impl(int const l, int const r,
-                                std::size_t const u) -> Info
+  [[nodiscard]] auto query_impl(int const l, int const r, std::size_t const u)
+      -> Info
   {
     // If [l, r] nests node u, the segment node doesn't have to be divided
     // anymore. So we direct return the info of this node.
@@ -130,3 +132,5 @@ private:
   std::vector<Info> _info;
   std::vector<Lazy_tag> _lazy_tags;
 };
+
+} // namespace shelpam

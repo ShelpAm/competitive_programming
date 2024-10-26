@@ -1,6 +1,8 @@
 #pragma once
+
 #include <iostream>
 #include <string_view>
+
 // Includer should contain concept `shelpam::concepts::tuple<T>`.
 namespace shelpam::concepts {
 template <typename T>
