@@ -1,10 +1,8 @@
-#pragma once
-
-/*Problem: $(PROBLEM)*/
-/*Contest: $(CONTEST)*/
-/*Judge: $(JUDGE)*/
-/*URL: $(URL)*/
-/*Start: $(DATE)*/
+/*Problem: H. GG and YY's Stone Game*/
+/*Contest: The 2024 Sichuan Provincial Collegiate Programming Contest*/
+/*Judge: Codeforces*/
+/*URL: https://codeforces.com/gym/105222/problem/H*/
+/*Start: Mon 28 Oct 2024 06:48:01 PM CST*/
 /*Author: ShelpAm*/
 
 // #include <bits/stdc++.h>
@@ -155,7 +153,7 @@ auto main() -> int
   constexpr auto my_precision{10};
   std::cout << std::fixed << std::setprecision(my_precision);
   int t{1};
-  // std::cin >> t;
+  std::cin >> t;
   for (int i{}; i != t; ++i) {
     try {
       std::cerr << "Test case " << i << '\n';
@@ -172,6 +170,14 @@ using i64 = std::int_fast64_t;
 using u64 = std::uint_fast64_t;
 void solve_case()
 {
-  /*return;*/
+  i64 n;
+  std::cin >> n;
+  if (n % 3 == 0) {
+    std::cout << 1 << ' ';
+  }
+  else {
+    std::cout << 0 << ' ';
+  }
+  std::cout << n / 3 + n % 3 << '\n';
 }
 } // namespace

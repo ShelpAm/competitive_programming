@@ -1,10 +1,8 @@
-#pragma once
-
-/*Problem: $(PROBLEM)*/
-/*Contest: $(CONTEST)*/
-/*Judge: $(JUDGE)*/
-/*URL: $(URL)*/
-/*Start: $(DATE)*/
+/*Problem: D1. The Endspeaker (Easy Version)*/
+/*Contest: Codeforces Round 982 (Div. 2)*/
+/*Judge: Codeforces*/
+/*URL: https://codeforces.com/contest/2027/problem/D1*/
+/*Start: Mon 28 Oct 2024 01:22:12 PM CST*/
 /*Author: ShelpAm*/
 
 // #include <bits/stdc++.h>

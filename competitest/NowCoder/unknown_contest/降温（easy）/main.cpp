@@ -1,10 +1,8 @@
-#pragma once
-
-/*Problem: $(PROBLEM)*/
-/*Contest: $(CONTEST)*/
-/*Judge: $(JUDGE)*/
-/*URL: $(URL)*/
-/*Start: $(DATE)*/
+/*Problem: 降温（easy）*/
+/*Contest: unknown_contest*/
+/*Judge: NowCoder*/
+/*URL: https://ac.nowcoder.com/acm/contest/92972/E*/
+/*Start: Sun 27 Oct 2024 07:48:11 PM CST*/
 /*Author: ShelpAm*/
 
 // #include <bits/stdc++.h>
@@ -172,6 +170,52 @@ using i64 = std::int_fast64_t;
 using u64 = std::uint_fast64_t;
 void solve_case()
 {
-  /*return;*/
+  int n, x;
+  std::cin >> n >> x;
+  std::vector<int> a(n);
+  std::cin >> a;
+
+  for (auto &e : a) {
+    e += 50;
+  }
+  a.insert(a.begin(), 100);
+
+  std::vector<std::vector<int>> f(n + 1, std::vector<int>(101, -inf<int>));
+  f[0][100] = 0;
+  std::vector<std::vector<int>> g(n + 1, std::vector<int>(101, inf<int>));
+  g[0][100] = 0;
+  for (int i{1}; i != n + 1; ++i) {
+    if (a[i] == 50 - 999) {
+      for (int j{}; j != 101; ++j) {
+        for (int k{}; k != 101; ++k) {
+          chmax(f[i][j], f[i - 1][k] + (j - k <= -x));
+        }
+      }
+    }
+    else {
+      for (int k{}; k != 101; ++k) {
+        chmax(f[i][a[i]], f[i - 1][k] + (a[i] - k <= -x));
+      }
+    }
+  }
+
+  for (int i{1}; i != n + 1; ++i) {
+    if (a[i] == 50 - 999) {
+      for (int j{}; j != 101; ++j) {
+        for (int k{}; k != 101; ++k) {
+          chmin(g[i][j], g[i - 1][k] + (j - k <= -x));
+        }
+      }
+    }
+    else {
+      for (int k{}; k != 101; ++k) {
+        chmin(g[i][a[i]], g[i - 1][k] + (a[i] - k <= -x));
+      }
+    }
+  }
+  debug("f", f);
+  debug("g", g);
+
+  std::cout << std::ranges::max(f[n]) << ' ' << std::ranges::min(g[n]);
 }
 } // namespace

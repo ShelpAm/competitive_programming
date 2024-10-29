@@ -18,8 +18,8 @@ class Segment_tree {
   };
 
   struct Node {
-    int left_end{};
-    int right_end{};
+    int left{};
+    int right{};
   };
 
   struct Info {
@@ -29,7 +29,7 @@ class Segment_tree {
       return *this;
     }
 
-    void apply(Lazy_tag const &lazy_tag, int const segment_length)
+    void apply(Lazy_tag const &lazy_tag, int segment_length)
     {
       sum += lazy_tag.addition * segment_length;
     }
@@ -38,29 +38,29 @@ class Segment_tree {
   };
 
 public:
-  explicit Segment_tree(int const l, int const r)
+  explicit Segment_tree(int l, int r)
       : _nodes(4 * (r - l + 1) + 1), _info(4 * (r - l + 1) + 1),
         _lazy_tags(4 * (r - l + 1) + 1)
   {
     build_tree(l, r, 1);
   }
 
-  void apply(int const l, int const r, Lazy_tag const &tag)
+  void apply(int l, int r, Lazy_tag const &tag)
   {
     apply_impl(l, r, 1, tag);
   }
 
-  auto query(int const l, int const r) -> Info
+  auto query(int l, int r) -> Info
   {
     return query_impl(l, r, 1);
   }
 
 private:
   // Sets up segments that nodes manage.
-  void build_tree(int const l, int const r, int const u)
+  void build_tree(int l, int r, int u)
   {
-    _nodes[u].left_end = l;
-    _nodes[u].right_end = r;
+    _nodes[u].left = l;
+    _nodes[u].right = r;
 
     if (l != r) {
       auto const m{(l + r) / 2};
@@ -69,63 +69,61 @@ private:
     }
   }
 
-  void do_lazy_propagation(std::size_t const u)
+  void do_lazy_propagation(std::size_t u)
   {
     if (!is_leaf(u)) {
       _lazy_tags[u * 2] += _lazy_tags[u];
       _lazy_tags[u * 2 + 1] += _lazy_tags[u];
       _info[u * 2].apply(_lazy_tags[u],
-                         _nodes[u * 2].right_end - _nodes[u * 2].left_end + 1);
-      _info[u * 2 + 1].apply(_lazy_tags[u], _nodes[u * 2 + 1].right_end -
-                                                _nodes[u * 2 + 1].left_end + 1);
+                         _nodes[u * 2].right - _nodes[u * 2].left + 1);
+      _info[u * 2 + 1].apply(_lazy_tags[u], _nodes[u * 2 + 1].right -
+                                                _nodes[u * 2 + 1].left + 1);
     }
 
     _lazy_tags[u] = {};
   }
 
-  void apply_impl(int const l, int const r, std::size_t const u,
-                  Lazy_tag const &tag)
+  void apply_impl(int l, int r, std::size_t u, Lazy_tag const &tag)
   {
     _info[u].apply(tag, r - l + 1);
 
-    if (l <= _nodes[u].left_end && _nodes[u].right_end <= r) {
+    if (l <= _nodes[u].left && _nodes[u].right <= r) {
       _lazy_tags[u] += tag;
       return;
     }
 
-    if (_nodes[u * 2].right_end >= l) {
-      apply_impl(l, std::min(r, _nodes[u * 2].right_end), u * 2, tag);
+    if (_nodes[u * 2].right >= l) {
+      apply_impl(l, std::min(r, _nodes[u * 2].right), u * 2, tag);
     }
-    if (_nodes[u * 2 + 1].left_end <= r) {
-      apply_impl(std::max(_nodes[u * 2 + 1].left_end, l), r, u * 2 + 1, tag);
+    if (_nodes[u * 2 + 1].left <= r) {
+      apply_impl(std::max(_nodes[u * 2 + 1].left, l), r, u * 2 + 1, tag);
     }
   }
 
   // We assume that [l, r] contains [_nodes[u].left_end, _nodes[u].right_end].
-  [[nodiscard]] auto query_impl(int const l, int const r, std::size_t const u)
-      -> Info
+  [[nodiscard]] auto query_impl(int l, int r, std::size_t u) -> Info
   {
     // If [l, r] nests node u, the segment node doesn't have to be divided
     // anymore. So we direct return the info of this node.
-    if (l <= _nodes[u].left_end && _nodes[u].right_end <= r) {
+    if (l <= _nodes[u].left && _nodes[u].right <= r) {
       return _info[u];
     }
 
     do_lazy_propagation(u);
 
     Info res;
-    if (_nodes[u * 2].right_end >= l) {
+    if (_nodes[u * 2].right >= l) {
       res += query_impl(l, r, u * 2);
     }
-    if (_nodes[u * 2 + 1].left_end <= r) {
+    if (_nodes[u * 2 + 1].left <= r) {
       res += query_impl(l, r, u * 2 + 1);
     }
     return res;
   }
 
-  [[nodiscard]] auto is_leaf(std::size_t const u) const -> bool
+  [[nodiscard]] auto is_leaf(std::size_t u) const -> bool
   {
-    return _nodes[u].left_end == _nodes[u].right_end;
+    return _nodes[u].left == _nodes[u].right;
   }
 
   std::vector<Node> _nodes;

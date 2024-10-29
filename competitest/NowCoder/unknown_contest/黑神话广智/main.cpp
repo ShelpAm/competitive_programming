@@ -1,10 +1,8 @@
-#pragma once
-
-/*Problem: $(PROBLEM)*/
-/*Contest: $(CONTEST)*/
-/*Judge: $(JUDGE)*/
-/*URL: $(URL)*/
-/*Start: $(DATE)*/
+/*Problem: 黑神话广智*/
+/*Contest: unknown_contest*/
+/*Judge: NowCoder*/
+/*URL: https://ac.nowcoder.com/acm/contest/94329/F*/
+/*Start: Sat 26 Oct 2024 02:15:34 PM CST*/
 /*Author: ShelpAm*/
 
 // #include <bits/stdc++.h>
@@ -155,7 +153,7 @@ auto main() -> int
   constexpr auto my_precision{10};
   std::cout << std::fixed << std::setprecision(my_precision);
   int t{1};
-  // std::cin >> t;
+  std::cin >> t;
   for (int i{}; i != t; ++i) {
     try {
       std::cerr << "Test case " << i << '\n';
@@ -172,6 +170,57 @@ using i64 = std::int_fast64_t;
 using u64 = std::uint_fast64_t;
 void solve_case()
 {
-  /*return;*/
+  int hp;
+  std::array<std::pair<int, int>, 2> a;
+  std::cin >> hp >> a;
+  std::vector<int> p(hp + 1);
+  std::cin >> (p | std::views::drop(1));
+
+  // std::vector<std::vector<int>> _f(hp + 1, std::vector<int>(1 << 4,
+  // inf<int>)); std::function<i64(int, unsigned)> f{[&](int h, unsigned mask)
+  // -> i64 {
+  //   debug("h", h);
+  //   if (h <= 0) {
+  //     return 0;
+  //   }
+  //   if (_f[h][mask] == inf<int>) {
+  //     for (unsigned method{}; auto const &[a, b] : a) {
+  //       chmin(_f[h][mask], f(h - b - (mask == 0 && method == 1 ? k[h] : 0),
+  //                            (mask << 1 & 0xf) | method) +
+  //                              a);
+  //       ++method;
+  //     }
+  //   }
+  //   return _f[h][mask];
+  // }};
+  // std::cout << f(hp, 0xf) << '\n';
+
+  std::vector<std::vector<i64>> f(hp + std::max(a[0].second, a[1].second) +
+                                      std::ranges::max(p) + 1,
+                                  std::vector<i64>(1 << 4, inf<i64>));
+  // f[i][j]: taking damage `i`, with previous 4 hits `j`.
+  f[0][0xf] = 0;
+  for (int i{}; i != hp; ++i) {
+    for (int j{}; j != 1 << 4; ++j) {
+      for (int k{}; k != 2; ++k) {
+        // debug("i,j,k", std::vector{i, j, k});
+        // assert(i + a[k].second +
+        //            (k == 1 && j == 0 && hp - i >= 0 ? p[hp - i] : 0) <
+        // f.size());
+        chmin(f[i + a[k].second +
+                (k == 1 && j == 0 && hp - i >= 0 ? p[hp - i] : 0)]
+               [(j << 1 & 0xf) | k],
+              f[i][j] + a[k].first);
+      }
+    }
+  }
+
+  i64 ans{inf<i64>};
+  for (int i{hp}; i != f.size(); ++i) {
+    for (auto const e : f[i]) {
+      chmin(ans, e);
+    }
+  }
+  std::cout << ans << '\n';
 }
 } // namespace

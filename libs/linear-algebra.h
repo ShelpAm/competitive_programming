@@ -44,7 +44,7 @@ auto intersect(Line l, Circle c) -> bool
          c.r * c.r * (1 + (l.k * l.k));
 }
 
-// 非相切的相交，精度比点斜式表示的直线高
+// 非相切的相交，精度100%
 // 注意：此函数涉及到x^4，不要超出数据类型表示范围了。
 auto intersect(Line_2 l, Circle c) -> bool
 {
@@ -99,6 +99,28 @@ auto in_polygen(Polygen const &poly, Point p) -> bool
     a -= area(p, poly[i], poly[(i + 1) % poly.size()]);
   }
   return std::abs(a) < eps;
+}
+
+struct Rectangle {
+  [[nodiscard]] auto width() const -> long double
+  {
+    return std::abs(p.x - q.x);
+  }
+
+  [[nodiscard]] auto height() const -> long double
+  {
+    return std::abs(p.y - q.y);
+  }
+
+  Point p, q;
+};
+
+// 非相切的相交
+auto intersect(Rectangle const &r1, Rectangle const &r2) -> bool
+{
+  auto const dx{r1.p.x + r1.q.x - r2.p.x - r2.q.x};
+  auto const dy{r1.p.y + r1.q.y - r2.p.y - r2.q.y};
+  return dx < r1.width() + r2.width() && dy < r1.height() + r2.height();
 }
 
 } // namespace shelpam::linear_algebra

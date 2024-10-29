@@ -1,10 +1,8 @@
-#pragma once
-
-/*Problem: $(PROBLEM)*/
-/*Contest: $(CONTEST)*/
-/*Judge: $(JUDGE)*/
-/*URL: $(URL)*/
-/*Start: $(DATE)*/
+/*Problem: B. Link Summon*/
+/*Contest: The 2024 Sichuan Provincial Collegiate Programming Contest*/
+/*Judge: Codeforces*/
+/*URL: https://codeforces.com/gym/105222/problem/B*/
+/*Start: Mon 28 Oct 2024 08:19:10 PM CST*/
 /*Author: ShelpAm*/
 
 // #include <bits/stdc++.h>
@@ -155,7 +153,7 @@ auto main() -> int
   constexpr auto my_precision{10};
   std::cout << std::fixed << std::setprecision(my_precision);
   int t{1};
-  // std::cin >> t;
+  std::cin >> t;
   for (int i{}; i != t; ++i) {
     try {
       std::cerr << "Test case " << i << '\n';
@@ -170,8 +168,121 @@ auto main() -> int
 namespace {
 using i64 = std::int_fast64_t;
 using u64 = std::uint_fast64_t;
+#define int i64
 void solve_case()
 {
-  /*return;*/
+  std::vector<i64> a(6);
+  for (int i{1}; i != 6; ++i) {
+    std::cin >> a[i];
+  }
+
+  int ans{};
+
+  // for (int i{1}; i != 3; ++i) {
+  //   auto const e{std::min(a[i], a[6 - i])};
+  //   a[i] -= e;
+  //   a[6 - i] -= e;
+  //   ans += e;
+  // }
+  // ans += a[3] / 2;
+  // a[3] %= 2;
+  //
+  // debug("a", a);
+  // for (int i{5}; i != 4; --i) {
+  //   i64 need{(6 - i) * a[i]};
+  //   i64 now{};
+  //   for (int j{1}; j != i; ++j) {
+  //     auto const cost{std::min(a[j], need - now)};
+  //     now += cost;
+  //     a[j] -= cost;
+  //     if (a[j] != 0) {
+  //       break;
+  //     }
+  //   }
+  //
+  //   auto const used{now / (6 - i)};
+  //   ans += used;
+  //   a[i] -= used;
+  //
+  //   if (now < need) {
+  //     now %= 6 - i;
+  //     ans += (a[i] + now) / (6 - i + 1);
+  //     break;
+  //   }
+  // }
+  //
+  // // 1 2 3
+  // auto bonus{*std::ranges::min_element(a.begin() + 1, a.begin() + 4)};
+  // ans += bonus;
+  // for (int i{1}; i != 4; ++i) {
+  //   a[i] -= bonus;
+  // }
+  //
+  // // 2 2 2
+  // ans += a[2] / 3;
+  // a[2] %= 3;
+  //
+  // // 1 1 2 2
+  // {
+  //   auto const used{std::min(a[1], a[2]) / 2};
+  //   ans += used;
+  //   a[1] -= used;
+  //   a[2] -= used;
+  // }
+  //
+  // for (int i{4}; i != 0; --i) {
+  //   i64 need{(6 - i) * a[i]};
+  //   i64 now{};
+  //   for (int j{1}; j != i; ++j) {
+  //     auto const cost{std::min(a[j], need - now)};
+  //     now += cost;
+  //     a[j] -= cost;
+  //     if (a[j] != 0) {
+  //       break;
+  //     }
+  //   }
+  //
+  //   auto const used{now / (6 - i)};
+  //   ans += used;
+  //   a[i] -= used;
+  //
+  //   if (now < need) {
+  //     now %= 6 - i;
+  //     ans += (a[i] + now) / (6 - i + 1);
+  //     break;
+  //   }
+  // }
+
+  for (int p{2}; p != 7; ++p) {
+    for (int i{}; i != pow(7UL, 5, mod998244353); ++i) {
+      auto t{i};
+      std::vector<int> usage(6);
+      int sum{};
+      for (int j{1}; j != 6; ++j) {
+        usage[j] = t % 7;
+        sum += usage[j] * j;
+        t /= 7;
+      }
+      if (sum != 6 || sum_of(usage) != p) {
+        continue;
+      }
+      int packs{inf<int>};
+      for (int j{1}; j != 6; ++j) {
+        if (usage[j] != 0) {
+          chmin(packs, a[j] / usage[j]);
+        }
+      }
+      for (int j{1}; j != 6; ++j) {
+        a[j] -= packs * usage[j];
+      }
+      if (packs != 0) {
+        debug("usage", usage);
+        debug("packs", packs);
+      }
+      ans += packs;
+    }
+  }
+
+  std::cout << ans << '\n';
 }
 } // namespace

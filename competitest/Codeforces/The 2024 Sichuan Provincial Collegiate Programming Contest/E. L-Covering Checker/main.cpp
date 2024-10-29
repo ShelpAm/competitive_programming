@@ -1,10 +1,8 @@
-#pragma once
-
-/*Problem: $(PROBLEM)*/
-/*Contest: $(CONTEST)*/
-/*Judge: $(JUDGE)*/
-/*URL: $(URL)*/
-/*Start: $(DATE)*/
+/*Problem: E. L-Covering Checker*/
+/*Contest: The 2024 Sichuan Provincial Collegiate Programming Contest*/
+/*Judge: Codeforces*/
+/*URL: https://codeforces.com/gym/105222/problem/E*/
+/*Start: Mon 28 Oct 2024 07:12:52 PM CST*/
 /*Author: ShelpAm*/
 
 // #include <bits/stdc++.h>
@@ -155,7 +153,7 @@ auto main() -> int
   constexpr auto my_precision{10};
   std::cout << std::fixed << std::setprecision(my_precision);
   int t{1};
-  // std::cin >> t;
+  std::cin >> t;
   for (int i{}; i != t; ++i) {
     try {
       std::cerr << "Test case " << i << '\n';
@@ -172,6 +170,71 @@ using i64 = std::int_fast64_t;
 using u64 = std::uint_fast64_t;
 void solve_case()
 {
-  /*return;*/
+  int n, m;
+  std::cin >> n >> m;
+  std::vector<std::vector<char>> a(n + 2, std::vector<char>(m + 2, -inf<char>));
+
+  std::unordered_map<char, int> o{{'U', 0}, {'R', 1},  {'D', 2},
+                                  {'L', 3}, {'C', -1}, {'.', '.'}};
+  for (int i{1}; i != n + 1; ++i) {
+    for (int j{1}; j != m + 1; ++j) {
+      std::cin >> a[i][j];
+      a[i][j] = o[a[i][j]];
+    }
+  }
+
+  for (int i{1}; i != n + 1; ++i) {
+    for (int j{1}; j != m + 1; ++j) {
+      if (a[i][j] == -1) {
+        a[i][j] = -2;
+        std::vector<int> fuck;
+        if (a[i - 1][j] == 2) {
+          a[i - 1][j] = -2; // -2 -> visited.
+          fuck.push_back(2);
+        }
+        if (a[i][j - 1] == 1) {
+          a[i][j - 1] = -2; // -2 -> visited.
+          fuck.push_back(1);
+        }
+        if (a[i + 1][j] == 0) {
+          a[i + 1][j] = -2; // -2 -> visited.
+          fuck.push_back(0);
+        }
+        if (a[i][j + 1] == 3) {
+          a[i][j + 1] = -2; // -2 -> visited.
+          fuck.push_back(3);
+        }
+        if (fuck.size() != 2) {
+          std::cout << "No\n";
+          return;
+        }
+        if (std::abs(fuck[0] - fuck[1]) == 2) {
+          std::cout << "No\n";
+          return;
+        }
+      }
+    }
+  }
+
+  if (a[1][m] != '.') {
+    std::cout << "No\n";
+    return;
+  }
+  a[1][m] = -2;
+  // for (int i{1}; i != n + 1; ++i) {
+  //   for (int j{1}; j != m + 1; ++j) {
+  //     std::cout << int(a[i][j]) << ' ';
+  //   }
+  //   std::cout << "\n";
+  // }
+  for (int i{1}; i != n + 1; ++i) {
+    for (int j{1}; j != m + 1; ++j) {
+      if (a[i][j] != -2) {
+        std::cout << "No\n";
+        return;
+      }
+    }
+  }
+  std::cout << "Yes\n";
 }
 } // namespace

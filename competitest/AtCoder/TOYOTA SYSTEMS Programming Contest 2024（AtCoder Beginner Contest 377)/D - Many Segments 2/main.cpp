@@ -1,10 +1,9 @@
-#pragma once
-
-/*Problem: $(PROBLEM)*/
-/*Contest: $(CONTEST)*/
-/*Judge: $(JUDGE)*/
-/*URL: $(URL)*/
-/*Start: $(DATE)*/
+/*Problem: D - Many Segments 2*/
+/*Contest: TOYOTA SYSTEMS Programming Contest 2024（AtCoder Beginner Contest
+ * 377)*/
+/*Judge: AtCoder*/
+/*URL: https://atcoder.jp/contests/abc377/tasks/abc377_d*/
+/*Start: Sun 27 Oct 2024 01:43:58 PM CST*/
 /*Author: ShelpAm*/
 
 // #include <bits/stdc++.h>
@@ -172,6 +171,25 @@ using i64 = std::int_fast64_t;
 using u64 = std::uint_fast64_t;
 void solve_case()
 {
-  /*return;*/
+  int n, m;
+  std::cin >> n >> m;
+  std::multimap<int, int> rs;
+  std::multiset<int> rbounds{m + 1};
+  for (int i{}; i != n; ++i) {
+    int l, r;
+    std::cin >> l >> r;
+    rs.insert({l + 1, r});
+    rbounds.insert(r);
+  }
+
+  i64 ans{};
+  for (int i{1}; i != m + 1; ++i) {
+    for (auto [it, end]{rs.equal_range(i)}; it != end; ++it) {
+      rbounds.extract(it->second);
+    }
+    ans += *rbounds.begin() - i;
+    debug("i, min", std::pair{i, *rbounds.begin()});
+  }
+  std::cout << ans << '\n';
 }
 } // namespace

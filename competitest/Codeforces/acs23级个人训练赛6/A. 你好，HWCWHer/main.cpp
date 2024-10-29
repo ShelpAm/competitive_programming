@@ -1,10 +1,8 @@
-#pragma once
-
-/*Problem: $(PROBLEM)*/
-/*Contest: $(CONTEST)*/
-/*Judge: $(JUDGE)*/
-/*URL: $(URL)*/
-/*Start: $(DATE)*/
+/*Problem: A. 你好，HWCWHer*/
+/*Contest: acs23级个人训练赛6*/
+/*Judge: Codeforces*/
+/*URL: https://codeforces.com/gym/562252/problem/A*/
+/*Start: Tue 29 Oct 2024 01:10:52 PM CST*/
 /*Author: ShelpAm*/
 
 // #include <bits/stdc++.h>
@@ -153,9 +151,9 @@ auto main() -> int
   std::ios::sync_with_stdio(false);
   std::cin.tie(nullptr);
   constexpr auto my_precision{10};
-  std::cout << std::fixed << std::setprecision(my_precision);
+  // std::cout << std::fixed << std::setprecision(my_precision);
   int t{1};
-  // std::cin >> t;
+  std::cin >> t;
   for (int i{}; i != t; ++i) {
     try {
       std::cerr << "Test case " << i << '\n';
@@ -172,6 +170,39 @@ using i64 = std::int_fast64_t;
 using u64 = std::uint_fast64_t;
 void solve_case()
 {
-  /*return;*/
+  i64 n, k;
+  std::cin >> n >> k;
+
+  n -= k * (k - 1) / 2;
+  n += k - 1;
+  chmax(n, 0);
+  std::cout << n / k << '\n';
+
+  // for (int n{1}; n != 20; ++n) {
+  //   for (int k{2}; k != 10; ++k) {
+  //     std::unordered_map<int, int> cnt;
+  //     cnt[1] = n;
+  //     std::deque<int> q;
+  //     q.push_back(1);
+  //     while (!q.empty()) {
+  //       auto const i{q.front()};
+  //       q.pop_front();
+  //       if (i == k || i == 0) {
+  //         continue;
+  //       }
+  //       if ((cnt[i - 1] += cnt[i] / 2) >= 2 && cnt[i] >= 2) {
+  //         q.push_back(i - 1);
+  //       }
+  //       if ((cnt[i + 1] += cnt[i] / 2) >= 2 && cnt[i] >= 2) {
+  //         q.push_front(i + 1);
+  //       }
+  //       cnt[i] %= 2;
+  //       debug("q", q);
+  //       debug("cnt", cnt);
+  //     }
+  //     std::cout << cnt[k] << ' ';
+  //   }
+  //   std::cout << '\n';
+  // }
 }
 } // namespace

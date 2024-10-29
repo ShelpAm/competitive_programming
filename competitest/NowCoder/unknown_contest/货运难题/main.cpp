@@ -1,10 +1,8 @@
-#pragma once
-
-/*Problem: $(PROBLEM)*/
-/*Contest: $(CONTEST)*/
-/*Judge: $(JUDGE)*/
-/*URL: $(URL)*/
-/*Start: $(DATE)*/
+/*Problem: 货运难题*/
+/*Contest: unknown_contest*/
+/*Judge: NowCoder*/
+/*URL: https://ac.nowcoder.com/acm/contest/94329/E*/
+/*Start: Sat 26 Oct 2024 01:38:57 PM CST*/
 /*Author: ShelpAm*/
 
 // #include <bits/stdc++.h>
@@ -155,7 +153,7 @@ auto main() -> int
   constexpr auto my_precision{10};
   std::cout << std::fixed << std::setprecision(my_precision);
   int t{1};
-  // std::cin >> t;
+  std::cin >> t;
   for (int i{}; i != t; ++i) {
     try {
       std::cerr << "Test case " << i << '\n';
@@ -172,6 +170,27 @@ using i64 = std::int_fast64_t;
 using u64 = std::uint_fast64_t;
 void solve_case()
 {
-  /*return;*/
+  int n, k;
+  std::cin >> n >> k;
+  std::vector<int> a(n);
+  std::cin >> a;
+
+  std::cout << binary_search(
+                   [&](auto x) {
+                     int cnt{};
+                     i64 holding{};
+                     for (auto const e : a) {
+                       if ((holding += e) > x) {
+                         holding = e;
+                         ++cnt;
+                       }
+                     }
+                     if (holding != 0) {
+                       ++cnt;
+                     }
+                     return cnt <= k;
+                   },
+                   sum_of(a), std::ranges::max(a) - 1)
+            << '\n';
 }
 } // namespace

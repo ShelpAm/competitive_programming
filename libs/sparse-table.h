@@ -16,8 +16,8 @@ public:
     }
   }
 
-  [[nodiscard]] constexpr auto
-  query(std::size_t l, std::size_t r) const -> decltype(F{}(T{}, T{}))
+  [[nodiscard]] constexpr auto query(std::size_t l, std::size_t r) const
+      -> decltype(F{}(T{}, T{}))
   {
     assert(r >= l);
     auto const k{msb(r - l + 1)};

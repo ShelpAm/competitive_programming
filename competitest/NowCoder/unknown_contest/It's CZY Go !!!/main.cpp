@@ -1,10 +1,8 @@
-#pragma once
-
-/*Problem: $(PROBLEM)*/
-/*Contest: $(CONTEST)*/
-/*Judge: $(JUDGE)*/
-/*URL: $(URL)*/
-/*Start: $(DATE)*/
+/*Problem: It's CZY Go !!!*/
+/*Contest: unknown_contest*/
+/*Judge: NowCoder*/
+/*URL: https://ac.nowcoder.com/acm/contest/94329/J*/
+/*Start: Sat 26 Oct 2024 03:30:47 PM CST*/
 /*Author: ShelpAm*/
 
 // #include <bits/stdc++.h>
@@ -155,7 +153,7 @@ auto main() -> int
   constexpr auto my_precision{10};
   std::cout << std::fixed << std::setprecision(my_precision);
   int t{1};
-  // std::cin >> t;
+  std::cin >> t;
   for (int i{}; i != t; ++i) {
     try {
       std::cerr << "Test case " << i << '\n';
@@ -172,6 +170,82 @@ using i64 = std::int_fast64_t;
 using u64 = std::uint_fast64_t;
 void solve_case()
 {
-  /*return;*/
+  int n, m;
+  i64 q;
+  std::cin >> n >> m >> q;
+  std::vector<std::vector<int>> a(n);
+  std::vector<std::tuple<int, int, int>> instructions;
+  for (int i{}; i != m; ++i) {
+    std::string s;
+    std::cin >> s;
+    if (s[0] == 'v') {
+      auto const arrow{s.find("<-")};
+      auto const v{std::stoi(s.substr(3, arrow - 3))};
+      auto const que{std::stoi(s.substr(arrow + 6))};
+      instructions.push_back({0, v - 1, que - 1});
+    }
+    else {
+      auto const arrow{s.find("<-")};
+      auto const que{std::stoi(s.substr(4, arrow - 4))};
+      auto const literal{std::stoi(s.substr(arrow + 2))};
+      instructions.push_back({1, que - 1, literal});
+    }
+  }
+
+  { // Determines if panic.
+    std::vector<int> que_size(n);
+    for (auto const &[op, x, y] : instructions) {
+      if (op == 0) {
+        if (--que_size[y] < 0) {
+          std::cout << "panic\n";
+          return;
+        }
+      }
+      else {
+        ++que_size[x];
+      }
+    }
+  }
+
+  std::vector<std::vector<int>> pushed_to(n);
+  std::vector<int> pulled_from(n);
+  for (auto const &[op, x, y] : instructions) {
+    if (op == 1) {
+      pushed_to[x].push_back(y);
+    }
+    else {
+      ++pulled_from[y];
+    }
+  }
+
+  // Of some variable
+  std::vector<int> last_pos(n, -1);
+  std::vector<int> last_que(n);
+  // Fethces
+  std::vector<int> before(n);
+  // Current fetches of a queue.
+  std::vector<int> cur_fetches(n);
+  for (int idx{}; auto const &[op, x, y] : instructions) {
+    if (op == 0) { // x: variable, y: queue.
+      last_pos[x] = idx;
+      last_que[x] = y;
+      before[x] = cur_fetches[y];
+
+      ++cur_fetches[y];
+    }
+    ++idx;
+  }
+
+  for (int i{}; i != n; ++i) {
+    if (last_pos[i] == -1) {
+      std::cout << 0 << ' ';
+    }
+    else {
+      auto const index{((q - 1) * pulled_from[last_que[i]] + before[i]) %
+                       pushed_to[last_que[i]].size()};
+      std::cout << pushed_to[last_que[i]][index] << ' ';
+    }
+  }
+  std::cout << '\n';
 }
 } // namespace

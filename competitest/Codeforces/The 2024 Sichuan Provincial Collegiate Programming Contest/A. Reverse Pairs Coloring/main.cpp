@@ -1,10 +1,8 @@
-#pragma once
-
-/*Problem: $(PROBLEM)*/
-/*Contest: $(CONTEST)*/
-/*Judge: $(JUDGE)*/
-/*URL: $(URL)*/
-/*Start: $(DATE)*/
+/*Problem: A. Reverse Pairs Coloring*/
+/*Contest: The 2024 Sichuan Provincial Collegiate Programming Contest*/
+/*Judge: Codeforces*/
+/*URL: https://codeforces.com/gym/105222/problem/A*/
+/*Start: Mon 28 Oct 2024 07:43:14 PM CST*/
 /*Author: ShelpAm*/
 
 // #include <bits/stdc++.h>
@@ -172,6 +170,29 @@ using i64 = std::int_fast64_t;
 using u64 = std::uint_fast64_t;
 void solve_case()
 {
-  /*return;*/
+  int n;
+  std::cin >> n;
+  std::vector<int> a(n);
+  std::cin >> a;
+
+  for (auto &e : a) {
+    --e;
+  }
+
+  std::vector<std::vector<int>> b(n, std::vector<int>(n));
+  for (int i{}; i != n; ++i) {
+    for (int j{i + 1}; j != n; ++j) {
+      if (a[i] > a[j]) {
+        b[i][a[j]] = 1;
+      }
+    }
+  }
+
+  for (auto const &e : b) {
+    for (auto const f : e) {
+      std::cout << f;
+    }
+    std::cout << '\n';
+  }
 }
 } // namespace

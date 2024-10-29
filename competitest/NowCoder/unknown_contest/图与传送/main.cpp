@@ -1,10 +1,8 @@
-#pragma once
-
-/*Problem: $(PROBLEM)*/
-/*Contest: $(CONTEST)*/
-/*Judge: $(JUDGE)*/
-/*URL: $(URL)*/
-/*Start: $(DATE)*/
+/*Problem: 图与传送*/
+/*Contest: unknown_contest*/
+/*Judge: NowCoder*/
+/*URL: https://ac.nowcoder.com/acm/contest/94329/I*/
+/*Start: Sat 26 Oct 2024 04:13:51 PM CST*/
 /*Author: ShelpAm*/
 
 // #include <bits/stdc++.h>
@@ -14,6 +12,7 @@
 #include <cassert>
 #include <chrono>
 #include <climits>
+#include <complex>
 #include <concepts>
 #include <cstddef>
 #include <cstdint>
@@ -155,7 +154,7 @@ auto main() -> int
   constexpr auto my_precision{10};
   std::cout << std::fixed << std::setprecision(my_precision);
   int t{1};
-  // std::cin >> t;
+  std::cin >> t;
   for (int i{}; i != t; ++i) {
     try {
       std::cerr << "Test case " << i << '\n';
@@ -170,8 +169,146 @@ auto main() -> int
 namespace {
 using i64 = std::int_fast64_t;
 using u64 = std::uint_fast64_t;
+namespace shelpam::graph {
+constexpr auto infinity{std::numeric_limits<std::int_fast64_t>::max() / 4};
+struct Edge : public std::pair<std::int_fast64_t, int> {
+  Edge() = default;
+  Edge(std::int_fast64_t f, std::int_fast64_t s)
+      : std::pair<std::int_fast64_t, int>{f, s}
+  {
+  }
+  auto operator+(Edge const &other) const -> Edge
+  {
+    return Edge{first + other.first, second + other.second};
+  }
+  auto operator>(Edge const &other) const
+  {
+    return std::tie(first, second) > std::tie(other.first, other.second);
+  }
+};
+using edge_t = Edge;
+class Graph {
+public:
+  // static auto read(int num_of_vertices, int num_of_edges, bool directed,
+  //                  bool contains_w, bool read_from_1 = true) -> Graph
+  // {
+  //   Graph g(num_of_vertices);
+  //   for (int i = 0; i != num_of_edges; ++i) {
+  //     int u;
+  //     int v;
+  //     std::int_fast64_t w;
+  //     std::cin >> u >> v;
+  //     if (contains_w) {
+  //       std::cin >> w;
+  //     }
+  //     else {
+  //       w = 1;
+  //     }
+  //     if (read_from_1) {
+  //       --u, --v;
+  //     }
+  //     g.add_edge(u, v, w);
+  //     if (!directed) {
+  //       g.add_edge(v, u, w);
+  //     }
+  //   }
+  //   return g;
+  // }
+
+  explicit Graph(std::size_t max_num_of_vertices)
+      : adjacent(max_num_of_vertices)
+  {
+  }
+
+  void add_edge(std::size_t u, std::size_t v, edge_t w)
+  {
+    adjacent[u].emplace_back(w, v);
+  }
+
+  [[nodiscard]] auto edges_of(std::size_t u) const
+  {
+    return adjacent[u];
+  }
+
+  [[nodiscard]] auto size() const -> std::size_t
+  {
+    return adjacent.size();
+  }
+
+private:
+  std::vector<std::vector<std::pair<edge_t, int>>> adjacent;
+};
+struct Dijkstra_result {
+  std::vector<edge_t> distance;
+  std::vector<int> previous;
+};
+auto dijkstra(Graph const &g, std::vector<int> const &sources)
+    -> Dijkstra_result
+{
+  std::vector<edge_t> dist(g.size(), edge_t{infinity, infinity});
+  std::vector<int> prev(g.size(), -1);
+
+  // Nodes not in q had got the shortest distance from source(s)
+  auto by_dist{[&](int l, int r) {
+    return std::tie(dist[l], l) < std::tie(dist[r], r);
+  }};
+  std::set<int, decltype(by_dist)> q{by_dist};
+  for (auto const source : sources) {
+    dist[source] = {};
+    q.insert(source);
+  }
+
+  while (!q.empty()) { // The main loop
+    // Extract and remove the closest vertex from queue.
+    auto const u{*q.begin()};
+    q.erase(u);
+
+    for (auto const &[w, v] : g.edges_of(u)) {
+      if (auto const alt{dist[u] + w}; dist[v] > alt) {
+        q.erase(v);
+        dist[v] = alt;
+        prev[v] = u;
+        q.insert(v);
+      }
+    }
+  }
+
+  return {.distance{dist}, .previous{prev}};
+}
+auto dijkstra(Graph const &graph, int source) -> Dijkstra_result
+{
+  return dijkstra(graph, std::vector<int>{source});
+}
+
+} // namespace shelpam::graph
 void solve_case()
 {
-  /*return;*/
+  using namespace shelpam::graph;
+
+  int n, m, k;
+  i64 w;
+  std::cin >> n >> m >> k >> w;
+
+  Graph g(n);
+  for (int i{}; i != m; ++i) {
+    i64 u, v, w;
+    std::cin >> u >> v >> w;
+    --u, --v;
+    g.add_edge(u, v, {w, 0});
+    g.add_edge(v, u, {w, 0});
+  }
+
+  for (int i{}; i + k != n; ++i) {
+    g.add_edge(i, i + k, {w, 1});
+    g.add_edge(k + i, i, {w, 1});
+  }
+
+  auto d{dijkstra(g, 0).distance[n - 1]};
+  if (d == edge_t{infinity, infinity}) {
+    std::cout << -1 << ' ' << -1 << '\n';
+  }
+  else {
+    std::cout << d.first << ' ' << d.second << '\n';
+  }
 }
 } // namespace

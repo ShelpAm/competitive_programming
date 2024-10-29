@@ -1,10 +1,8 @@
-#pragma once
-
-/*Problem: $(PROBLEM)*/
-/*Contest: $(CONTEST)*/
-/*Judge: $(JUDGE)*/
-/*URL: $(URL)*/
-/*Start: $(DATE)*/
+/*Problem: 绳匠的苦恼*/
+/*Contest: unknown_contest*/
+/*Judge: NowCoder*/
+/*URL: https://ac.nowcoder.com/acm/contest/94329/H*/
+/*Start: Sat 26 Oct 2024 03:07:55 PM CST*/
 /*Author: ShelpAm*/
 
 // #include <bits/stdc++.h>
@@ -37,8 +35,8 @@
 #include <vector>
 
 namespace {
-[[maybe_unused]] constexpr std::uint_fast64_t mod998244353{998'244'353ULL};
-[[maybe_unused]] constexpr std::uint_fast64_t mod1e9p7{1'000'000'007ULL};
+[[maybe_unused]] constexpr std::int_fast64_t mod998244353{998'244'353ULL};
+[[maybe_unused]] constexpr std::int_fast64_t mod1e9p7{1'000'000'007ULL};
 [[maybe_unused]] constexpr double eps{1e-8};
 template <typename T> constexpr T inf{std::numeric_limits<T>::max() / 4};
 template <typename T> constexpr T max{std::numeric_limits<T>::max()};
@@ -172,6 +170,50 @@ using i64 = std::int_fast64_t;
 using u64 = std::uint_fast64_t;
 void solve_case()
 {
-  /*return;*/
+  int n, q;
+  std::cin >> n >> q;
+  std::vector<i64> a(n + 2);
+  for (int i{1}; i != n + 1; ++i) {
+    std::cin >> a[i];
+  }
+  std::vector<std::pair<int, int>> queries(q);
+  std::cin >> queries;
+
+  std::vector<i64> ans(q);
+
+  auto solve_half_left{[&](bool mid) {
+    std::vector<i64> tri(n + 1);
+    std::vector<i64> pre(n + 1);
+
+    for (int i{1}; i != n + 1; ++i) {
+      (tri[i] = tri[i - 1] + a[i] * i) %= mod1e9p7;
+      (pre[i] = pre[i - 1] + a[i]) %= mod1e9p7;
+    }
+
+    for (int idx{}; auto const &[l, r] : queries) {
+      int m{(l + r) / 2}; // mid - prefering left.
+      if ((r - l + 1) % 2 == 1 && !mid) {
+        --m;
+      }
+      ans[idx] += ((tri[m] - tri[l - 1]) % mod1e9p7 + mod1e9p7) % mod1e9p7;
+      ((ans[idx] %= mod1e9p7) += mod1e9p7) %= mod1e9p7;
+
+      ans[idx] -= (((pre[m] - pre[l - 1]) % mod1e9p7 + mod1e9p7) % mod1e9p7) *
+                  (l - 1) % mod1e9p7;
+      ((ans[idx] %= mod1e9p7) += mod1e9p7) %= mod1e9p7;
+      ++idx;
+    }
+  }};
+
+  solve_half_left(true);
+  std::ranges::reverse(a);
+  for (auto &[l, r] : queries) {
+    std::tie(l, r) = std::pair{n + 1 - r, n + 1 - l};
+  }
+  solve_half_left(false);
+
+  for (auto const e : ans) {
+    std::cout << e << '\n';
+  }
 }
 } // namespace

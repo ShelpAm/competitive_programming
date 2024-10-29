@@ -1,10 +1,8 @@
-#pragma once
-
-/*Problem: $(PROBLEM)*/
-/*Contest: $(CONTEST)*/
-/*Judge: $(JUDGE)*/
-/*URL: $(URL)*/
-/*Start: $(DATE)*/
+/*Problem: 琪露诺的无尽加法*/
+/*Contest: unknown_contest*/
+/*Judge: NowCoder*/
+/*URL: https://ac.nowcoder.com/acm/contest/94329/D*/
+/*Start: Sat 26 Oct 2024 02:05:49 PM CST*/
 /*Author: ShelpAm*/
 
 // #include <bits/stdc++.h>
@@ -155,7 +153,7 @@ auto main() -> int
   constexpr auto my_precision{10};
   std::cout << std::fixed << std::setprecision(my_precision);
   int t{1};
-  // std::cin >> t;
+  std::cin >> t;
   for (int i{}; i != t; ++i) {
     try {
       std::cerr << "Test case " << i << '\n';
@@ -172,6 +170,40 @@ using i64 = std::int_fast64_t;
 using u64 = std::uint_fast64_t;
 void solve_case()
 {
-  /*return;*/
+  i64 n;
+  int x, y, a, b;
+  std::cin >> n >> x >> y >> a >> b;
+
+  i64 ans{};
+  std::string s;
+  bool baka{};
+  auto dfs{[&](auto dfs, i64 m) -> void {
+    for (int len{1}; 2 * len <= s.size(); ++len) {
+      std::string_view t{s};
+      if (t.substr(s.size() - len, len) == t.substr(s.size() - 2 * len, len)) {
+        baka = true;
+        return;
+      }
+    }
+
+    chmax(ans, m);
+    if (m % x == 0) {
+      s.push_back('0');
+      dfs(dfs, m + a);
+      s.pop_back();
+    }
+    if (m % y == 0) {
+      s.push_back('1');
+      dfs(dfs, m + b);
+      s.pop_back();
+    }
+  }};
+  dfs(dfs, n);
+  if (baka) {
+    std::cout << "baka\n";
+  }
+  else {
+    std::cout << ans << '\n';
+  }
 }
 } // namespace

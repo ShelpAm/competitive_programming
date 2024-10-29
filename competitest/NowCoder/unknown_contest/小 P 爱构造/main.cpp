@@ -1,10 +1,8 @@
-#pragma once
-
-/*Problem: $(PROBLEM)*/
-/*Contest: $(CONTEST)*/
-/*Judge: $(JUDGE)*/
-/*URL: $(URL)*/
-/*Start: $(DATE)*/
+/*Problem: 小 P 爱构造*/
+/*Contest: unknown_contest*/
+/*Judge: NowCoder*/
+/*URL: https://ac.nowcoder.com/acm/contest/94329/G*/
+/*Start: Sat 26 Oct 2024 01:03:44 PM CST*/
 /*Author: ShelpAm*/
 
 // #include <bits/stdc++.h>
@@ -155,7 +153,7 @@ auto main() -> int
   constexpr auto my_precision{10};
   std::cout << std::fixed << std::setprecision(my_precision);
   int t{1};
-  // std::cin >> t;
+  std::cin >> t;
   for (int i{}; i != t; ++i) {
     try {
       std::cerr << "Test case " << i << '\n';
@@ -172,6 +170,23 @@ using i64 = std::int_fast64_t;
 using u64 = std::uint_fast64_t;
 void solve_case()
 {
-  /*return;*/
+  int n, k;
+  std::cin >> n >> k;
+
+  if (n < 2 * k) {
+    std::cout << "NO" << '\n';
+    return;
+  }
+
+  std::cout << "YES\n";
+
+  for (int i{1}; i <= n / 2; ++i) {
+    std::cout << i + n / 2 << ' ';
+    std::cout << i << ' ';
+  }
+  if (n % 2 == 1) {
+    std::cout << n;
+  }
+  std::cout << '\n';
 }
 } // namespace

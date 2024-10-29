@@ -1,10 +1,8 @@
-#pragma once
-
-/*Problem: $(PROBLEM)*/
-/*Contest: $(CONTEST)*/
-/*Judge: $(JUDGE)*/
-/*URL: $(URL)*/
-/*Start: $(DATE)*/
+/*Problem: 闺蜜*/
+/*Contest: unknown_contest*/
+/*Judge: NowCoder*/
+/*URL: https://ac.nowcoder.com/acm/contest/92972/C*/
+/*Start: Sun 27 Oct 2024 07:08:36 PM CST*/
 /*Author: ShelpAm*/
 
 // #include <bits/stdc++.h>
@@ -155,7 +153,7 @@ auto main() -> int
   constexpr auto my_precision{10};
   std::cout << std::fixed << std::setprecision(my_precision);
   int t{1};
-  // std::cin >> t;
+  std::cin >> t;
   for (int i{}; i != t; ++i) {
     try {
       std::cerr << "Test case " << i << '\n';
@@ -172,6 +170,17 @@ using i64 = std::int_fast64_t;
 using u64 = std::uint_fast64_t;
 void solve_case()
 {
-  /*return;*/
+  int n;
+  std::cin >> n;
+  std::vector<int> a(n);
+  std::cin >> a;
+
+  std::ranges::sort(a, std::ranges::greater{});
+  std::swap(a.front(), a.back());
+  i64 s{};
+  for (int i{}; i != n; ++i) {
+    s += (i % 2 == 0 ? 1 : -1) * a[i];
+  }
+  std::cout << (s > 0 ? "kou" : s == 0 ? "draw" : "yukari") << '\n';
 }
 } // namespace

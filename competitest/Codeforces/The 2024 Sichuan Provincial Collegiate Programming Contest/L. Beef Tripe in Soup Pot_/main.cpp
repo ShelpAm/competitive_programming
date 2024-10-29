@@ -1,10 +1,8 @@
-#pragma once
-
-/*Problem: $(PROBLEM)*/
-/*Contest: $(CONTEST)*/
-/*Judge: $(JUDGE)*/
-/*URL: $(URL)*/
-/*Start: $(DATE)*/
+/*Problem: L. Beef Tripe in Soup Pot?*/
+/*Contest: The 2024 Sichuan Provincial Collegiate Programming Contest*/
+/*Judge: Codeforces*/
+/*URL: https://codeforces.com/gym/105222/problem/L*/
+/*Start: Mon 28 Oct 2024 06:56:35 PM CST*/
 /*Author: ShelpAm*/
 
 // #include <bits/stdc++.h>
@@ -172,6 +170,39 @@ using i64 = std::int_fast64_t;
 using u64 = std::uint_fast64_t;
 void solve_case()
 {
-  /*return;*/
+  int n;
+  std::cin >> n;
+  std::vector<std::array<int, 5>> a(n);
+  for (int i{}; i != n; ++i) {
+    a[i][0] = i + 1;
+    for (int j{1}; j != 5; ++j) {
+      std::cin >> a[i][j];
+    }
+  }
+
+  std::vector<std::vector<int>> k(2);
+  for (auto const &[a, b, c, d, e] : a) {
+    if (d && e) {
+      k[(b < c ? 0 : 1)].push_back(a);
+    }
+    else if (d) {
+      k[0].push_back(a);
+    }
+    else {
+      k[1].push_back(a);
+    }
+  }
+
+  for (int idx{}; auto &e : k) {
+    std::ranges::sort(e, [&](auto l, auto r) {
+      return a[l - 1][1 + idx] < a[r - 1][1 + idx];
+    });
+    std::cout << e.size() << ' ';
+    for (auto const f : e) {
+      std::cout << f << ' ';
+    }
+    std::cout << '\n';
+    ++idx;
+  }
 }
 } // namespace

@@ -1,10 +1,8 @@
-#pragma once
-
-/*Problem: $(PROBLEM)*/
-/*Contest: $(CONTEST)*/
-/*Judge: $(JUDGE)*/
-/*URL: $(URL)*/
-/*Start: $(DATE)*/
+/*Problem: 雨幕*/
+/*Contest: unknown_contest*/
+/*Judge: NowCoder*/
+/*URL: https://ac.nowcoder.com/acm/contest/92972/B*/
+/*Start: Sun 27 Oct 2024 07:05:55 PM CST*/
 /*Author: ShelpAm*/
 
 // #include <bits/stdc++.h>
@@ -172,6 +170,27 @@ using i64 = std::int_fast64_t;
 using u64 = std::uint_fast64_t;
 void solve_case()
 {
-  /*return;*/
+  int n, m;
+  std::cin >> n >> m;
+  std::vector<std::string> a(n);
+  std::cin >> a;
+
+  int ans{};
+  for (int i{}; i != n - 1; ++i) {
+    for (int j{}; j != m - 1; ++j) {
+      bool ok{true};
+      for (int x{}; x != 2; ++x) {
+        for (int y{}; y != 2; ++y) {
+          if (a[i + x][j + y] == '.') {
+            ok = false;
+          }
+        }
+      }
+      if (ok) {
+        ++ans;
+      }
+    }
+  }
+  std::cout << ans << '\n';
 }
 } // namespace

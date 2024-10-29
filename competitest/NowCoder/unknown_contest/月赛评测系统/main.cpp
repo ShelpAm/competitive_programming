@@ -1,10 +1,8 @@
-#pragma once
-
-/*Problem: $(PROBLEM)*/
-/*Contest: $(CONTEST)*/
-/*Judge: $(JUDGE)*/
-/*URL: $(URL)*/
-/*Start: $(DATE)*/
+/*Problem: 月赛评测系统*/
+/*Contest: unknown_contest*/
+/*Judge: NowCoder*/
+/*URL: https://ac.nowcoder.com/acm/contest/94329/B*/
+/*Start: Sat 26 Oct 2024 01:11:27 PM CST*/
 /*Author: ShelpAm*/
 
 // #include <bits/stdc++.h>
@@ -172,6 +170,17 @@ using i64 = std::int_fast64_t;
 using u64 = std::uint_fast64_t;
 void solve_case()
 {
-  /*return;*/
+  int n, x;
+  std::cin >> n >> x;
+  std::vector<int> a(n);
+  std::cin >> a;
+
+  std::ranges::sort(a, std::ranges::greater());
+  for (int i{1}; i != n; ++i) {
+    a[i] += a[i - 1];
+  }
+
+  std::cout << std::ranges::lower_bound(a, x) - a.begin() + 1 << ' '
+            << std::min(n, x) << '\n';
 }
 } // namespace

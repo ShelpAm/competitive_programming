@@ -1,10 +1,8 @@
-#pragma once
-
-/*Problem: $(PROBLEM)*/
-/*Contest: $(CONTEST)*/
-/*Judge: $(JUDGE)*/
-/*URL: $(URL)*/
-/*Start: $(DATE)*/
+/*Problem: 医生*/
+/*Contest: unknown_contest*/
+/*Judge: NowCoder*/
+/*URL: https://ac.nowcoder.com/acm/contest/92972/D*/
+/*Start: Sun 27 Oct 2024 07:14:59 PM CST*/
 /*Author: ShelpAm*/
 
 // #include <bits/stdc++.h>
@@ -172,6 +170,49 @@ using i64 = std::int_fast64_t;
 using u64 = std::uint_fast64_t;
 void solve_case()
 {
-  /*return;*/
+  int n, m;
+  std::cin >> n >> m;
+  std::vector<int> a(n);
+  for (auto &e : a) {
+    for (int i{}; i != m; ++i) {
+      char c;
+      std::cin >> c;
+      e = (e << 1) + c - '0';
+    }
+  }
+  int k;
+  std::cin >> k;
+  std::vector<int> medicine(k);
+  for (auto &e : medicine) {
+    for (int i{}; i != m; ++i) {
+      char c;
+      std::cin >> c;
+      e = (e << 1) + c - '0';
+    }
+  }
+
+  std::unordered_map<int, int> cnt;
+  for (unsigned i{}; i != 1 << k; ++i) {
+    int cure{};
+    for (int j{}; j != k; ++j) {
+      if (i & 1 << j) {
+        cure |= medicine[j];
+      }
+    }
+    if (!cnt.contains(cure)) {
+      cnt.insert({cure, inf<int>});
+    }
+    chmin(cnt[cure], std::popcount(i));
+  }
+
+  for (auto const e : a) {
+    int min{inf<int>};
+    for (auto const &[k, v] : cnt) {
+      if ((k | e) == k) {
+        chmin(min, v);
+      }
+    }
+    std::cout << (min == inf<int> ? -1 : min) << '\n';
+  }
 }
 } // namespace

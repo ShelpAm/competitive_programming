@@ -1,10 +1,8 @@
-#pragma once
-
-/*Problem: $(PROBLEM)*/
-/*Contest: $(CONTEST)*/
-/*Judge: $(JUDGE)*/
-/*URL: $(URL)*/
-/*Start: $(DATE)*/
+/*Problem: D2. The Endspeaker (Hard Version)*/
+/*Contest: Codeforces Round 982 (Div. 2)*/
+/*Judge: Codeforces*/
+/*URL: https://codeforces.com/contest/2027/problem/D2*/
+/*Start: Sun 27 Oct 2024 06:15:45 PM CST*/
 /*Author: ShelpAm*/
 
 // #include <bits/stdc++.h>
@@ -155,7 +153,7 @@ auto main() -> int
   constexpr auto my_precision{10};
   std::cout << std::fixed << std::setprecision(my_precision);
   int t{1};
-  // std::cin >> t;
+  std::cin >> t;
   for (int i{}; i != t; ++i) {
     try {
       std::cerr << "Test case " << i << '\n';
@@ -172,6 +170,63 @@ using i64 = std::int_fast64_t;
 using u64 = std::uint_fast64_t;
 void solve_case()
 {
-  /*return;*/
+  int n, m;
+  std::cin >> n >> m;
+  std::vector<i64> a(n);
+  std::vector<int> b(m);
+  std::cin >> a >> b;
+
+  a.insert(a.begin(), 0);
+  b.insert(b.begin(), 0);
+  for (int i{1}; i != n + 1; ++i) {
+    a[i] += a[i - 1];
+  }
+
+  debug("a", a);
+  debug("b", b);
+
+  std::vector<std::vector<i64>> f(n + 1, std::vector<i64>(m + 1, inf<i64>));
+  std::vector<std::vector<i64>> g(n + 1, std::vector<i64>(m + 1, 0));
+  f[0].assign(m + 1, 0);
+  g[0].assign(m + 1, 1);
+  for (int j{1}; j != m + 1; ++j) {
+    std::deque<std::array<i64, 3>> q{{a[0], f[0][j], 1}};
+    std::deque<i64> p{1};
+    for (int i{1}; i != n + 1; ++i) {
+      while (!q.empty() && q.front()[0] < a[i] - b[j]) {
+        q.pop_front();
+      }
+      if (chmin(f[i][j], f[i][j - 1])) {
+        g[i][j] = g[i][j - 1];
+      }
+      if (!q.empty()) {
+        if (chmin(f[i][j], q.front()[1] + m - j)) {
+          g[i][j] = 0;
+          for (auto const &[va, vf, vg] : q) {
+            if (vf + m - j == f[i][j]) {
+              (g[i][j] += vg) %= mod1e9p7;
+            }
+          }
+        }
+      }
+      while (!q.empty() && q.back()[1] > f[i][j]) {
+        q.pop_back();
+      }
+      q.push_back({a[i], f[i][j], g[i][j]});
+    }
+  }
+  debug("f", f);
+  debug("g", g);
+  auto ans{std::ranges::min(f[n])};
+  if (ans == inf<i64>) {
+    ans = -1;
+  }
+  i64 cnt{};
+  for (int i{}; i != m + 1; ++i) {
+    if (f[n][i] == ans) {
+      (cnt += g[n][i]) %= mod1e9p7;
+    }
+  }
+  std::cout << ans << ' ' << cnt << '\n';
 }
 } // namespace

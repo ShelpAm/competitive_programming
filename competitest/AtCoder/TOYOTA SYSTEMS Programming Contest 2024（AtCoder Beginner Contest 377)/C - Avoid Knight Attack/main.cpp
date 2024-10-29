@@ -1,10 +1,9 @@
-#pragma once
-
-/*Problem: $(PROBLEM)*/
-/*Contest: $(CONTEST)*/
-/*Judge: $(JUDGE)*/
-/*URL: $(URL)*/
-/*Start: $(DATE)*/
+/*Problem: C - Avoid Knight Attack*/
+/*Contest: TOYOTA SYSTEMS Programming Contest 2024（AtCoder Beginner Contest
+ * 377)*/
+/*Judge: AtCoder*/
+/*URL: https://atcoder.jp/contests/abc377/tasks/abc377_c*/
+/*Start: Sat 26 Oct 2024 09:37:50 PM CST*/
 /*Author: ShelpAm*/
 
 // #include <bits/stdc++.h>
@@ -172,6 +171,30 @@ using i64 = std::int_fast64_t;
 using u64 = std::uint_fast64_t;
 void solve_case()
 {
-  /*return;*/
+  std::vector<int> const rect{-2, -1, 1, 2};
+
+  i64 n;
+  int m;
+  std::cin >> n >> m;
+  std::set<std::pair<int, int>> a;
+  for (int i{}; i != m; ++i) {
+    int x, y;
+    std::cin >> x >> y;
+
+    a.insert({x, y});
+    for (auto dx : rect) {
+      for (auto dy : rect) {
+        if (std::abs(dx) + std::abs(dy) == 3) {
+          auto const nx{dx + x};
+          auto const ny{dy + y};
+          if (nx >= 1 && nx <= n && ny >= 1 && ny <= n) {
+            a.insert({nx, ny});
+          }
+        }
+      }
+    }
+  }
+  debug("a", a);
+  std::cout << n * n - a.size() << '\n';
 }
 } // namespace

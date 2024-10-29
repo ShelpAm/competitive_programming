@@ -1,10 +1,8 @@
-#pragma once
-
-/*Problem: $(PROBLEM)*/
-/*Contest: $(CONTEST)*/
-/*Judge: $(JUDGE)*/
-/*URL: $(URL)*/
-/*Start: $(DATE)*/
+/*Problem: 冰上迷宫*/
+/*Contest: unknown_contest*/
+/*Judge: NowCoder*/
+/*URL: https://ac.nowcoder.com/acm/contest/94329/C*/
+/*Start: Sat 26 Oct 2024 01:15:28 PM CST*/
 /*Author: ShelpAm*/
 
 // #include <bits/stdc++.h>
@@ -172,6 +170,45 @@ using i64 = std::int_fast64_t;
 using u64 = std::uint_fast64_t;
 void solve_case()
 {
-  /*return;*/
+  int n, m;
+  std::cin >> n >> m;
+  std::vector<std::string> a(n);
+  std::cin >> a;
+  int sx, sy, ex, ey;
+  std::cin >> sx >> sy >> ex >> ey;
+  --sx, --sy, --ex, --ey;
+
+  if (sx == ex && sy == ey && a[sx][sy] == '*') {
+    std::cout << "YES\n";
+    return;
+  }
+
+  std::vector<std::pair<int, int>> const dirs{{-1, 0}, {0, -1}, {1, 0}, {0, 1}};
+  std::vector<std::deque<bool>> vis(n, std::deque<bool>(m));
+  auto dfs{[&](auto dfs, int x, int y) -> void {
+    if (vis[x][y]) {
+      return;
+    }
+    vis[x][y] = true;
+
+    for (auto [dx, dy] : dirs) {
+      dx += x, dy += y;
+      if (dx < 0 || dx >= n || dy < 0 || dy >= m || a[dx][dy] == '*') {
+        continue;
+      }
+      dfs(dfs, dx, dy);
+    }
+  }};
+  dfs(dfs, sx, sy);
+
+  int counter{};
+  for (auto [dx, dy] : dirs) {
+    dx += ex, dy += ey;
+    if (dx >= 0 && dx < n && dy >= 0 && dy < m && vis[dx][dy]) {
+      ++counter;
+    }
+  }
+  debug("vis", vis);
+  std::cout << (counter + (a[ex][ey] == '*' ? 1 : 0) >= 2 ? "YES\n" : "NO\n");
 }
 } // namespace

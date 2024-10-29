@@ -1,10 +1,9 @@
-#pragma once
-
-/*Problem: $(PROBLEM)*/
-/*Contest: $(CONTEST)*/
-/*Judge: $(JUDGE)*/
-/*URL: $(URL)*/
-/*Start: $(DATE)*/
+/*Problem: A - Rearranging ABC*/
+/*Contest: TOYOTA SYSTEMS Programming Contest 2024（AtCoder Beginner Contest
+ * 377)*/
+/*Judge: AtCoder*/
+/*URL: https://atcoder.jp/contests/abc377/tasks/abc377_a*/
+/*Start: Sat 26 Oct 2024 09:33:42 PM CST*/
 /*Author: ShelpAm*/
 
 // #include <bits/stdc++.h>
@@ -172,6 +171,11 @@ using i64 = std::int_fast64_t;
 using u64 = std::uint_fast64_t;
 void solve_case()
 {
-  /*return;*/
+  std::string s;
+  std::cin >> s;
+  std::cout << (std::set<char>{s.begin(), s.end()} ==
+                        std::set<char>{'A', 'B', 'C'}
+                    ? "Yes\n"
+                    : "No\n");
 }
 } // namespace

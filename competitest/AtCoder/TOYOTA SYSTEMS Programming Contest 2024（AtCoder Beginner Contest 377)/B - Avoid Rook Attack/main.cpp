@@ -1,10 +1,9 @@
-#pragma once
-
-/*Problem: $(PROBLEM)*/
-/*Contest: $(CONTEST)*/
-/*Judge: $(JUDGE)*/
-/*URL: $(URL)*/
-/*Start: $(DATE)*/
+/*Problem: B - Avoid Rook Attack*/
+/*Contest: TOYOTA SYSTEMS Programming Contest 2024（AtCoder Beginner Contest
+ * 377)*/
+/*Judge: AtCoder*/
+/*URL: https://atcoder.jp/contests/abc377/tasks/abc377_b*/
+/*Start: Sat 26 Oct 2024 09:35:25 PM CST*/
 /*Author: ShelpAm*/
 
 // #include <bits/stdc++.h>
@@ -172,6 +171,25 @@ using i64 = std::int_fast64_t;
 using u64 = std::uint_fast64_t;
 void solve_case()
 {
-  /*return;*/
+  std::vector<std::string> a(8);
+  std::cin >> a;
+
+  int const n{8};
+  int ans{};
+  for (int i{}; i != n; ++i) {
+    for (int j{}; j != n; ++j) {
+      bool ok{true};
+      for (int x{}; x != n; ++x) {
+        if (a[i][x] == '#') {
+          ok = false;
+        }
+        if (a[x][j] == '#') {
+          ok = false;
+        }
+      }
+      ans += ok;
+    }
+  }
+  std::cout << ans << '\n';
 }
 } // namespace
