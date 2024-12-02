@@ -1,10 +1,11 @@
 #pragma once
 
-/*Problem: $(PROBLEM)*/
-/*Contest: $(CONTEST)*/
-/*Judge: $(JUDGE)*/
-/*URL: $(URL)*/
-/*Start: $(DATE)*/
+/*Problem: L. Bridge Renovation*/
+/*Contest: 2024-2025 ICPC, NERC, Southern and Volga Russian Regional Contest
+ * (Unrated, Online Mirror, ICPC Rules, Preferably Teams)*/
+/*Judge: Codeforces*/
+/*URL: https://codeforces.com/contest/2038/problem/L*/
+/*Start: Mon 18 Nov 2024 10:38:13 PM CST*/
 /*Author: ShelpAm*/
 
 // #include <bits/stdc++.h>
@@ -173,6 +174,33 @@ using i64 = std::int_fast64_t;
 using u64 = std::uint_fast64_t;
 void solve_case()
 {
-    /*return;*/
+    int n;
+    std::cin >> n;
+    std::cout << binary_search(
+                     [n](auto m) {
+                         int t{n};
+                         int r{n % 2};
+                         m -= n / 2;
+                         m -= n / 2;
+                         t -= n / 2;
+
+                         m -= t / 3;
+                         t %= 3;
+
+                         if (r == 1) {
+                             if (t != 0) {
+                                 m -= 2;
+                             }
+                             else {
+                                 m -= 1;
+                             }
+                         }
+                         else if (t != 0) {
+                             m -= 1;
+                         }
+                         return m >= 0;
+                     },
+                     2000, 0)
+              << '\n';
 }
 } // namespace

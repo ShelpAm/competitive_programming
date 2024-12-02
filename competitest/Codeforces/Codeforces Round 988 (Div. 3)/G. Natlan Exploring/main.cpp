@@ -1,10 +1,10 @@
 #pragma once
 
-/*Problem: $(PROBLEM)*/
-/*Contest: $(CONTEST)*/
-/*Judge: $(JUDGE)*/
-/*URL: $(URL)*/
-/*Start: $(DATE)*/
+/*Problem: G. Natlan Exploring*/
+/*Contest: Codeforces Round 988 (Div. 3)*/
+/*Judge: Codeforces*/
+/*URL: https://codeforces.com/contest/2037/problem/G*/
+/*Start: Mon 18 Nov 2024 08:02:39 PM CST*/
 /*Author: ShelpAm*/
 
 // #include <bits/stdc++.h>
@@ -37,8 +37,8 @@
 #include <vector>
 
 namespace {
-[[maybe_unused]] constexpr std::uint_fast64_t mod998244353{998'244'353ULL};
-[[maybe_unused]] constexpr std::uint_fast64_t mod1e9p7{1'000'000'007ULL};
+[[maybe_unused]] constexpr std::int_fast64_t mod998244353{998'244'353ULL};
+[[maybe_unused]] constexpr std::int_fast64_t mod1e9p7{1'000'000'007ULL};
 [[maybe_unused]] constexpr double eps{1e-8};
 template <typename T> constexpr T inf{std::numeric_limits<T>::max() / 4};
 template <typename T> constexpr T max{std::numeric_limits<T>::max()};
@@ -171,8 +171,123 @@ auto main() -> int
 namespace {
 using i64 = std::int_fast64_t;
 using u64 = std::uint_fast64_t;
+class Sieve {
+  public:
+    Sieve(int const upper_bound) : _min_factor(upper_bound + 1, 0)
+    {
+        for (int i = 2; i != upper_bound + 1; ++i) {
+            if (_min_factor[i] == 0) {
+                _primes.push_back(i);
+                _min_factor[i] = i;
+            }
+            for (auto const p : _primes) {
+                if (i * p > upper_bound || p > _min_factor[i]) {
+                    break;
+                }
+                _min_factor[i * p] = p;
+            }
+        }
+    }
+
+    // Time complexity: O(sqrt(x))
+    [[nodiscard]] auto factorize(std::uint_fast64_t x) const
+        -> std::map<std::uint_fast64_t, std::uint_fast64_t>
+    {
+        std::map<std::uint_fast64_t, std::uint_fast64_t> res;
+        assert(x <= (_min_factor.size() - 1) * (_min_factor.size() - 1));
+        for (auto const p : _primes) {
+            if (p > x) {
+                break;
+            }
+            while (x % p == 0) {
+                x /= p;
+                ++res[p];
+            }
+        }
+        if (x >= _min_factor.size()) {
+            ++res[x];
+        }
+        return res;
+    }
+
+    [[nodiscard]] auto is_prime(int x) const -> bool
+    {
+        return _min_factor[x] == x;
+    }
+
+    [[nodiscard]] auto primes() const -> std::vector<int> const &
+    {
+        return _primes;
+    }
+
+  private:
+    std::vector<int> _primes;
+    std::vector<int> _min_factor;
+};
 void solve_case()
 {
-    /*return;*/
+    int n;
+    std::cin >> n;
+    std::vector<int> a(n);
+    std::cin >> a;
+    Sieve s(1e3);
+    std::unordered_map<int, i64> f;
+
+    std::vector<int> pf;
+    for (auto const &[k, _] : s.factorize(a[0])) {
+        f[k] = 1;
+        pf.push_back(k);
+    }
+    for (int i{1}; i != 1 << pf.size(); ++i) {
+        i64 base{1};
+        for (int j{}; j != pf.size(); ++j) {
+            if (i & 1 << j) {
+                (base *= pf[j]) %= mod998244353;
+            }
+        }
+        f[base] = 1;
+    }
+
+    std::vector<i64> g(n);
+    for (int idx{}; auto const e : a) {
+        i64 &sum{g[idx]};
+
+        // Gets prime factors.
+        std::vector<int> pf;
+        for (auto const &[k, _] : s.factorize(e)) {
+            pf.push_back(k);
+        }
+
+        // Inclusive .... principle.
+        for (unsigned i{1}; i != 1 << pf.size(); ++i) {
+            i64 base{1};
+            for (int j{}; j != pf.size(); ++j) {
+                if (i & 1 << j) {
+                    (base *= pf[j]) %= mod998244353;
+                }
+            }
+            sum += (std::popcount(i) % 2 == 1 ? 1 : -1) * f[base];
+            ((sum %= mod998244353) += mod998244353) %= mod998244353;
+        }
+
+        // Add number of path to `f`. (Updates number of path for each
+        // composition of prime factors)
+        for (unsigned i{1}; i != 1 << pf.size(); ++i) {
+            i64 base{1};
+            for (int j{}; j != pf.size(); ++j) {
+                if (i & 1 << j) {
+                    (base *= pf[j]) %= mod998244353;
+                }
+            }
+            (f[base] += sum) %= mod998244353;
+        }
+
+        ++idx;
+    }
+
+    debug("g", g);
+    std::cout << g[n - 1] * pow(2ULL, mod998244353 - 2, mod998244353) %
+                     mod998244353
+              << '\n';
 }
 } // namespace

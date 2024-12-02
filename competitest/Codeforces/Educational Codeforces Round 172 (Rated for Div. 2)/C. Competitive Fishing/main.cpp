@@ -1,10 +1,10 @@
 #pragma once
 
-/*Problem: $(PROBLEM)*/
-/*Contest: $(CONTEST)*/
-/*Judge: $(JUDGE)*/
-/*URL: $(URL)*/
-/*Start: $(DATE)*/
+/*Problem: C. Competitive Fishing*/
+/*Contest: Educational Codeforces Round 172 (Rated for Div. 2)*/
+/*Judge: Codeforces*/
+/*URL: https://codeforces.com/contest/2042/problem/C*/
+/*Start: Mon 02 Dec 2024 11:18:16 PM CST*/
 /*Author: ShelpAm*/
 
 // #include <bits/stdc++.h>
@@ -156,7 +156,7 @@ auto main() -> int
     constexpr auto my_precision{10};
     std::cout << std::fixed << std::setprecision(my_precision);
     int t{1};
-    // std::cin >> t;
+    std::cin >> t;
     for (int i{}; i != t; ++i) {
         try {
             std::cerr << "Test case " << i << '\n';
@@ -173,6 +173,34 @@ using i64 = std::int_fast64_t;
 using u64 = std::uint_fast64_t;
 void solve_case()
 {
-    /*return;*/
+    int n, k;
+    std::cin >> n >> k;
+    std::string s;
+    std::cin >> s;
+
+    std::vector<int> a(n + 1);
+    for (int i{}; i != n; ++i) {
+        a[i] = s[i] == '1' ? 1 : -1;
+    }
+    for (int i{n - 1}; i != -1; --i) {
+        a[i] += a[i + 1];
+    }
+
+    debug("a", a);
+
+    i64 sum{};
+    int cnt{};
+    std::priority_queue<int> q{a.begin() + 1, a.end()};
+    while (!q.empty() && q.top() > 0) {
+        ++cnt;
+        sum += q.top();
+        q.pop();
+        if (sum >= k) {
+            std::cout << cnt + 1 << '\n';
+            return;
+        }
+    }
+
+    std::cout << -1 << '\n';
 }
 } // namespace

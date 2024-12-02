@@ -1,10 +1,10 @@
 #pragma once
 
-/*Problem: $(PROBLEM)*/
-/*Contest: $(CONTEST)*/
-/*Judge: $(JUDGE)*/
-/*URL: $(URL)*/
-/*Start: $(DATE)*/
+/*Problem: Reinforced Problem*/
+/*Contest: unknown_contest*/
+/*Judge: NowCoder*/
+/*URL: https://ac.nowcoder.com/acm/contest/93820/I*/
+/*Start: Sat 16 Nov 2024 07:16:38 PM CST*/
 /*Author: ShelpAm*/
 
 // #include <bits/stdc++.h>
@@ -156,7 +156,7 @@ auto main() -> int
     constexpr auto my_precision{10};
     std::cout << std::fixed << std::setprecision(my_precision);
     int t{1};
-    // std::cin >> t;
+    std::cin >> t;
     for (int i{}; i != t; ++i) {
         try {
             std::cerr << "Test case " << i << '\n';
@@ -173,6 +173,11 @@ using i64 = std::int_fast64_t;
 using u64 = std::uint_fast64_t;
 void solve_case()
 {
-    /*return;*/
+    int n, m;
+    std::cin >> n >> m;
+    std::vector<int> a(n), b(n);
+    std::cin >> a >> b;
+
+    std::vector<std::vector<int>> f(n + 1, std::vector<int>(2));
 }
 } // namespace

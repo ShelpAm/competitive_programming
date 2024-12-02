@@ -1,10 +1,10 @@
 #pragma once
 
-/*Problem: $(PROBLEM)*/
-/*Contest: $(CONTEST)*/
-/*Judge: $(JUDGE)*/
-/*URL: $(URL)*/
-/*Start: $(DATE)*/
+/*Problem: E. Kachina's Favorite Binary String*/
+/*Contest: Codeforces Round 988 (Div. 3)*/
+/*Judge: Codeforces*/
+/*URL: https://codeforces.com/contest/2037/problem/E*/
+/*Start: Mon 18 Nov 2024 06:29:26 PM CST*/
 /*Author: ShelpAm*/
 
 // #include <bits/stdc++.h>
@@ -156,7 +156,7 @@ auto main() -> int
     constexpr auto my_precision{10};
     std::cout << std::fixed << std::setprecision(my_precision);
     int t{1};
-    // std::cin >> t;
+    std::cin >> t;
     for (int i{}; i != t; ++i) {
         try {
             std::cerr << "Test case " << i << '\n';
@@ -173,6 +173,37 @@ using i64 = std::int_fast64_t;
 using u64 = std::uint_fast64_t;
 void solve_case()
 {
-    /*return;*/
+    int n;
+    std::cin >> n;
+    std::vector<int> a(n);
+    for (int i{1}; i != n; ++i) {
+        std::cout << "? 1 " << i + 1 << '\n' << std::flush;
+        std::cin >> a[i];
+    }
+
+    for (int i{n - 1}; i != 0; --i) {
+        a[i] -= a[i - 1];
+    }
+
+    if (sum_of(a) == 0) {
+        std::cout << "! IMPOSSIBLE\n";
+        return;
+    }
+
+    std::vector<int> ans(n);
+    for (int i{}; i != n; ++i) {
+        ans[i] = a[i] != 0;
+    }
+    auto const p =
+        std::ranges::find_if(ans, [](auto e) { return e != 0; }) - ans.begin();
+    for (int i{}; i != p - a[p]; ++i) {
+        ans[i] = 1;
+    }
+
+    std::cout << "! ";
+    for (auto const e : ans) {
+        std::cout << e;
+    }
+    std::cout << '\n';
 }
 } // namespace

@@ -1,10 +1,10 @@
 #pragma once
 
-/*Problem: $(PROBLEM)*/
-/*Contest: $(CONTEST)*/
-/*Judge: $(JUDGE)*/
-/*URL: $(URL)*/
-/*Start: $(DATE)*/
+/*Problem: gcd 之和*/
+/*Contest: unknown_contest*/
+/*Judge: NowCoder*/
+/*URL: https://ac.nowcoder.com/acm/contest/93820/B*/
+/*Start: Sat 16 Nov 2024 08:03:01 PM CST*/
 /*Author: ShelpAm*/
 
 // #include <bits/stdc++.h>
@@ -156,7 +156,7 @@ auto main() -> int
     constexpr auto my_precision{10};
     std::cout << std::fixed << std::setprecision(my_precision);
     int t{1};
-    // std::cin >> t;
+    std::cin >> t;
     for (int i{}; i != t; ++i) {
         try {
             std::cerr << "Test case " << i << '\n';
@@ -171,8 +171,108 @@ auto main() -> int
 namespace {
 using i64 = std::int_fast64_t;
 using u64 = std::uint_fast64_t;
+namespace sparse_table {
+// Note: 0-indexed
+template <typename T, typename F> class Sparse_table {
+  public:
+    constexpr Sparse_table(std::vector<T> table)
+        : _table(msb(table.size()) + 1, std::move(table))
+    {
+        for (std::size_t i{1}; i != _table.size(); ++i) {
+            for (std::size_t j{}; j != _table[0].size(); ++j) {
+                _table[i][j] =
+                    _f(_table[i - 1][j], _table[i - 1][j + (1 << (i - 1))]);
+            }
+        }
+    }
+
+    [[nodiscard]] constexpr auto query(std::size_t l, std::size_t r) const
+        -> decltype(F{}(T{}, T{}))
+    {
+        assert(r >= l);
+        auto const k{msb(r - l + 1)};
+        return _f(_table[k][l], _table[k][r - (1 << k) + 1]);
+    }
+
+  private:
+    std::vector<std::vector<T>> _table;
+    F _f;
+};
+
+namespace details {
+template <typename T> struct Min {
+    constexpr auto operator()(T const &lhs, T const &rhs) const -> T const &
+    {
+        return std::min(lhs, rhs);
+    }
+};
+template <typename T> struct Max {
+    constexpr auto operator()(T const &lhs, T const &rhs) const -> T const &
+    {
+        return std::max(lhs, rhs);
+    }
+};
+} // namespace details
+
+template <typename T> class Min_st : public Sparse_table<T, details::Min<T>> {
+  public:
+    using Sparse_table<T, details::Min<T>>::Sparse_table;
+};
+template <typename T> Min_st(std::vector<T>) -> Min_st<T>;
+template <typename T> class Max_st : public Sparse_table<T, details::Max<T>> {
+  public:
+    using Sparse_table<T, details::Max<T>>::Sparse_table;
+};
+template <typename T> Max_st(std::vector<T>) -> Max_st<T>;
+} // namespace sparse_table
+struct Gcd {
+    auto operator()(auto const &a, auto const &b) const
+    {
+        return std::gcd(a, b);
+    }
+};
+struct Bit_or {
+    auto operator()(int i, int j) const
+    {
+        return i | j;
+    }
+};
 void solve_case()
 {
-    /*return;*/
+    int n;
+    std::cin >> n;
+    std::vector<int> a(n);
+    std::cin >> a;
+    sparse_table::Sparse_table<int, Gcd> st{a};
+    sparse_table::Sparse_table<int, Bit_or> bit_or{a};
+
+    __int128_t ans{};
+    for (int i{}; i != n; ++i) {
+        // Find right most whose gcd and bit-wise or is the same as [i,i].
+        auto d{a[i]};
+        auto bo{a[i]};
+        for (int j{i}; j != n;) {
+            d = std::gcd(d, a[j]);
+            bo |= a[j];
+            auto const nj{binary_search(
+                [&](auto nj) {
+                    return st.query(i, nj) == d && bit_or.query(i, nj) == bo;
+                },
+                j, n)};
+            ans += static_cast<__int128_t>(d) * bo * (nj - j + 1);
+            j = nj + 1;
+        }
+    }
+
+    std::vector<int> t;
+    while (ans != 0) {
+        t.push_back(ans % 10);
+        ans /= 10;
+    }
+    std::ranges::reverse(t);
+    for (auto e : t) {
+        std::cout << e;
+    }
+    std::cout << '\n';
 }
 } // namespace

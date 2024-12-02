@@ -1,10 +1,10 @@
 #pragma once
 
-/*Problem: $(PROBLEM)*/
-/*Contest: $(CONTEST)*/
-/*Judge: $(JUDGE)*/
-/*URL: $(URL)*/
-/*Start: $(DATE)*/
+/*Problem: 蛇形矩阵*/
+/*Contest: unknown_contest*/
+/*Judge: NowCoder*/
+/*URL: https://ac.nowcoder.com/acm/contest/96457/D*/
+/*Start: Sat 16 Nov 2024 11:00:17 AM CST*/
 /*Author: ShelpAm*/
 
 // #include <bits/stdc++.h>
@@ -173,6 +173,28 @@ using i64 = std::int_fast64_t;
 using u64 = std::uint_fast64_t;
 void solve_case()
 {
-    /*return;*/
+    int n;
+    std::cin >> n;
+
+    std::vector<std::vector<int>> a(n, std::vector<int>(n));
+    std::vector<std::vector<int>> b(2 * n - 1);
+    int t{};
+    for (int i{}; i != 2 * n - 1; ++i) {
+        auto const cnt{n - std::abs(n - i - 1)};
+        for (int j{}; j != cnt; ++j) {
+            b[i].push_back(++t);
+        }
+        if (i % 2 == 1) {
+            std::ranges::reverse(b[i]);
+        }
+    }
+
+    for (int i{}; i != n; ++i) {
+        for (int j{}; j != n; ++j) {
+            std::cout << b[i + j].back() << ' ';
+            b[i + j].pop_back();
+        }
+        std::cout << '\n';
+    }
 }
 } // namespace

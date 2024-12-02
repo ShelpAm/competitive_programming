@@ -1,10 +1,10 @@
 #pragma once
 
-/*Problem: $(PROBLEM)*/
-/*Contest: $(CONTEST)*/
-/*Judge: $(JUDGE)*/
-/*URL: $(URL)*/
-/*Start: $(DATE)*/
+/*Problem: U494597 Yulian的救赎*/
+/*Contest: unknown_contest*/
+/*Judge: Luogu*/
+/*URL: https://www.luogu.com.cn/problem/U494597?contestId=216153*/
+/*Start: Tue 26 Nov 2024 07:33:32 PM CST*/
 /*Author: ShelpAm*/
 
 // #include <bits/stdc++.h>
@@ -156,7 +156,7 @@ auto main() -> int
     constexpr auto my_precision{10};
     std::cout << std::fixed << std::setprecision(my_precision);
     int t{1};
-    // std::cin >> t;
+    std::cin >> t;
     for (int i{}; i != t; ++i) {
         try {
             std::cerr << "Test case " << i << '\n';
@@ -173,6 +173,17 @@ using i64 = std::int_fast64_t;
 using u64 = std::uint_fast64_t;
 void solve_case()
 {
-    /*return;*/
+    int n;
+    std::cin >> n;
+    std::string s;
+    std::cin >> s;
+    if (n % 2 == 0) {
+        std::cout << (s.front() == '1' || s.back() == '1' ? "YES" : "NO")
+                  << '\n';
+    }
+    else {
+        std::cout << ((s.front() == '1' && s.back() == '1') ? "YES" : "NO")
+                  << '\n';
+    }
 }
 } // namespace

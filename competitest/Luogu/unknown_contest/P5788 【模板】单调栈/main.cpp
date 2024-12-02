@@ -1,10 +1,10 @@
 #pragma once
 
-/*Problem: $(PROBLEM)*/
-/*Contest: $(CONTEST)*/
-/*Judge: $(JUDGE)*/
-/*URL: $(URL)*/
-/*Start: $(DATE)*/
+/*Problem: P5788 【模板】单调栈*/
+/*Contest: unknown_contest*/
+/*Judge: Luogu*/
+/*URL: https://www.luogu.com.cn/problem/P5788*/
+/*Start: Sun 24 Nov 2024 02:52:25 PM CST*/
 /*Author: ShelpAm*/
 
 // #include <bits/stdc++.h>
@@ -173,6 +173,22 @@ using i64 = std::int_fast64_t;
 using u64 = std::uint_fast64_t;
 void solve_case()
 {
-    /*return;*/
+    int n;
+    std::cin >> n;
+    std::vector<int> a(n);
+    std::cin >> a;
+
+    std::vector<int> ans(n, -1);
+    std::stack<int> s;
+    for (int i{}; i != n; ++i) {
+        while (!s.empty() && a[s.top()] < a[i]) {
+            ans[s.top()] = i;
+            s.pop();
+        }
+        s.push(i);
+    }
+    for (auto e : ans) {
+        std::cout << e + 1 << ' ';
+    }
 }
 } // namespace

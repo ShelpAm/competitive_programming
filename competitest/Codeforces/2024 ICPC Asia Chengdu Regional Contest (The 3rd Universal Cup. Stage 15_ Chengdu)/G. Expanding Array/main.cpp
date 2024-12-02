@@ -1,10 +1,11 @@
 #pragma once
 
-/*Problem: $(PROBLEM)*/
-/*Contest: $(CONTEST)*/
-/*Judge: $(JUDGE)*/
-/*URL: $(URL)*/
-/*Start: $(DATE)*/
+/*Problem: G. Expanding Array*/
+/*Contest: 2024 ICPC Asia Chengdu Regional Contest (The 3rd Universal Cup. Stage
+ * 15: Chengdu)*/
+/*Judge: Codeforces*/
+/*URL: https://codeforces.com/gym/105486/problem/G*/
+/*Start: Wed 13 Nov 2024 07:58:28 PM CST*/
 /*Author: ShelpAm*/
 
 // #include <bits/stdc++.h>
@@ -173,6 +174,22 @@ using i64 = std::int_fast64_t;
 using u64 = std::uint_fast64_t;
 void solve_case()
 {
-    /*return;*/
+    int n;
+    std::cin >> n;
+    std::vector<u64> a(n);
+    std::cin >> a;
+
+    std::unordered_set<u64> s{0};
+    for (auto t : a | std::views::slide(2)) {
+        s.insert(t[0]);
+        s.insert(t[0] & t[1]);
+        s.insert(t[0] | t[1]);
+        s.insert(t[0] ^ t[1]);
+        auto const inter{t[0] & t[1]};
+        s.insert(inter ^ t[0]);
+        s.insert(inter ^ t[1]);
+        s.insert(t[1]);
+    }
+    std::cout << s.size() << '\n';
 }
 } // namespace

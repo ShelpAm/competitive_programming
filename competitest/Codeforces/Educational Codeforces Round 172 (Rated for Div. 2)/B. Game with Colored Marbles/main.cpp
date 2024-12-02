@@ -1,10 +1,10 @@
 #pragma once
 
-/*Problem: $(PROBLEM)*/
-/*Contest: $(CONTEST)*/
-/*Judge: $(JUDGE)*/
-/*URL: $(URL)*/
-/*Start: $(DATE)*/
+/*Problem: B. Game with Colored Marbles*/
+/*Contest: Educational Codeforces Round 172 (Rated for Div. 2)*/
+/*Judge: Codeforces*/
+/*URL: https://codeforces.com/contest/2042/problem/B*/
+/*Start: Mon 02 Dec 2024 11:06:54 PM CST*/
 /*Author: ShelpAm*/
 
 // #include <bits/stdc++.h>
@@ -156,7 +156,7 @@ auto main() -> int
     constexpr auto my_precision{10};
     std::cout << std::fixed << std::setprecision(my_precision);
     int t{1};
-    // std::cin >> t;
+    std::cin >> t;
     for (int i{}; i != t; ++i) {
         try {
             std::cerr << "Test case " << i << '\n';
@@ -173,6 +173,26 @@ using i64 = std::int_fast64_t;
 using u64 = std::uint_fast64_t;
 void solve_case()
 {
-    /*return;*/
+    int n;
+    std::cin >> n;
+    std::vector<int> a(n);
+    std::cin >> a;
+
+    std::unordered_map<int, int> o;
+    for (auto const e : a) {
+        ++o[e];
+    }
+
+    std::array<int, 1001> k{};
+    for (auto const &[_, cnt] : o) {
+        ++k[cnt];
+    }
+
+    int ans{};
+    ans += (k[1] + 1) / 2 * 2;
+    for (int i{2}; i != k.size(); ++i) {
+        ans += k[i];
+    }
+    std::cout << ans << '\n';
 }
 } // namespace

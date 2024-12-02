@@ -1,10 +1,10 @@
 #pragma once
 
-/*Problem: $(PROBLEM)*/
-/*Contest: $(CONTEST)*/
-/*Judge: $(JUDGE)*/
-/*URL: $(URL)*/
-/*Start: $(DATE)*/
+/*Problem: A. Box*/
+/*Contest: acs23级个人训练赛7*/
+/*Judge: Codeforces*/
+/*URL: https://codeforces.com/gym/564193/problem/A*/
+/*Start: Tue 05 Nov 2024 01:33:02 PM CST*/
 /*Author: ShelpAm*/
 
 // #include <bits/stdc++.h>
@@ -171,8 +171,36 @@ auto main() -> int
 namespace {
 using i64 = std::int_fast64_t;
 using u64 = std::uint_fast64_t;
+auto between(int x, int l, int r) -> bool
+{
+    return x >= l && x <= r;
+}
 void solve_case()
 {
-    /*return;*/
+    int z0, z1, u0, v0, u1, v1;
+    std::cin >> z0 >> z1 >> u0 >> v0 >> u1 >> v1;
+    z1 += z0;
+    // std::tie(u0, u1) = std::minmax(u0, u1);
+    // std::tie(v0, v1) = std::minmax(v0, v1);
+    // assert(u0 <= u1);
+    // assert(v0 <= v1);
+    if (u0 > u1) {
+        std::swap(u0, u1);
+    }
+    if (v0 > v1) {
+        std::swap(v0, v1);
+    }
+
+    int q;
+    std::cin >> q;
+    for (int i{}; i != q; ++i) {
+        int x, y, z;
+        std::cin >> x >> y >> z;
+        std::cout << (between(x, u0, u1) && between(y, v0, v1) &&
+                              between(z, z0, z1)
+                          ? "YES"
+                          : "NO")
+                  << '\n';
+    }
 }
 } // namespace

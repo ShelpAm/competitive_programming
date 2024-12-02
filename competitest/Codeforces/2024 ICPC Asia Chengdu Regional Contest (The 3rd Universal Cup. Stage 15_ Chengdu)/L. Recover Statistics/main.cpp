@@ -1,10 +1,11 @@
 #pragma once
 
-/*Problem: $(PROBLEM)*/
-/*Contest: $(CONTEST)*/
-/*Judge: $(JUDGE)*/
-/*URL: $(URL)*/
-/*Start: $(DATE)*/
+/*Problem: L. Recover Statistics*/
+/*Contest: 2024 ICPC Asia Chengdu Regional Contest (The 3rd Universal Cup. Stage
+ * 15: Chengdu)*/
+/*Judge: Codeforces*/
+/*URL: https://codeforces.com/gym/105486/problem/L*/
+/*Start: Wed 13 Nov 2024 07:17:55 PM CST*/
 /*Author: ShelpAm*/
 
 // #include <bits/stdc++.h>
@@ -173,6 +174,18 @@ using i64 = std::int_fast64_t;
 using u64 = std::uint_fast64_t;
 void solve_case()
 {
-    /*return;*/
+    int a, b, c;
+    std::cin >> a >> b >> c;
+    std::cout << 100 << '\n';
+    for (int i{}; i != 50; ++i) {
+        std::cout << a << ' ';
+    }
+    for (int i{}; i != 45; ++i) {
+        std::cout << b << ' ';
+    }
+    for (int i{}; i != 4; ++i) {
+        std::cout << c << ' ';
+    }
+    std::cout << c + 1 << '\n';
 }
 } // namespace

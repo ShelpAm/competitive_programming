@@ -1,10 +1,10 @@
 #pragma once
 
-/*Problem: $(PROBLEM)*/
-/*Contest: $(CONTEST)*/
-/*Judge: $(JUDGE)*/
-/*URL: $(URL)*/
-/*Start: $(DATE)*/
+/*Problem: 小心火烛的歪*/
+/*Contest: unknown_contest*/
+/*Judge: NowCoder*/
+/*URL: https://ac.nowcoder.com/acm/contest/96115/D*/
+/*Start: Sun 24 Nov 2024 09:02:01 PM CST*/
 /*Author: ShelpAm*/
 
 // #include <bits/stdc++.h>
@@ -173,6 +173,60 @@ using i64 = std::int_fast64_t;
 using u64 = std::uint_fast64_t;
 void solve_case()
 {
-    /*return;*/
+    int n, m, q;
+    std::cin >> n >> m >> q;
+    std::vector<std::string> a(n);
+    std::cin >> a;
+
+    auto compress{[](auto const &a) {
+        u64 bits{};
+        for (auto const &b : a) {
+            for (auto e : b) {
+                bits <<= 1;
+                bits |= e - '0';
+            }
+        }
+        return bits;
+    }};
+
+    auto const ca{compress(a)};
+    std::vector<u64> fireworks(q);
+    for (int i{}; i != q; ++i) {
+        std::vector<std::string> p(n);
+        std::cin >> p;
+        fireworks[i] = compress(p);
+    }
+
+    std::cerr << std::bitset<47>{ca} << '\n';
+    for (auto e : fireworks) {
+        std::cerr << std::bitset<47>{e} << '\n';
+    }
+
+    std::vector<int> ans(10);
+    for (int i{}; i != 1 << q; ++i) {
+        u64 res{};
+        std::vector<int> cur;
+        for (int j{}; j != q; ++j) {
+            if (i & 1 << j) {
+                cur.push_back(j);
+                res |= fireworks[j];
+            }
+        }
+        if ((res ^ ca) == ((1ULL << (n * m)) - 1)) {
+            if (cur.size() < ans.size()) {
+                ans = cur;
+            }
+        }
+    }
+
+    if (ans.size() == 10) {
+        std::cout << -1 << '\n';
+    }
+    else {
+        std::cout << ans.size() << '\n';
+        for (auto e : ans) {
+            std::cout << e + 1 << ' ';
+        }
+    }
 }
 } // namespace

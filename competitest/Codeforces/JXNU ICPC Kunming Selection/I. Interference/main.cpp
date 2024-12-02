@@ -1,10 +1,10 @@
 #pragma once
 
-/*Problem: $(PROBLEM)*/
-/*Contest: $(CONTEST)*/
-/*Judge: $(JUDGE)*/
-/*URL: $(URL)*/
-/*Start: $(DATE)*/
+/*Problem: I. Interference*/
+/*Contest: JXNU ICPC Kunming Selection*/
+/*Judge: Codeforces*/
+/*URL: https://codeforces.com/gym/563673/problem/I*/
+/*Start: Mon 04 Nov 2024 06:13:57 PM CST*/
 /*Author: ShelpAm*/
 
 // #include <bits/stdc++.h>
@@ -171,8 +171,101 @@ auto main() -> int
 namespace {
 using i64 = std::int_fast64_t;
 using u64 = std::uint_fast64_t;
+class Fenwick_tree {
+  public:
+    // _tree[1..size] is available
+    explicit Fenwick_tree(int size) : _tree(size + 1) {}
+
+    // The input array should start from the index 1.
+    explicit Fenwick_tree(std::vector<std::int_fast64_t> coll)
+        : _tree{std::move(coll)}
+    {
+        for (int i = 1; i != _tree.size(); ++i) {
+            if (auto const parent_index = i + lsb(i);
+                parent_index < _tree.size()) {
+                _tree[parent_index] += _tree[i];
+            }
+        }
+    }
+
+    [[nodiscard]] auto sum(int l, int r) const -> std::int_fast64_t
+    {
+        assert(l > 0);
+        assert(l <= r);
+        assert(r < _tree.size());
+        return prefix_sum(r) - prefix_sum(l - 1);
+    }
+
+    [[nodiscard]] auto prefix_sum(int index) const -> std::int_fast64_t
+    {
+        std::int_fast64_t sum{};
+        while (index > 0) {
+            sum += _tree[index];
+            index -= lsb(index);
+        }
+        return sum;
+    }
+
+    void add_to(int index, std::int_fast64_t delta)
+    {
+        auto n{static_cast<int>(_tree.size())};
+        while (index < n) {
+            _tree[index] += delta;
+            index += lsb(index);
+        }
+    }
+
+  private:
+    std::vector<std::int_fast64_t> _tree;
+};
 void solve_case()
 {
-    /*return;*/
+    int n, w;
+    std::cin >> n >> w;
+    std::vector<std::array<int, 4>> queries(n);
+
+    std::set<int> pts;
+    std::map<int, int> o;
+
+    for (auto &[op, p, l, a] : queries) {
+        char ch;
+        std::cin >> ch;
+        op = ch;
+        if (op == '!') {
+            std::cin >> p >> l >> a;
+        }
+        else {
+            std::cin >> p;
+            pts.insert(p);
+        }
+    }
+
+    int idx{1};
+    for (auto const &e : pts) {
+        o[e] = idx;
+        ++idx;
+    }
+    o[max<int>] = idx;
+
+    std::vector<Fenwick_tree> ft;
+    for (int i{}; i != 4; ++i) {
+        ft.push_back(Fenwick_tree(o.size() + 2));
+    }
+
+    std::vector<int> const sign{1, 0, -1, 0};
+
+    for (auto const &[op, p, l, a] : queries) {
+        if (op == '!') {
+            for (int i{}; i != 4; ++i) {
+                auto const left{o.lower_bound(p)->second};
+                auto const right{o.lower_bound(p + l)->second};
+                ft[(p + i) % 4].add_to(left, a * sign[i]);
+                ft[(p + i) % 4].add_to(right, -a * sign[i]);
+            }
+        }
+        else {
+            std::cout << ft[p % 4].prefix_sum(o.at(p)) << '\n';
+        }
+    }
 }
 } // namespace

@@ -1,10 +1,10 @@
 #pragma once
 
-/*Problem: $(PROBLEM)*/
-/*Contest: $(CONTEST)*/
-/*Judge: $(JUDGE)*/
-/*URL: $(URL)*/
-/*Start: $(DATE)*/
+/*Problem: 小苯的优雅好序列*/
+/*Contest: unknown_contest*/
+/*Judge: NowCoder*/
+/*URL: https://ac.nowcoder.com/acm/contest/97017/F*/
+/*Start: Sun 01 Dec 2024 09:32:14 PM CST*/
 /*Author: ShelpAm*/
 
 // #include <bits/stdc++.h>
@@ -156,7 +156,7 @@ auto main() -> int
     constexpr auto my_precision{10};
     std::cout << std::fixed << std::setprecision(my_precision);
     int t{1};
-    // std::cin >> t;
+    std::cin >> t;
     for (int i{}; i != t; ++i) {
         try {
             std::cerr << "Test case " << i << '\n';
@@ -173,6 +173,44 @@ using i64 = std::int_fast64_t;
 using u64 = std::uint_fast64_t;
 void solve_case()
 {
-    /*return;*/
+    int n, k;
+    std::cin >> n >> k;
+    std::vector<int> a(n);
+    std::cin >> a;
+
+    {
+        std::set<int> tmp{a.begin(), a.end()};
+        a = {tmp.begin(), tmp.end()};
+    }
+
+    if (a.size() == 1) {
+        std::cout << k << ' ' << static_cast<i64>(1 + k) * k / 2 << '\n';
+        return;
+    }
+
+    int d{};
+    for (int i{}; i != a.size() - 1; ++i) {
+        d = std::gcd(d, a[i + 1] - a[i]);
+    }
+
+    std::set<int> s;
+    for (int i{1}; i * i <= d; ++i) {
+        if (d % i == 0) {
+            s.insert(i);
+            s.insert(d / i);
+        }
+    }
+
+    debug("s", s);
+
+    auto const min{a[0]};
+    std::vector<int> ans;
+    for (auto const x_plus_min : s) {
+        if (1 <= x_plus_min - min && x_plus_min - min <= k &&
+            d % x_plus_min == 0) {
+            ans.push_back(x_plus_min - min);
+        }
+    }
+    std::cout << ans.size() << ' ' << sum_of(ans) << '\n';
 }
 } // namespace

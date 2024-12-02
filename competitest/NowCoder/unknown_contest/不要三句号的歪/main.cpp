@@ -1,10 +1,10 @@
 #pragma once
 
-/*Problem: $(PROBLEM)*/
-/*Contest: $(CONTEST)*/
-/*Judge: $(JUDGE)*/
-/*URL: $(URL)*/
-/*Start: $(DATE)*/
+/*Problem: 不要三句号的歪*/
+/*Contest: unknown_contest*/
+/*Judge: NowCoder*/
+/*URL: https://ac.nowcoder.com/acm/contest/96115/B*/
+/*Start: Sun 24 Nov 2024 08:12:06 PM CST*/
 /*Author: ShelpAm*/
 
 // #include <bits/stdc++.h>
@@ -173,6 +173,17 @@ using i64 = std::int_fast64_t;
 using u64 = std::uint_fast64_t;
 void solve_case()
 {
-    /*return;*/
+    std::string s;
+    std::cin >> s;
+    std::vector<int> p;
+    for (int i{}; auto e : s) {
+        if (e == ',') {
+            p.push_back(i);
+        }
+        ++i;
+    }
+    std::cout << std::stoull(s.substr(p[2] + 1)) -
+                     std::stoull(s.substr(p[0] + 1, p[1] - p[0] - 1)) - 1
+              << '\n';
 }
 } // namespace

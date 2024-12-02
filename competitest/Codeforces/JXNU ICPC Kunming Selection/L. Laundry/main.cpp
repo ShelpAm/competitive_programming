@@ -1,10 +1,10 @@
 #pragma once
 
-/*Problem: $(PROBLEM)*/
-/*Contest: $(CONTEST)*/
-/*Judge: $(JUDGE)*/
-/*URL: $(URL)*/
-/*Start: $(DATE)*/
+/*Problem: L. Laundry*/
+/*Contest: JXNU ICPC Kunming Selection*/
+/*Judge: Codeforces*/
+/*URL: https://codeforces.com/gym/563673/problem/L*/
+/*Start: Mon 04 Nov 2024 07:18:49 PM CST*/
 /*Author: ShelpAm*/
 
 // #include <bits/stdc++.h>
@@ -173,6 +173,9 @@ using i64 = std::int_fast64_t;
 using u64 = std::uint_fast64_t;
 void solve_case()
 {
-    /*return;*/
+    int k;
+    std::cin >> k;
+    std::vector<int> a(7);
+    std::cin >> a;
 }
 } // namespace

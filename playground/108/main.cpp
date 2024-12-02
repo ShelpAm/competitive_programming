@@ -171,8 +171,5 @@ auto main() -> int
 namespace {
 using i64 = std::int_fast64_t;
 using u64 = std::uint_fast64_t;
-void solve_case()
-{
-    /*return;*/
-}
+void solve_case() {}
 } // namespace

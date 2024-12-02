@@ -1,10 +1,11 @@
 #pragma once
 
-/*Problem: $(PROBLEM)*/
-/*Contest: $(CONTEST)*/
-/*Judge: $(JUDGE)*/
-/*URL: $(URL)*/
-/*Start: $(DATE)*/
+/*Problem: N. Fixing the Expression*/
+/*Contest: 2024-2025 ICPC, NERC, Southern and Volga Russian Regional Contest
+ * (Unrated, Online Mirror, ICPC Rules, Preferably Teams)*/
+/*Judge: Codeforces*/
+/*URL: https://codeforces.com/contest/2038/problem/N*/
+/*Start: Tue 19 Nov 2024 11:14:37 PM CST*/
 /*Author: ShelpAm*/
 
 // #include <bits/stdc++.h>
@@ -24,6 +25,7 @@
 #include <map>
 #include <numbers>
 #include <numeric>
+#include <print>
 #include <queue>
 #include <random>
 #include <ranges>
@@ -156,7 +158,7 @@ auto main() -> int
     constexpr auto my_precision{10};
     std::cout << std::fixed << std::setprecision(my_precision);
     int t{1};
-    // std::cin >> t;
+    std::cin >> t;
     for (int i{}; i != t; ++i) {
         try {
             std::cerr << "Test case " << i << '\n';
@@ -173,6 +175,17 @@ using i64 = std::int_fast64_t;
 using u64 = std::uint_fast64_t;
 void solve_case()
 {
-    /*return;*/
+    std::string s;
+    std::cin >> s;
+    if (s[0] < s[2]) {
+        s[1] = '<';
+    }
+    else if (s[0] > s[2]) {
+        s[1] = '>';
+    }
+    else {
+        s[1] = '=';
+    }
+    std::println("{}", s);
 }
 } // namespace

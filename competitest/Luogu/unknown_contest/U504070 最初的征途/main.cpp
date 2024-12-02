@@ -1,10 +1,10 @@
 #pragma once
 
-/*Problem: $(PROBLEM)*/
-/*Contest: $(CONTEST)*/
-/*Judge: $(JUDGE)*/
-/*URL: $(URL)*/
-/*Start: $(DATE)*/
+/*Problem: U504070 最初的征途*/
+/*Contest: unknown_contest*/
+/*Judge: Luogu*/
+/*URL: https://www.luogu.com.cn/problem/U504070?contestId=216153*/
+/*Start: Tue 26 Nov 2024 07:26:58 PM CST*/
 /*Author: ShelpAm*/
 
 // #include <bits/stdc++.h>

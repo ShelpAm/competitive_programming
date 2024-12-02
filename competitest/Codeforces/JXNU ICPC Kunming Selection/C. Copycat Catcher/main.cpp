@@ -1,10 +1,10 @@
 #pragma once
 
-/*Problem: $(PROBLEM)*/
-/*Contest: $(CONTEST)*/
-/*Judge: $(JUDGE)*/
-/*URL: $(URL)*/
-/*Start: $(DATE)*/
+/*Problem: C. Copycat Catcher*/
+/*Contest: JXNU ICPC Kunming Selection*/
+/*Judge: Codeforces*/
+/*URL: https://codeforces.com/gym/563673/problem/C*/
+/*Start: Mon 04 Nov 2024 07:28:36 PM CST*/
 /*Author: ShelpAm*/
 
 // #include <bits/stdc++.h>
@@ -171,8 +171,109 @@ auto main() -> int
 namespace {
 using i64 = std::int_fast64_t;
 using u64 = std::uint_fast64_t;
+// note: zero-indexed
+template <std::size_t Base> class Hash {
+  public:
+    template <typename R>
+    constexpr Hash(R const &range)
+        : _hash_value(range.size() + 1), _pow_base(range.size() + 1)
+    {
+        for (std::size_t i{1}; i != _hash_value.size(); ++i) {
+            _hash_value[i] = _hash_value[i - 1] * Base + range[i - 1];
+        }
+
+        _pow_base[0] = 1;
+        for (std::size_t i{1}; i != _pow_base.size(); ++i) {
+            _pow_base[i] = _pow_base[i - 1] * Base;
+        }
+    }
+
+    [[nodiscard]] auto query(std::size_t l, std::size_t r) const -> std::size_t
+    {
+        return _hash_value[r + 1] - (_hash_value[l] * _pow_base[r - l + 1]);
+    }
+
+  private:
+    std::vector<std::size_t> _hash_value;
+    std::vector<std::size_t> _pow_base;
+};
 void solve_case()
 {
-    /*return;*/
+    int n;
+    std::cin >> n;
+    std::vector<std::string> tokens(n);
+    std::cin >> tokens;
+
+    constexpr std::size_t base{131};
+
+    auto get_hash{[&](std::vector<std::string> const &tokens) {
+        std::vector<u64> h(tokens.size());
+        std::unordered_map<char, Hash<base>> pos_hash;
+        std::unordered_map<char, std::vector<int>> pos_onehot;
+        for (int i{}; i != tokens.size(); ++i) {
+            h[i] = tokens[i].size() == 1 && std::isalpha(tokens[i][0])
+                       ? 0
+                       : Hash<base>{tokens[i]}.query(0, tokens[i].size() - 1);
+        }
+        //
+        // for (auto const &e : tokens) {
+        //     std::cerr << e << ' ';
+        // }
+        // std::cerr << '\n';
+        // debug("h", h);
+
+        for (char c = 0; c != 127; ++c) {
+            if (std::isalpha(c)) {
+                pos_onehot[c].assign(tokens.size(), 0);
+                for (int idx{}; auto const &token : tokens) {
+                    if (token.size() == 1 && c == token[0]) {
+                        pos_onehot[c][idx] = 1;
+                    }
+                    ++idx;
+                }
+                pos_hash.insert({c, Hash<131>{pos_onehot[c]}});
+            }
+        }
+
+        Hash<base> hash{h};
+        return std::pair{hash, pos_hash};
+    }};
+
+    auto const [hash, pos_hash]{get_hash(tokens)};
+
+    int q;
+    std::cin >> q;
+    for (int i{}; i != q; ++i) {
+        int m;
+        std::cin >> m;
+        std::vector<std::string> line(m);
+        std::cin >> line;
+        auto const [ds, onehot]{get_hash(line)};
+
+        auto const hashvalue{ds.query(0, m - 1)};
+        std::vector<u64> onehot_hash;
+        for (auto const &[_, v] : onehot) {
+            onehot_hash.push_back(v.query(0, m - 1));
+        }
+        std::ranges::sort(onehot_hash);
+
+        auto solve{[&]() {
+            for (int i{}; i + m - 1 != n; ++i) {
+                if (hashvalue == hash.query(i, i + m - 1)) {
+                    std::vector<u64> f;
+                    for (auto const &[_, v] : pos_hash) {
+                        f.push_back(v.query(i, i + m - 1));
+                    }
+                    std::ranges::sort(f);
+                    if (f == onehot_hash) {
+                        std::cout << "yes\n";
+                        return;
+                    }
+                }
+            }
+            std::cout << "no\n";
+        }};
+        solve();
+    }
 }
 } // namespace

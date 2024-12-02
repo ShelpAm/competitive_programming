@@ -1,10 +1,10 @@
 #pragma once
 
-/*Problem: $(PROBLEM)*/
-/*Contest: $(CONTEST)*/
-/*Judge: $(JUDGE)*/
-/*URL: $(URL)*/
-/*Start: $(DATE)*/
+/*Problem: M. Musical Mending*/
+/*Contest: JXNU ICPC Kunming Selection*/
+/*Judge: Codeforces*/
+/*URL: https://codeforces.com/gym/563673/problem/M*/
+/*Start: Mon 04 Nov 2024 05:37:12 PM CST*/
 /*Author: ShelpAm*/
 
 // #include <bits/stdc++.h>
@@ -173,6 +173,35 @@ using i64 = std::int_fast64_t;
 using u64 = std::uint_fast64_t;
 void solve_case()
 {
-    /*return;*/
+    int n;
+    std::cin >> n;
+    std::vector<i64> a(n);
+    std::cin >> a;
+
+    auto f{[&](auto a0) {
+        i64 res{};
+        for (int i{}; i != n; ++i) {
+            res += std::abs(a[i] - (a0 + i));
+        }
+        return res;
+    }};
+
+    int lo{-4000010}, hi{4000010};
+    while (lo <= hi) {
+        auto const l{lo + (hi - lo) / 3};
+        auto const r{hi - (hi - lo) / 3};
+        if (f(l) <= f(r)) {
+            hi = r - 1;
+        }
+        else {
+            lo = l + 1;
+        }
+        // debug("lo hi", std::pair{lo, hi});
+    }
+    // i64 ans{inf<i64>};
+    // for (int i{-2}; i != 3; ++i) {
+    //     chmin(ans, f(lo + i));
+    // }
+    std::cout << std::min(f(lo), f(hi)) << '\n';
 }
 } // namespace

@@ -1,10 +1,10 @@
 #pragma once
 
-/*Problem: $(PROBLEM)*/
-/*Contest: $(CONTEST)*/
-/*Judge: $(JUDGE)*/
-/*URL: $(URL)*/
-/*Start: $(DATE)*/
+/*Problem: 乖乖起飞！*/
+/*Contest: unknown_contest*/
+/*Judge: NowCoder*/
+/*URL: https://ac.nowcoder.com/acm/contest/93820/H*/
+/*Start: Sat 16 Nov 2024 07:10:29 PM CST*/
 /*Author: ShelpAm*/
 
 // #include <bits/stdc++.h>
@@ -156,7 +156,7 @@ auto main() -> int
     constexpr auto my_precision{10};
     std::cout << std::fixed << std::setprecision(my_precision);
     int t{1};
-    // std::cin >> t;
+    std::cin >> t;
     for (int i{}; i != t; ++i) {
         try {
             std::cerr << "Test case " << i << '\n';
@@ -173,6 +173,27 @@ using i64 = std::int_fast64_t;
 using u64 = std::uint_fast64_t;
 void solve_case()
 {
-    /*return;*/
+    int n;
+    std::cin >> n;
+    std::vector<int> a(n);
+    std::cin >> a;
+
+    std::vector<int> d(n, inf<int>);
+    std::queue<int> q;
+    q.push(0);
+    d[0] = 0;
+    while (!q.empty()) {
+        auto const u{q.front()};
+        q.pop();
+
+        for (auto v : {-1, 1, a[u], -a[u]}) {
+            v += u;
+            if (v >= 0 && v < n && chmin(d[v], d[u] + 1)) {
+                q.push(v);
+            }
+        }
+    }
+
+    std::cout << d[n - 1] << '\n';
 }
 } // namespace

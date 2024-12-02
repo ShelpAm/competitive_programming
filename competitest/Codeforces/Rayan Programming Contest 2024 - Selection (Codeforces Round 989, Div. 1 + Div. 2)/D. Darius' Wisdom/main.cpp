@@ -1,10 +1,11 @@
 #pragma once
 
-/*Problem: $(PROBLEM)*/
-/*Contest: $(CONTEST)*/
-/*Judge: $(JUDGE)*/
-/*URL: $(URL)*/
-/*Start: $(DATE)*/
+/*Problem: D. Darius' Wisdom*/
+/*Contest: Rayan Programming Contest 2024 - Selection (Codeforces Round 989,
+ * Div. 1 + Div. 2)*/
+/*Judge: Codeforces*/
+/*URL: https://codeforces.com/contest/2034/problem/D*/
+/*Start: Mon 02 Dec 2024 08:58:09 PM CST*/
 /*Author: ShelpAm*/
 
 // #include <bits/stdc++.h>
@@ -156,7 +157,7 @@ auto main() -> int
     constexpr auto my_precision{10};
     std::cout << std::fixed << std::setprecision(my_precision);
     int t{1};
-    // std::cin >> t;
+    std::cin >> t;
     for (int i{}; i != t; ++i) {
         try {
             std::cerr << "Test case " << i << '\n';
@@ -173,6 +174,48 @@ using i64 = std::int_fast64_t;
 using u64 = std::uint_fast64_t;
 void solve_case()
 {
-    /*return;*/
+    int n;
+    std::cin >> n;
+    std::vector<int> a(n);
+    std::cin >> a;
+
+    std::vector<std::pair<int, int>> ans;
+    auto put{[&](int dst, int src) {
+        ++a[dst];
+        --a[src];
+        ans.push_back({dst, src});
+    }};
+
+    // Moves all 1's to the right
+    for (int i{}, j{n - 1}; i < j; ++i) {
+        while (j != -1 && a[j] != 0) {
+            --j;
+        }
+        if (i < j && a[i] == 1) {
+            put(j, i);
+        }
+    }
+
+    // Move 2 to right
+    // j - first 1 in right, k first 0 in right
+    for (int i{}, j{n - 1}, k{n - 1}; i < j; ++i) {
+        while (j != -1 && a[j] != 1) {
+            --j;
+        }
+        while (k != -1 && a[k] != 0) {
+            --k;
+        }
+        if (i < j && a[i] == 2) {
+            put(j, i);
+            if (k > i) {
+                put(k, i);
+            }
+        }
+    }
+
+    std::cout << ans.size() << '\n';
+    for (auto [x, y] : ans) {
+        std::cout << x + 1 << ' ' << y + 1 << '\n';
+    }
 }
 } // namespace

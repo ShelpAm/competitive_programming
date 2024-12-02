@@ -1,10 +1,10 @@
 #pragma once
 
-/*Problem: $(PROBLEM)*/
-/*Contest: $(CONTEST)*/
-/*Judge: $(JUDGE)*/
-/*URL: $(URL)*/
-/*Start: $(DATE)*/
+/*Problem: 竞赛技巧*/
+/*Contest: unknown_contest*/
+/*Judge: NowCoder*/
+/*URL: https://ac.nowcoder.com/acm/contest/96457/G*/
+/*Start: Sat 16 Nov 2024 11:23:10 AM CST*/
 /*Author: ShelpAm*/
 
 // #include <bits/stdc++.h>
@@ -173,6 +173,13 @@ using i64 = std::int_fast64_t;
 using u64 = std::uint_fast64_t;
 void solve_case()
 {
-    /*return;*/
+    int n;
+    std::cin >> n;
+    std::vector<std::array<int, 3>> a(n);
+    std::cin >> a;
+    std::ranges::sort(a);
+    for (auto const &[x, y, z] : a) {
+        std::cout << x << ' ' << y << ' ' << z << '\n';
+    }
 }
 } // namespace

@@ -1,10 +1,11 @@
 #pragma once
 
-/*Problem: $(PROBLEM)*/
-/*Contest: $(CONTEST)*/
-/*Judge: $(JUDGE)*/
-/*URL: $(URL)*/
-/*Start: $(DATE)*/
+/*Problem: B. Make It Equal*/
+/*Contest: 2024-2025 ICPC, NERC, Southern and Volga Russian Regional Contest
+ * (Unrated, Online Mirror, ICPC Rules, Preferably Teams)*/
+/*Judge: Codeforces*/
+/*URL: https://codeforces.com/contest/2038/problem/B*/
+/*Start: Mon 18 Nov 2024 10:52:24 PM CST*/
 /*Author: ShelpAm*/
 
 // #include <bits/stdc++.h>
@@ -156,7 +157,7 @@ auto main() -> int
     constexpr auto my_precision{10};
     std::cout << std::fixed << std::setprecision(my_precision);
     int t{1};
-    // std::cin >> t;
+    std::cin >> t;
     for (int i{}; i != t; ++i) {
         try {
             std::cerr << "Test case " << i << '\n';
@@ -173,6 +174,39 @@ using i64 = std::int_fast64_t;
 using u64 = std::uint_fast64_t;
 void solve_case()
 {
-    /*return;*/
+    int n;
+    std::cin >> n;
+    std::vector<i64> a(n);
+    std::cin >> a;
+
+    i64 r{};
+    auto check{[&](auto to) {
+        auto b{a};
+        r = 0;
+        // O(n)
+        for (int i{}; i != n; ++i) {
+            if (b[i] > to) {
+                auto const d{(b[i] - to + 1) / 2};
+                b[(i + 1) % n] += d;
+                b[i] -= 2 * d;
+                r += d;
+            }
+        }
+        // O(log a)
+        for (int i{}; b[i] > to; ++i %= n) {
+            auto const d{(b[i] - to + 1) / 2};
+            b[(i + 1) % n] += d;
+            b[i] -= 2 * d;
+            r += d;
+        }
+        return std::ranges::all_of(b, [=](auto e) { return e == to; });
+    }};
+    auto const lo{binary_search(check, 1, std::ranges::max(a) + 1, false)};
+    if (check(lo)) {
+        std::cout << r << '\n';
+    }
+    else {
+        std::cout << -1 << '\n';
+    }
 }
 } // namespace

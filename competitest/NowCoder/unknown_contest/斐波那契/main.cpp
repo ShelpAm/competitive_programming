@@ -1,10 +1,10 @@
 #pragma once
 
-/*Problem: $(PROBLEM)*/
-/*Contest: $(CONTEST)*/
-/*Judge: $(JUDGE)*/
-/*URL: $(URL)*/
-/*Start: $(DATE)*/
+/*Problem: 斐波那契*/
+/*Contest: unknown_contest*/
+/*Judge: NowCoder*/
+/*URL: https://ac.nowcoder.com/acm/contest/93820/C*/
+/*Start: Sat 16 Nov 2024 07:03:14 PM CST*/
 /*Author: ShelpAm*/
 
 // #include <bits/stdc++.h>
@@ -173,6 +173,20 @@ using i64 = std::int_fast64_t;
 using u64 = std::uint_fast64_t;
 void solve_case()
 {
-    /*return;*/
+    int n;
+    std::cin >> n;
+    std::map<std::array<int, 2>, int> offset{
+        {{1, 1}, 1}, {{1, 0}, 0}, {{0, 1}, 2}};
+    for (int i{}; i != n; ++i) {
+        int x, y, k;
+        std::cin >> x >> y >> k;
+        std::array a{x % 2, y % 2};
+        if (offset.contains(a)) {
+            std::cout << ((k - offset[a] + 3) % 3 < 2 ? 1 : 0) << '\n';
+        }
+        else {
+            std::cout << 0 << '\n';
+        }
+    }
 }
 } // namespace

@@ -1,10 +1,10 @@
 #pragma once
 
-/*Problem: $(PROBLEM)*/
-/*Contest: $(CONTEST)*/
-/*Judge: $(JUDGE)*/
-/*URL: $(URL)*/
-/*Start: $(DATE)*/
+/*Problem: 喜欢切数组的红*/
+/*Contest: unknown_contest*/
+/*Judge: NowCoder*/
+/*URL: https://ac.nowcoder.com/acm/contest/96115/E*/
+/*Start: Sun 24 Nov 2024 09:20:24 PM CST*/
 /*Author: ShelpAm*/
 
 // #include <bits/stdc++.h>
@@ -173,6 +173,46 @@ using i64 = std::int_fast64_t;
 using u64 = std::uint_fast64_t;
 void solve_case()
 {
-    /*return;*/
+    int n;
+    std::cin >> n;
+    std::vector<i64> a(n);
+    std::cin >> a;
+
+    auto p{a};
+    p.insert(p.begin(), 0);
+    std::vector<int> positives(n + 1);
+    for (int i{1}; i != n + 1; ++i) {
+        p[i] += p[i - 1];
+        positives[i] = positives[i - 1] + (a[i - 1] > 0);
+    }
+
+    if (p[n] % 3 != 0) {
+        std::cout << 0 << '\n';
+        return;
+    }
+
+    debug("psoiti", positives);
+
+    std::vector<int> ls, rs;
+    for (int i{1}; i != n; ++i) {
+        if (p[i] == p[n] / 3 && positives[i] != 0) {
+            ls.push_back(i);
+        }
+        if (p[n] - p[i] == p[n] / 3 && positives[n] - positives[i] != 0) {
+            rs.push_back(i);
+        }
+    }
+
+    debug("ls", ls);
+    debug("rs", rs);
+    i64 ans{};
+    for (int i{}, j{}; i != ls.size(); ++i) {
+        while (j != rs.size() &&
+               (rs[j] <= ls[i] || positives[rs[j]] - positives[ls[i]] == 0)) {
+            ++j;
+        }
+        ans += rs.size() - j;
+    }
+    std::cout << ans << '\n';
 }
 } // namespace

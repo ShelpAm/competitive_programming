@@ -1,10 +1,11 @@
 #pragma once
 
-/*Problem: $(PROBLEM)*/
-/*Contest: $(CONTEST)*/
-/*Judge: $(JUDGE)*/
-/*URL: $(URL)*/
-/*Start: $(DATE)*/
+/*Problem: B. Rakhsh's Revival*/
+/*Contest: Rayan Programming Contest 2024 - Selection (Codeforces Round 989,
+ * Div. 1 + Div. 2)*/
+/*Judge: Codeforces*/
+/*URL: https://codeforces.com/contest/2034/problem/B*/
+/*Start: Mon 02 Dec 2024 07:50:16 PM CST*/
 /*Author: ShelpAm*/
 
 // #include <bits/stdc++.h>
@@ -173,6 +174,6 @@ using i64 = std::int_fast64_t;
 using u64 = std::uint_fast64_t;
 void solve_case()
 {
-    /*return;*/
+    binary_search([](), std::int_fast64_t ok, std::int_fast64_t ng)
 }
 } // namespace

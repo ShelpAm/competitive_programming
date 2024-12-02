@@ -1,10 +1,11 @@
 #pragma once
 
-/*Problem: $(PROBLEM)*/
-/*Contest: $(CONTEST)*/
-/*Judge: $(JUDGE)*/
-/*URL: $(URL)*/
-/*Start: $(DATE)*/
+/*Problem: C. DIY*/
+/*Contest: 2024-2025 ICPC, NERC, Southern and Volga Russian Regional Contest
+ * (Unrated, Online Mirror, ICPC Rules, Preferably Teams)*/
+/*Judge: Codeforces*/
+/*URL: https://codeforces.com/contest/2038/problem/C*/
+/*Start: Tue 19 Nov 2024 10:43:56 PM CST*/
 /*Author: ShelpAm*/
 
 // #include <bits/stdc++.h>
@@ -24,6 +25,7 @@
 #include <map>
 #include <numbers>
 #include <numeric>
+#include <print>
 #include <queue>
 #include <random>
 #include <ranges>
@@ -156,7 +158,7 @@ auto main() -> int
     constexpr auto my_precision{10};
     std::cout << std::fixed << std::setprecision(my_precision);
     int t{1};
-    // std::cin >> t;
+    std::cin >> t;
     for (int i{}; i != t; ++i) {
         try {
             std::cerr << "Test case " << i << '\n';
@@ -173,6 +175,54 @@ using i64 = std::int_fast64_t;
 using u64 = std::uint_fast64_t;
 void solve_case()
 {
-    /*return;*/
+    int n;
+    std::cin >> n;
+    std::map<int, int> o;
+    for (int i{}; i != n; ++i) {
+        int x;
+        std::cin >> x;
+        ++o[x];
+    }
+
+    int avail{};
+    for (auto &[k, v] : o) {
+        v /= 2;
+        avail += v;
+    }
+    if (avail < 4) {
+        std::println("NO");
+        return;
+    }
+
+    for (auto it{o.begin()}; it != o.end();) {
+        if (it->second == 0) {
+            it = o.erase(it);
+        }
+        else {
+            ++it;
+        }
+    }
+
+    std::vector<int> l{o.begin()->first};
+    if (--o.begin()->second == 0) {
+        o.erase(o.begin());
+    }
+    l.push_back(o.begin()->first);
+
+    std::vector<int> r{std::prev(o.end())->first};
+    if (--std::prev(o.end())->second == 0) {
+        o.erase(std::prev(o.end()));
+    }
+    r.push_back(std::prev(o.end())->first);
+
+    std::swap(l[0], r[0]);
+
+    std::println("YES");
+    for (int i{}; i != 2; ++i) {
+        for (int j{}; j != 2; ++j) {
+            std::print("{} {} ", l[i], r[j]);
+        }
+    }
+    std::println();
 }
 } // namespace

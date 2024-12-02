@@ -1,10 +1,11 @@
 #pragma once
 
-/*Problem: $(PROBLEM)*/
-/*Contest: $(CONTEST)*/
-/*Judge: $(JUDGE)*/
-/*URL: $(URL)*/
-/*Start: $(DATE)*/
+/*Problem: A. Arrow a Row*/
+/*Contest: 2024 ICPC Asia Chengdu Regional Contest (The 3rd Universal Cup. Stage
+ * 15: Chengdu)*/
+/*Judge: Codeforces*/
+/*URL: https://codeforces.com/gym/105486/problem/A*/
+/*Start: Wed 13 Nov 2024 07:23:20 PM CST*/
 /*Author: ShelpAm*/
 
 // #include <bits/stdc++.h>
@@ -156,7 +157,7 @@ auto main() -> int
     constexpr auto my_precision{10};
     std::cout << std::fixed << std::setprecision(my_precision);
     int t{1};
-    // std::cin >> t;
+    std::cin >> t;
     for (int i{}; i != t; ++i) {
         try {
             std::cerr << "Test case " << i << '\n';
@@ -173,6 +174,33 @@ using i64 = std::int_fast64_t;
 using u64 = std::uint_fast64_t;
 void solve_case()
 {
-    /*return;*/
+    std::string s;
+    std::cin >> s;
+
+    if (!s.contains('-') || s.rfind('-') >= s.size() - 3 || s[0] == '-') {
+        std::cout << "No\n";
+        return;
+    }
+
+    std::vector<std::pair<int, int>> ans;
+    int last{};
+    for (auto const e : s | std::views::reverse) {
+        if (e != '>') {
+            break;
+        }
+        ++last;
+    }
+    for (auto i{s.size()}; i != s.size() + 3 - last; --i) {
+        ans.push_back({1, i});
+    }
+    for (int i{}; i != s.size() - last - 1; ++i) {
+        if (s[i] == '>') {
+            ans.push_back({i + 1, s.size() - (last - 3)});
+        }
+    }
+    std::cout << "Yes " << ans.size() << '\n';
+    for (auto const &[l, r] : ans) {
+        std::cout << l << ' ' << r - l + 1 << '\n';
+    }
 }
 } // namespace

@@ -1,10 +1,10 @@
 #pragma once
 
-/*Problem: $(PROBLEM)*/
-/*Contest: $(CONTEST)*/
-/*Judge: $(JUDGE)*/
-/*URL: $(URL)*/
-/*Start: $(DATE)*/
+/*Problem: C. CCPC*/
+/*Contest: acs23级个人训练赛7*/
+/*Judge: Codeforces*/
+/*URL: https://codeforces.com/gym/564193/problem/C*/
+/*Start: Tue 05 Nov 2024 01:22:57 PM CST*/
 /*Author: ShelpAm*/
 
 // #include <bits/stdc++.h>
@@ -173,6 +173,12 @@ using i64 = std::int_fast64_t;
 using u64 = std::uint_fast64_t;
 void solve_case()
 {
-    /*return;*/
+    std::string s;
+    std::cin >> s;
+    std::unordered_map<char, int> o;
+    for (auto const e : s) {
+        ++o[e];
+    }
+    std::cout << std::min((o['C'] - 1) / 2, o['P']) << '\n';
 }
 } // namespace

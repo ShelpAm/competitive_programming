@@ -1,10 +1,10 @@
 #pragma once
 
-/*Problem: $(PROBLEM)*/
-/*Contest: $(CONTEST)*/
-/*Judge: $(JUDGE)*/
-/*URL: $(URL)*/
-/*Start: $(DATE)*/
+/*Problem: C - Move Segment*/
+/*Contest: AtCoder Beginner Contest 380*/
+/*Judge: AtCoder*/
+/*URL: https://atcoder.jp/contests/abc380/tasks/abc380_c*/
+/*Start: Sat 16 Nov 2024 09:42:07 PM CST*/
 /*Author: ShelpAm*/
 
 // #include <bits/stdc++.h>
@@ -173,6 +173,29 @@ using i64 = std::int_fast64_t;
 using u64 = std::uint_fast64_t;
 void solve_case()
 {
-    /*return;*/
+    int n, k;
+    std::cin >> n >> k;
+    std::string s;
+    std::cin >> s;
+
+    std::vector<std::pair<char, int>> a;
+    for (char last{}; auto const e : s) {
+        if (e != last) {
+            a.push_back({e, 1});
+            last = e;
+        }
+        else {
+            ++a.back().second;
+        }
+    }
+
+    auto it{std::ranges::find_if(
+        a, [&k](auto const &p) { return p.first == '1' && --k == 0; })};
+    std::swap(*it, *std::prev(it));
+
+    for (auto const &[ch, cnt] : a) {
+        std::cout << std::string(cnt, ch);
+    }
+    std::cout << '\n';
 }
 } // namespace

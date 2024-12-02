@@ -1,10 +1,10 @@
 #pragma once
 
-/*Problem: $(PROBLEM)*/
-/*Contest: $(CONTEST)*/
-/*Judge: $(JUDGE)*/
-/*URL: $(URL)*/
-/*Start: $(DATE)*/
+/*Problem: C. Penchick and BBQ Buns*/
+/*Contest: Codeforces Round 987 (Div. 2)*/
+/*Judge: Codeforces*/
+/*URL: https://codeforces.com/contest/2031/problem/C*/
+/*Start: Sun 24 Nov 2024 01:51:06 PM CST*/
 /*Author: ShelpAm*/
 
 // #include <bits/stdc++.h>
@@ -24,6 +24,7 @@
 #include <map>
 #include <numbers>
 #include <numeric>
+#include <print>
 #include <queue>
 #include <random>
 #include <ranges>
@@ -173,6 +174,57 @@ using i64 = std::int_fast64_t;
 using u64 = std::uint_fast64_t;
 void solve_case()
 {
-    /*return;*/
+    int t;
+    std::cin >> t;
+
+    // std::set<std::pair<int, int>> s;
+    // for (int i{1}; i != 1e3 + 1; ++i) {
+    //     for (int j{i}; j != 1e3 + 1; ++j) {
+    //         if (auto const r{binary_search(
+    //                 [k{i * i + j * j}](auto x) { return x * x <= k; }, 0,
+    //                 1e3 + 1)};
+    //             r * r == i * i + j * j) {
+    //             // s.insert({i * i, j * j});
+    //             auto d{std::gcd(i, j)};
+    //             if (i / d % 2 == 1 && j / d % 2 == 1) {
+    //                 s.insert({i / d, j / d});
+    //             }
+    //         }
+    //     }
+    // }
+    // debug("s", s);
+    // // debug("s.size()", s.size());
+
+    while (t--) {
+        int n;
+        std::cin >> n;
+
+        if (n % 2 == 0) {
+            for (int i{1}; i <= n / 2; ++i) {
+                std::cout << i << ' ' << i << ' ';
+            }
+            std::cout << '\n';
+            continue;
+        }
+
+        if (n >= 27) {
+            std::vector<int> ans(n);
+            ans[0] = ans[9] = ans[25] = 1e6;
+            ans[22] = ans[26] = 1e6 - 1;
+            int m{1};
+            for (int i{}; i != n; ++i) {
+                if (!ans[i] && !ans[i + 1]) {
+                    ans[i] = ans[i + 1] = m++;
+                }
+            }
+            for (auto e : ans) {
+                std::cout << e << ' ';
+            }
+            std::cout << '\n';
+            continue;
+        }
+
+        std::cout << "-1\n";
+    }
 }
 } // namespace

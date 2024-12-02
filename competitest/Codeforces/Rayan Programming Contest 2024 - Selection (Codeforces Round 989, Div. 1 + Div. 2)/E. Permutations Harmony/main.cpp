@@ -1,10 +1,11 @@
 #pragma once
 
-/*Problem: $(PROBLEM)*/
-/*Contest: $(CONTEST)*/
-/*Judge: $(JUDGE)*/
-/*URL: $(URL)*/
-/*Start: $(DATE)*/
+/*Problem: E. Permutations Harmony*/
+/*Contest: Rayan Programming Contest 2024 - Selection (Codeforces Round 989,
+ * Div. 1 + Div. 2)*/
+/*Judge: Codeforces*/
+/*URL: https://codeforces.com/contest/2034/problem/E*/
+/*Start: Mon 02 Dec 2024 09:41:43 PM CST*/
 /*Author: ShelpAm*/
 
 // #include <bits/stdc++.h>
@@ -156,7 +157,7 @@ auto main() -> int
     constexpr auto my_precision{10};
     std::cout << std::fixed << std::setprecision(my_precision);
     int t{1};
-    // std::cin >> t;
+    std::cin >> t;
     for (int i{}; i != t; ++i) {
         try {
             std::cerr << "Test case " << i << '\n';
@@ -173,6 +174,74 @@ using i64 = std::int_fast64_t;
 using u64 = std::uint_fast64_t;
 void solve_case()
 {
-    /*return;*/
+    int n, k;
+    std::cin >> n >> k;
+
+    if (k == 1) {
+        if (n == 1) {
+            std::cout << "YES\n1\n";
+        }
+        else {
+            std::cout << "NO\n";
+        }
+        return;
+    }
+
+    if (n == k) {
+        std::cout << "YES\n";
+        for (int i{}; i != n; ++i) {
+            for (int j{}; j != n; ++j) {
+                std::cout << (j + i) % n + 1 << ' ';
+            }
+            std::cout << '\n';
+        }
+        return;
+    }
+
+    if (k % 2 == 1) {
+        std::cout << "NO\n";
+        return;
+    }
+    // k is already even.
+
+    auto factorial{[](int x) {
+        int res{1};
+        for (int i{1}; i != x + 1; ++i) {
+            res *= i;
+        }
+        return res;
+    }};
+
+    if (factorial(std::min(n, 10)) >= k / 2) {
+        std::vector<int> t(n);
+        std::ranges::iota(t, 1);
+
+        std::set<std::vector<int>> s;
+        do {
+            std::vector<int> o{t};
+            for (auto &e : t) {
+                e = n + 1 - e;
+            }
+            s.insert(t);
+            s.insert(o);
+        } while (s.size() < k && std::next_permutation(t.begin(), t.end()));
+
+        if (s.size() >= k) {
+            std::cout << "YES\n";
+            for (auto const &seq : s | std::views::take(k)) {
+                for (auto const e : seq) {
+                    std::cout << e << ' ';
+                }
+                std::cout << '\n';
+            }
+        }
+        else {
+            std::cout << "NO\n";
+        }
+
+        return;
+    }
+
+    std::cout << "NO\n";
 }
 } // namespace

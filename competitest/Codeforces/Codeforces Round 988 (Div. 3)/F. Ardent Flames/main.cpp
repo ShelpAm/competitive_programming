@@ -1,10 +1,10 @@
 #pragma once
 
-/*Problem: $(PROBLEM)*/
-/*Contest: $(CONTEST)*/
-/*Judge: $(JUDGE)*/
-/*URL: $(URL)*/
-/*Start: $(DATE)*/
+/*Problem: F. Ardent Flames*/
+/*Contest: Codeforces Round 988 (Div. 3)*/
+/*Judge: Codeforces*/
+/*URL: https://codeforces.com/contest/2037/problem/F*/
+/*Start: Mon 18 Nov 2024 07:42:38 PM CST*/
 /*Author: ShelpAm*/
 
 // #include <bits/stdc++.h>
@@ -156,7 +156,7 @@ auto main() -> int
     constexpr auto my_precision{10};
     std::cout << std::fixed << std::setprecision(my_precision);
     int t{1};
-    // std::cin >> t;
+    std::cin >> t;
     for (int i{}; i != t; ++i) {
         try {
             std::cerr << "Test case " << i << '\n';
@@ -173,6 +173,41 @@ using i64 = std::int_fast64_t;
 using u64 = std::uint_fast64_t;
 void solve_case()
 {
-    /*return;*/
+    int n, m, k;
+    std::cin >> n >> m >> k;
+    std::vector<int> h(n);
+    std::vector<int> x(n);
+    std::cin >> h >> x;
+
+    auto check{[&](i64 q) {
+        std::vector<std::pair<int, int>> a;
+        for (int i{}; i != n; ++i) {
+            if (q * m < h[i]) {
+                continue;
+            }
+            auto const maxd{(q * m - h[i]) / q};
+            a.push_back({x[i] - maxd, x[i] + maxd});
+        }
+
+        std::ranges::sort(a);
+        std::priority_queue<int, std::vector<int>, std::ranges::greater> rs;
+        for (auto const &[l, r] : a) {
+            while (!rs.empty() && rs.top() < l) {
+                rs.pop();
+            }
+            rs.push(r);
+            if (rs.size() >= k) {
+                return true;
+            }
+        }
+        return false;
+    }};
+    auto q{binary_search(check, max<int>, 0, false)};
+    if (!check(q)) {
+        std::cout << -1 << '\n';
+    }
+    else {
+        std::cout << q << '\n';
+    }
 }
 } // namespace

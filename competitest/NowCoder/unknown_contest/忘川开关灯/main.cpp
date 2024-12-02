@@ -1,10 +1,10 @@
 #pragma once
 
-/*Problem: $(PROBLEM)*/
-/*Contest: $(CONTEST)*/
-/*Judge: $(JUDGE)*/
-/*URL: $(URL)*/
-/*Start: $(DATE)*/
+/*Problem: 忘川开关灯*/
+/*Contest: unknown_contest*/
+/*Judge: NowCoder*/
+/*URL: https://ac.nowcoder.com/acm/contest/96457/A*/
+/*Start: Sat 16 Nov 2024 10:36:56 AM CST*/
 /*Author: ShelpAm*/
 
 // #include <bits/stdc++.h>
@@ -173,6 +173,36 @@ using i64 = std::int_fast64_t;
 using u64 = std::uint_fast64_t;
 void solve_case()
 {
-    /*return;*/
+    int n;
+    std::cin >> n;
+    std::vector<int> a(n);
+    std::cin >> a;
+
+    std::unordered_map<int, int> t;
+    for (auto const e : a) {
+        t[e] ^= 1;
+    }
+
+    debug("t", t);
+
+    int q;
+    std::cin >> q;
+    for (int i{}; i != q; ++i) {
+        int x;
+        std::cin >> x;
+        int on{};
+        std::unordered_set<int> f;
+        for (int j{1}; j * j <= x; ++j) {
+            if (x % j == 0) {
+                f.insert(j);
+                f.insert(x / j);
+            }
+        }
+        debug("f", f);
+        for (auto const e : f) {
+            on ^= t[e];
+        }
+        std::cout << (on ? "ON" : "OFF") << '\n';
+    }
 }
 } // namespace

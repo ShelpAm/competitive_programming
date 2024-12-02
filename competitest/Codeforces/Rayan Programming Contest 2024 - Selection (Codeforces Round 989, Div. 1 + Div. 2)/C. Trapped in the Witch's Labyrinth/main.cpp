@@ -1,10 +1,11 @@
 #pragma once
 
-/*Problem: $(PROBLEM)*/
-/*Contest: $(CONTEST)*/
-/*Judge: $(JUDGE)*/
-/*URL: $(URL)*/
-/*Start: $(DATE)*/
+/*Problem: C. Trapped in the Witch's Labyrinth*/
+/*Contest: Rayan Programming Contest 2024 - Selection (Codeforces Round 989,
+ * Div. 1 + Div. 2)*/
+/*Judge: Codeforces*/
+/*URL: https://codeforces.com/contest/2034/problem/C*/
+/*Start: Mon 02 Dec 2024 08:08:00 PM CST*/
 /*Author: ShelpAm*/
 
 // #include <bits/stdc++.h>
@@ -156,7 +157,7 @@ auto main() -> int
     constexpr auto my_precision{10};
     std::cout << std::fixed << std::setprecision(my_precision);
     int t{1};
-    // std::cin >> t;
+    std::cin >> t;
     for (int i{}; i != t; ++i) {
         try {
             std::cerr << "Test case " << i << '\n';
@@ -173,6 +174,65 @@ using i64 = std::int_fast64_t;
 using u64 = std::uint_fast64_t;
 void solve_case()
 {
-    /*return;*/
+    std::unordered_map<char, std::pair<int, int>> dir{
+        {'U', {-1, 0}}, {'D', {1, 0}}, {'L', {0, -1}}, {'R', {0, 1}}};
+
+    int n, m;
+    std::cin >> n >> m;
+    std::vector<std::string> a(n);
+    std::cin >> a;
+
+    std::vector<std::vector<int>> s(n, std::vector<int>(m));
+    // 2-trapped, 3-go away.
+    for (int i{}; i != n; ++i) {
+        for (int j{}; j != m; ++j) {
+            int path_state{};
+            auto dfs{[&](auto dfs, int x, int y) {
+                if (x == -1 || x == n || y == -1 || y == m) {
+                    path_state = 3;
+                    return;
+                }
+                if (a[x][y] == '?') {
+                    path_state = 2;
+                    return;
+                }
+                if (s[x][y] == 0) { // Unvisited
+                    s[x][y] = 2;    // Assume it has been trapped.
+                }
+                else {
+                    path_state = s[x][y];
+                    return;
+                }
+                auto [dx, dy]{dir[a[x][y]]};
+                dfs(dfs, x + dx, y + dy);
+                s[x][y] = path_state;
+            }};
+            dfs(dfs, i, j);
+        }
+    }
+
+    for (int i{}; i != n; ++i) {
+        for (int j{}; j != m; ++j) {
+            if (s[i][j] == 0) {
+                bool ok{};
+                for (auto [_, d] : dir) {
+                    auto [dx, dy]{d};
+                    dx += i, dy += j;
+                    if (dx >= 0 && dx < n && dy >= 0 && dy < m) {
+                        ok |= s[dx][dy] == 2 || a[dx][dy] == '?';
+                    }
+                }
+                s[i][j] = (ok ? 2 : 3);
+            }
+        }
+    }
+
+    int cnt{};
+    for (int i{}; i != n; ++i) {
+        for (int j{}; j != m; ++j) {
+            cnt += s[i][j] == 2;
+        }
+    }
+    std::cout << cnt << '\n';
 }
 } // namespace

@@ -1,10 +1,10 @@
 #pragma once
 
-/*Problem: $(PROBLEM)*/
-/*Contest: $(CONTEST)*/
-/*Judge: $(JUDGE)*/
-/*URL: $(URL)*/
-/*Start: $(DATE)*/
+/*Problem: 约瑟夫环*/
+/*Contest: unknown_contest*/
+/*Judge: NowCoder*/
+/*URL: https://ac.nowcoder.com/acm/contest/96457/C*/
+/*Start: Sat 16 Nov 2024 10:48:22 AM CST*/
 /*Author: ShelpAm*/
 
 // #include <bits/stdc++.h>
@@ -173,6 +173,22 @@ using i64 = std::int_fast64_t;
 using u64 = std::uint_fast64_t;
 void solve_case()
 {
-    /*return;*/
+    int n, k, m;
+    std::cin >> n >> k >> m;
+    std::deque<bool> live(n, true);
+
+    int t{k - 1};
+    for (int i{}; i != n; ++i) {
+        for (int j{}; j != m; ++j) {
+            while (!live[++t %= n]) {
+            }
+        }
+        if (i != n - 1) {
+            live[t] = false;
+        }
+        else {
+            std::cout << t << '\n';
+        }
+    }
 }
 } // namespace

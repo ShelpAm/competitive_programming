@@ -1,10 +1,10 @@
 #pragma once
 
-/*Problem: $(PROBLEM)*/
-/*Contest: $(CONTEST)*/
-/*Judge: $(JUDGE)*/
-/*URL: $(URL)*/
-/*Start: $(DATE)*/
+/*Problem: D. Penchick and Desert Rabbit*/
+/*Contest: Codeforces Round 987 (Div. 2)*/
+/*Judge: Codeforces*/
+/*URL: https://codeforces.com/contest/2031/problem/D*/
+/*Start: Sun 24 Nov 2024 02:57:31 PM CST*/
 /*Author: ShelpAm*/
 
 // #include <bits/stdc++.h>
@@ -21,6 +21,7 @@
 #include <functional>
 #include <iomanip>
 #include <iostream>
+#include <list>
 #include <map>
 #include <numbers>
 #include <numeric>
@@ -156,7 +157,7 @@ auto main() -> int
     constexpr auto my_precision{10};
     std::cout << std::fixed << std::setprecision(my_precision);
     int t{1};
-    // std::cin >> t;
+    std::cin >> t;
     for (int i{}; i != t; ++i) {
         try {
             std::cerr << "Test case " << i << '\n';
@@ -173,6 +174,37 @@ using i64 = std::int_fast64_t;
 using u64 = std::uint_fast64_t;
 void solve_case()
 {
-    /*return;*/
+    int n;
+    std::cin >> n;
+    std::vector<int> a(n);
+    std::cin >> a;
+    auto const max{std::ranges::max(a)};
+    a.insert(a.begin(), -inf<int>);
+    a.push_back(inf<int>);
+
+    std::vector<int> p{a}, s{a};
+    for (int i{1}; i != n + 1; ++i) {
+        chmax(p[i], p[i - 1]);
+    }
+    for (int i{n}; i != 0; --i) {
+        chmin(s[i], s[i + 1]);
+    }
+
+    std::vector<int> ans(n + 1);
+    ans[n] = max;
+
+    // auto const min{std::ranges::max_element(a.begin() + 1, a.end() - 1)};
+    for (int i{n - 1}; i != 0; --i) {
+        if (p[i] > s[i + 1]) {
+            ans[i] = ans[i + 1];
+        }
+        else {
+            ans[i] = p[i];
+        }
+    }
+    for (int i{1}; i != n + 1; ++i) {
+        std::cout << ans[i] << ' ';
+    }
+    std::cout << '\n';
 }
 } // namespace

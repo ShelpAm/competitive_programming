@@ -1,10 +1,11 @@
 #pragma once
 
-/*Problem: $(PROBLEM)*/
-/*Contest: $(CONTEST)*/
-/*Judge: $(JUDGE)*/
-/*URL: $(URL)*/
-/*Start: $(DATE)*/
+/*Problem: J. Waiting for...*/
+/*Contest: 2024-2025 ICPC, NERC, Southern and Volga Russian Regional Contest
+ * (Unrated, Online Mirror, ICPC Rules, Preferably Teams)*/
+/*Judge: Codeforces*/
+/*URL: https://codeforces.com/contest/2038/problem/J*/
+/*Start: Tue 19 Nov 2024 11:16:56 PM CST*/
 /*Author: ShelpAm*/
 
 // #include <bits/stdc++.h>
@@ -24,6 +25,7 @@
 #include <map>
 #include <numbers>
 #include <numeric>
+#include <print>
 #include <queue>
 #include <random>
 #include <ranges>
@@ -173,6 +175,21 @@ using i64 = std::int_fast64_t;
 using u64 = std::uint_fast64_t;
 void solve_case()
 {
-    /*return;*/
+    int n;
+    std::cin >> n;
+    int s{};
+    for (int i{}; i != n; ++i) {
+        char op;
+        int x;
+        std::cin >> op >> x;
+        if (op == 'P') {
+            s += x;
+        }
+        else if (op == 'B') {
+            s -= x;
+            std::println("{}", s <= -1 ? "YES" : "NO");
+            chmax(s, 0);
+        }
+    }
 }
 } // namespace

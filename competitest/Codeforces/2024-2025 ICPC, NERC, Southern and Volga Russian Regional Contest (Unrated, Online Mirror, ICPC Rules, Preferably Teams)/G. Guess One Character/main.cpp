@@ -1,10 +1,11 @@
 #pragma once
 
-/*Problem: $(PROBLEM)*/
-/*Contest: $(CONTEST)*/
-/*Judge: $(JUDGE)*/
-/*URL: $(URL)*/
-/*Start: $(DATE)*/
+/*Problem: G. Guess One Character*/
+/*Contest: 2024-2025 ICPC, NERC, Southern and Volga Russian Regional Contest
+ * (Unrated, Online Mirror, ICPC Rules, Preferably Teams)*/
+/*Judge: Codeforces*/
+/*URL: https://codeforces.com/contest/2038/problem/G*/
+/*Start: Tue 19 Nov 2024 11:35:13 PM CST*/
 /*Author: ShelpAm*/
 
 // #include <bits/stdc++.h>
@@ -24,6 +25,7 @@
 #include <map>
 #include <numbers>
 #include <numeric>
+#include <print>
 #include <queue>
 #include <random>
 #include <ranges>
@@ -156,7 +158,7 @@ auto main() -> int
     constexpr auto my_precision{10};
     std::cout << std::fixed << std::setprecision(my_precision);
     int t{1};
-    // std::cin >> t;
+    std::cin >> t;
     for (int i{}; i != t; ++i) {
         try {
             std::cerr << "Test case " << i << '\n';
@@ -173,6 +175,22 @@ using i64 = std::int_fast64_t;
 using u64 = std::uint_fast64_t;
 void solve_case()
 {
-    /*return;*/
+    int n;
+    std::cin >> n;
+
+    std::cout << "1 1" << std::endl;
+    int _1;
+    std::cin >> _1;
+    std::cout << "1 11" << std::endl;
+    int _11;
+    std::cin >> _11;
+    std::cout << "1 10" << std::endl;
+    int _10;
+    std::cin >> _10;
+
+    std::cout << "0 " << n << ' ' << (_11 + _10 == _1 ? 0 : 1) << std::endl;
+
+    int x;
+    std::cin >> x;
 }
 } // namespace

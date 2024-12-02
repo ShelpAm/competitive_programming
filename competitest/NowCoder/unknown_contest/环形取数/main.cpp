@@ -1,10 +1,10 @@
 #pragma once
 
-/*Problem: $(PROBLEM)*/
-/*Contest: $(CONTEST)*/
-/*Judge: $(JUDGE)*/
-/*URL: $(URL)*/
-/*Start: $(DATE)*/
+/*Problem: 环形取数*/
+/*Contest: unknown_contest*/
+/*Judge: NowCoder*/
+/*URL: https://ac.nowcoder.com/acm/contest/93820/A*/
+/*Start: Sat 16 Nov 2024 07:01:15 PM CST*/
 /*Author: ShelpAm*/
 
 // #include <bits/stdc++.h>
@@ -156,7 +156,7 @@ auto main() -> int
     constexpr auto my_precision{10};
     std::cout << std::fixed << std::setprecision(my_precision);
     int t{1};
-    // std::cin >> t;
+    std::cin >> t;
     for (int i{}; i != t; ++i) {
         try {
             std::cerr << "Test case " << i << '\n';
@@ -173,6 +173,44 @@ using i64 = std::int_fast64_t;
 using u64 = std::uint_fast64_t;
 void solve_case()
 {
-    /*return;*/
+    int n;
+    std::cin >> n;
+    std::vector<int> a(n);
+    std::cin >> a;
+    for (int i{}; i != n; ++i) {
+        a.push_back(a[i]);
+    }
+
+    std::vector<std::vector<i64>> f(2 * n, std::vector<i64>(2 * n));
+    for (int i{}; i != 2 * n; ++i) {
+        f[i][i] = a[i];
+    }
+
+    for (int l{2}; l != n + 1; ++l) {
+        for (int i{}; i + l - 1 != 2 * n; ++i) {
+            auto const j{i + l - 1};
+            if (l % 2 == 0) {
+                f[i][j] = std::max(f[i + 1][j], f[i][j - 1]);
+            }
+            else {
+                f[i][j] = std::min(f[i + 1][j] + a[i], f[i][j - 1] + a[j]);
+            }
+        }
+    }
+    debug("f", f);
+    // if (n % 2 == 1) {
+    i64 ans{inf<i64>};
+    for (int i{}; i != n; ++i) {
+        chmin(ans, f[i][i + n - 1]);
+    }
+    std::cout << ans << '\n';
+    // }
+    // else {
+    //     i64 ans{};
+    //     for (int i{}; i != n; ++i) {
+    //         chmax(ans, f[i][i + n - 1]);
+    //     }
+    //     std::cout << ans << '\n';
+    // }
 }
 } // namespace

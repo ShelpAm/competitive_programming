@@ -1,10 +1,10 @@
 #pragma once
 
-/*Problem: $(PROBLEM)*/
-/*Contest: $(CONTEST)*/
-/*Judge: $(JUDGE)*/
-/*URL: $(URL)*/
-/*Start: $(DATE)*/
+/*Problem: 小H学数学*/
+/*Contest: unknown_contest*/
+/*Judge: NowCoder*/
+/*URL: https://ac.nowcoder.com/acm/contest/94114/B*/
+/*Start: Sat 02 Nov 2024 01:45:37 PM CST*/
 /*Author: ShelpAm*/
 
 // #include <bits/stdc++.h>
@@ -59,21 +59,20 @@ concept tuple = is_tuple_t<Ts...>::value;
 
 auto operator>>(auto &istream, auto &&t) -> decltype(istream)
 {
-    using T = std::remove_cvref_t<decltype(t)>;
-    static_assert(!shelpam::concepts::tuple<T>,
-                  "tuple: not implemented yet.\n");
-    if constexpr (std::ranges::range<T>) {
-        for (auto &ele : t) {
-            istream >> ele;
-        }
+  using T = std::remove_cvref_t<decltype(t)>;
+  static_assert(!shelpam::concepts::tuple<T>, "tuple: not implemented yet.\n");
+  if constexpr (std::ranges::range<T>) {
+    for (auto &ele : t) {
+      istream >> ele;
     }
-    else if constexpr (shelpam::concepts::pair<T>) {
-        istream >> t.first >> t.second;
-    }
-    else {
-        istream >> t;
-    }
-    return istream;
+  }
+  else if constexpr (shelpam::concepts::pair<T>) {
+    istream >> t.first >> t.second;
+  }
+  else {
+    istream >> t;
+  }
+  return istream;
 }
 #ifndef ONLINE_JUDGE
 #include "/home/shelpam/Documents/projects/competitive-programming/libs/debug.h"
@@ -82,64 +81,64 @@ auto operator>>(auto &istream, auto &&t) -> decltype(istream)
 #endif
 auto chmax(auto &value, auto const &other) noexcept -> bool
 {
-    if (value < other) {
-        value = other;
-        return true;
-    }
-    return false;
+  if (value < other) {
+    value = other;
+    return true;
+  }
+  return false;
 }
 auto chmin(auto &value, auto const &other) noexcept -> bool
 {
-    if (value > other) {
-        value = other;
-        return true;
-    }
-    return false;
+  if (value > other) {
+    value = other;
+    return true;
+  }
+  return false;
 }
 constexpr auto sum_of(std::ranges::range auto const &coll) noexcept
 {
-    return std::accumulate(coll.begin(), coll.end(), std::int_fast64_t{});
+  return std::accumulate(coll.begin(), coll.end(), std::int_fast64_t{});
 }
 constexpr auto pow(auto a, std::int_fast64_t b, std::uint_fast64_t p)
 {
-    static_assert(sizeof(a) > sizeof(int), "Use of int is bug-prone.");
-    if (b < 0) {
-        throw std::invalid_argument{"Invalid exponent. It should be positive."};
+  static_assert(sizeof(a) > sizeof(int), "Use of int is bug-prone.");
+  if (b < 0) {
+    throw std::invalid_argument{"Invalid exponent. It should be positive."};
+  }
+  decltype(a) res{1};
+  while (b != 0) {
+    if ((b & 1) == 1) {
+      res = res * a % p;
     }
-    decltype(a) res{1};
-    while (b != 0) {
-        if ((b & 1) == 1) {
-            res = res * a % p;
-        }
-        a = a * a % p;
-        b >>= 1;
-    }
-    return res;
+    a = a * a % p;
+    b >>= 1;
+  }
+  return res;
 }
 auto binary_search(std::invocable<std::int_fast64_t> auto check,
                    std::int_fast64_t ok, std::int_fast64_t ng,
                    bool check_ok = true) -> std::int_fast64_t
 {
-    if (check_ok && !check(ok)) {
-        throw std::invalid_argument{"check isn't true on 'ok'."};
-    }
-    while (std::abs(ok - ng) > 1) {
-        auto const x{(ok + ng) / 2};
-        (check(x) ? ok : ng) = x;
-    }
-    return ok;
+  if (check_ok && !check(ok)) {
+    throw std::invalid_argument{"check isn't true on 'ok'."};
+  }
+  while (std::abs(ok - ng) > 1) {
+    auto const x{(ok + ng) / 2};
+    (check(x) ? ok : ng) = x;
+  }
+  return ok;
 }
 constexpr auto lsb(std::signed_integral auto i) noexcept -> decltype(i)
 {
-    return i & -i;
+  return i & -i;
 }
 // i mustn't be 0
 constexpr auto msb(std::unsigned_integral auto i) -> int
 {
-    if (i == 0) {
-        throw std::invalid_argument{"i must be positive."};
-    }
-    return sizeof(i) * CHAR_BIT - 1 - std::countl_zero(i);
+  if (i == 0) {
+    throw std::invalid_argument{"i must be positive."};
+  }
+  return sizeof(i) * CHAR_BIT - 1 - std::countl_zero(i);
 }
 /*[[maybe_unused]] auto gen_rand() noexcept*/
 /*{*/
@@ -151,28 +150,57 @@ void solve_case();
 } // namespace
 auto main() -> int
 {
-    std::ios::sync_with_stdio(false);
-    std::cin.tie(nullptr);
-    constexpr auto my_precision{10};
-    std::cout << std::fixed << std::setprecision(my_precision);
-    int t{1};
-    // std::cin >> t;
-    for (int i{}; i != t; ++i) {
-        try {
-            std::cerr << "Test case " << i << '\n';
-            solve_case();
-        }
-        catch (std::exception &e) {
-            std::cerr << "Exception: " << e.what() << '\n';
-        }
+  std::ios::sync_with_stdio(false);
+  std::cin.tie(nullptr);
+  constexpr auto my_precision{10};
+  std::cout << std::fixed << std::setprecision(my_precision);
+  int t{1};
+  // std::cin >> t;
+  for (int i{}; i != t; ++i) {
+    try {
+      std::cerr << "Test case " << i << '\n';
+      solve_case();
     }
-    return 0;
+    catch (std::exception &e) {
+      std::cerr << "Exception: " << e.what() << '\n';
+    }
+  }
+  return 0;
 }
 namespace {
 using i64 = std::int_fast64_t;
 using u64 = std::uint_fast64_t;
 void solve_case()
 {
-    /*return;*/
+  int x, y;
+  std::cin >> x >> y;
+  x = std::abs(x);
+  ++y;
+
+  std::vector<std::unordered_map<int, i64>> f(y + 1);
+
+  f[0][0] = 1;
+  for (int i{}; i != f.size() - 1; ++i) {
+    for (auto &[j, v] : f[i]) {
+      // 1 - 10
+      for (int k{1}; k != 11; ++k) {
+        for (auto const sign : {-1, 1}) {
+          (f[i + 1][j + (k * sign)] += v) %= mod1e9p7;
+        }
+      }
+      // 1 - 5   +   1 - 5
+      for (int k1{1}; k1 != 6; ++k1) {
+        for (int k2{1}; k2 != 6; ++k2) {
+          for (auto const s1 : {-1, 1}) {
+            for (auto const s2 : {-1, 1}) {
+              (f[i + 1][j + (k1 * s1) + (k2 * s2)] += v) %= mod1e9p7;
+            }
+          }
+        }
+      }
+    }
+  }
+  debug("f", f);
+  std::cout << f[y][x] << '\n';
 }
 } // namespace

@@ -1,10 +1,11 @@
 #pragma once
 
-/*Problem: $(PROBLEM)*/
-/*Contest: $(CONTEST)*/
-/*Judge: $(JUDGE)*/
-/*URL: $(URL)*/
-/*Start: $(DATE)*/
+/*Problem: A. Bonus Project*/
+/*Contest: 2024-2025 ICPC, NERC, Southern and Volga Russian Regional Contest
+ * (Unrated, Online Mirror, ICPC Rules, Preferably Teams)*/
+/*Judge: Codeforces*/
+/*URL: https://codeforces.com/contest/2038/problem/A*/
+/*Start: Tue 19 Nov 2024 11:06:56 PM CST*/
 /*Author: ShelpAm*/
 
 // #include <bits/stdc++.h>
@@ -24,6 +25,7 @@
 #include <map>
 #include <numbers>
 #include <numeric>
+#include <print>
 #include <queue>
 #include <random>
 #include <ranges>
@@ -173,6 +175,34 @@ using i64 = std::int_fast64_t;
 using u64 = std::uint_fast64_t;
 void solve_case()
 {
-    /*return;*/
+    int n, k;
+    std::cin >> n >> k;
+    std::vector<int> a(n);
+    std::vector<int> b(n);
+    std::cin >> a >> b;
+
+    int s{};
+    for (int i{}; i != n; ++i) {
+        s += a[i] / b[i];
+    }
+    if (s < k) {
+        for (int i{}; i != n; ++i) {
+            std::print("0 ");
+        }
+        std::println();
+    }
+    else {
+        std::vector<int> ans;
+        for (int i{n - 1}; i != -1; --i) {
+            auto const todo{std::min(k, a[i] / b[i])};
+            ans.push_back(todo);
+            k -= todo;
+        }
+        std::ranges::reverse(ans);
+        for (auto e : ans) {
+            std::print("{} ", e);
+        }
+        std::println();
+    }
 }
 } // namespace

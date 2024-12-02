@@ -1,10 +1,10 @@
 #pragma once
 
-/*Problem: $(PROBLEM)*/
-/*Contest: $(CONTEST)*/
-/*Judge: $(JUDGE)*/
-/*URL: $(URL)*/
-/*Start: $(DATE)*/
+/*Problem: 劳苏的数字*/
+/*Contest: unknown_contest*/
+/*Judge: NowCoder*/
+/*URL: https://ac.nowcoder.com/acm/contest/93820/E*/
+/*Start: Sat 16 Nov 2024 07:07:24 PM CST*/
 /*Author: ShelpAm*/
 
 // #include <bits/stdc++.h>
@@ -156,7 +156,7 @@ auto main() -> int
     constexpr auto my_precision{10};
     std::cout << std::fixed << std::setprecision(my_precision);
     int t{1};
-    // std::cin >> t;
+    std::cin >> t;
     for (int i{}; i != t; ++i) {
         try {
             std::cerr << "Test case " << i << '\n';
@@ -173,6 +173,18 @@ using i64 = std::int_fast64_t;
 using u64 = std::uint_fast64_t;
 void solve_case()
 {
-    /*return;*/
+    std::array<std::string, 3> a;
+    std::cin >> a;
+    std::cout << (std::ranges::any_of(a,
+                                      [](auto const &e) {
+                                          int s{};
+                                          for (auto ch : e) {
+                                              s += ch - '0';
+                                          }
+                                          return s % 3 == 0;
+                                      })
+                      ? "LaoSu Like Fake"
+                      : "LaoSu Don't Like Fake")
+              << '\n';
 }
 } // namespace
