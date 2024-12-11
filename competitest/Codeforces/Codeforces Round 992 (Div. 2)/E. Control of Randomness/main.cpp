@@ -1,10 +1,10 @@
 #pragma once
 
-/*Problem: $(PROBLEM)*/
-/*Contest: $(CONTEST)*/
-/*Judge: $(JUDGE)*/
-/*URL: $(URL)*/
-/*Start: $(DATE)*/
+/*Problem: E. Control of Randomness*/
+/*Contest: Codeforces Round 992 (Div. 2)*/
+/*Judge: Codeforces*/
+/*URL: https://codeforces.com/contest/2040/problem/E*/
+/*Start: Mon 09 Dec 2024 01:41:00 PM CST*/
 /*Author: ShelpAm*/
 
 // #include <bits/stdc++.h>
@@ -156,7 +156,7 @@ auto main() -> int
     constexpr auto my_precision{10};
     std::cout << std::fixed << std::setprecision(my_precision);
     int t{1};
-    // std::cin >> t;
+    std::cin >> t;
     for (int i{}; i != t; ++i) {
 #ifndef ONLINE_JUDGE
         std::cerr << "Test case " << i << '\n';
@@ -171,6 +171,57 @@ using i64 = std::int_fast64_t;
 using u64 = std::uint_fast64_t;
 void solve_case()
 {
-    /*return;*/
+    int n, q;
+    std::cin >> n >> q;
+    std::vector<std::vector<int>> adj(n);
+    for (int i{}; i != n - 1; ++i) {
+        int u, v;
+        std::cin >> u >> v;
+        adj[--u].push_back(--v);
+        adj[v].push_back(u);
+    }
+    std::vector<std::pair<int, int>> queries(q);
+    std::cin >> queries;
+
+    std::vector<int> pa(n);
+    std::vector<int> sons(n);
+    auto init{[&](this auto init, int u, int p) -> void {
+        pa[u] = p;
+        for (auto const v : adj[u]) {
+            if (v != p) {
+                init(v, u);
+                ++sons[u];
+            }
+        }
+    }};
+    init(0, 0);
+
+    for (auto &[u, p] : queries) {
+        --u;
+
+        std::vector<int> extra;
+        int f{};
+        auto dfs{[&](this auto dfs, int u) -> void {
+            if (u == 0) {
+                return;
+            }
+            auto const x{sons[pa[u]]};
+            // We keep the i is odd.
+            if (pa[u] == 0) {
+                f += 1;
+            }
+            else {
+                f += 2 * (x + 1);
+                extra.push_back(2 * x);
+                dfs(pa[pa[u]]);
+            }
+        }};
+        dfs(u);
+        std::ranges::sort(extra, std::ranges::greater{});
+        for (auto const e : extra | std::views::take(p)) {
+            f -= e;
+        }
+        std::cout << f << '\n';
+    }
 }
 } // namespace

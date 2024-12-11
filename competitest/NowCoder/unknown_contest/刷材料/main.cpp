@@ -1,10 +1,10 @@
 #pragma once
 
-/*Problem: $(PROBLEM)*/
-/*Contest: $(CONTEST)*/
-/*Judge: $(JUDGE)*/
-/*URL: $(URL)*/
-/*Start: $(DATE)*/
+/*Problem: 刷材料*/
+/*Contest: unknown_contest*/
+/*Judge: NowCoder*/
+/*URL: https://ac.nowcoder.com/acm/contest/97487/E*/
+/*Start: Sat 07 Dec 2024 02:26:55 PM CST*/
 /*Author: ShelpAm*/
 
 // #include <bits/stdc++.h>
@@ -100,19 +100,19 @@ constexpr auto sum_of(std::ranges::range auto const &coll) noexcept
 {
     return std::accumulate(coll.begin(), coll.end(), std::int_fast64_t{});
 }
-constexpr auto pow(auto base, std::int_fast64_t exp, std::uint_fast64_t p)
+constexpr auto pow(auto a, std::int_fast64_t b, std::uint_fast64_t p)
 {
-    static_assert(sizeof(base) > sizeof(int), "Use of `int`s is bug-prone.");
-    if (exp < 0) {
-        throw std::invalid_argument{"Exponent should be non-negative"};
+    static_assert(sizeof(a) > sizeof(int), "Use of int is bug-prone.");
+    if (b < 0) {
+        throw std::invalid_argument{"Invalid exponent. It should be positive."};
     }
-    decltype(base) res{1};
-    while (exp != 0) {
-        if ((exp & 1) == 1) {
-            res = res * base % p;
+    decltype(a) res{1};
+    while (b != 0) {
+        if ((b & 1) == 1) {
+            res = res * a % p;
         }
-        base = base * base % p;
-        exp >>= 1;
+        a = a * a % p;
+        b >>= 1;
     }
     return res;
 }
@@ -139,7 +139,7 @@ constexpr auto msb(std::unsigned_integral auto i) -> int
     if (i == 0) {
         throw std::invalid_argument{"i must be positive."};
     }
-    return (sizeof(i) * CHAR_BIT) - 1 - std::countl_zero(i);
+    return sizeof(i) * CHAR_BIT - 1 - std::countl_zero(i);
 }
 /*[[maybe_unused]] auto gen_rand() noexcept*/
 /*{*/
@@ -158,19 +158,104 @@ auto main() -> int
     int t{1};
     // std::cin >> t;
     for (int i{}; i != t; ++i) {
-#ifndef ONLINE_JUDGE
-        std::cerr << "Test case " << i << '\n';
-#endif
-        solve_case();
+        try {
+            std::cerr << "Test case " << i << '\n';
+            solve_case();
+        }
+        catch (std::exception &e) {
+            std::cerr << "Exception: " << e.what() << '\n';
+        }
     }
     return 0;
 }
-using namespace shelpam;
 namespace {
 using i64 = std::int_fast64_t;
 using u64 = std::uint_fast64_t;
+class Combinatorics {
+  public:
+    /// @param  upper_bound  Maximum number whose inverse can be queried.
+    /// @param  mod  Modulos of the results.
+    Combinatorics(int upper_bound, std::int_fast64_t const mod)
+        : _inverse(upper_bound + 1), _factorial(upper_bound + 1),
+          _prefix_inverse(upper_bound + 1), _upper_bound(upper_bound), _mod{mod}
+    {
+        _inverse[0] = _inverse[1] = _factorial[0] = _factorial[1] =
+            _prefix_inverse[0] = _prefix_inverse[1] = 1;
+        for (std::int_fast64_t i{2}; i != upper_bound + 1; ++i) {
+            _inverse[i] = (mod - mod / i) * _inverse[mod % i] % mod;
+            _factorial[i] = _factorial[i - 1] * i % mod;
+            _prefix_inverse[i] = _prefix_inverse[i - 1] * _inverse[i] % mod;
+        }
+    }
+
+    [[nodiscard]] auto inverse(int const n) const -> std::int_fast64_t
+    {
+        return _inverse[n];
+    }
+
+    [[nodiscard]] auto factorial(int const n) const -> std::int_fast64_t
+    {
+        assert(n >= 0);
+        assert(n <= _upper_bound);
+        return _factorial[n];
+    }
+
+    [[nodiscard]] auto prefix_inverse(int const n) const -> std::int_fast64_t
+    {
+        assert(n >= 0);
+        assert(n <= _upper_bound);
+        return _prefix_inverse[n];
+    }
+
+    auto combination(int const n, int const m) -> std::int_fast64_t
+    {
+        assert(n >= 0);
+        assert(n <= _upper_bound);
+        if (n < m) {
+            return 0;
+        }
+        return _factorial[n] * _prefix_inverse[m] % _mod *
+               _prefix_inverse[n - m] % _mod;
+    }
+
+  private:
+    std::vector<std::int_fast64_t> _inverse;
+    std::vector<std::int_fast64_t> _factorial;
+    std::vector<std::int_fast64_t> _prefix_inverse;
+    std::int_fast64_t _upper_bound;
+    std::int_fast64_t _mod;
+};
 void solve_case()
 {
-    /*return;*/
+    int n, m, k;
+    std::cin >> n >> m >> k;
+    std::vector<int> a(k);
+    std::cin >> a;
+    m -= n;
+
+    i64 ans{};
+    Combinatorics c{200000, mod1e9p7};
+
+    int depth{};
+    auto dfs{[&](auto dfs, int i, int sum, i64 inv, int cnt) -> void {
+        if (sum >= m) {
+            (ans += inv * c.factorial(cnt) % mod1e9p7) %= mod1e9p7;
+            debug(std::string(2 * depth, ' ') + "delta",
+                  inv * c.factorial(cnt) % mod1e9p7);
+        }
+        if (i == k) {
+            return;
+        }
+        for (int j{}; sum + (j - 1) * a[i] < m; ++j) {
+            ++depth;
+            std::cerr << std::string(2 * depth, ' ') << "in " << i
+                      << "-th, selected " << j << '\n';
+            dfs(dfs, i + 1, sum + (j * a[i]),
+                inv * c.prefix_inverse(j) % mod1e9p7, cnt + j);
+            --depth;
+        }
+    }};
+    dfs(dfs, 0, 0, 1, 0);
+    std::cout << ans << '\n';
 }
 } // namespace

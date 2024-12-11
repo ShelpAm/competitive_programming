@@ -1,10 +1,10 @@
 #pragma once
 
-/*Problem: $(PROBLEM)*/
-/*Contest: $(CONTEST)*/
-/*Judge: $(JUDGE)*/
-/*URL: $(URL)*/
-/*Start: $(DATE)*/
+/*Problem: C. Ordered Permutations*/
+/*Contest: Codeforces Round 992 (Div. 2)*/
+/*Judge: Codeforces*/
+/*URL: https://codeforces.com/contest/2040/problem/C*/
+/*Start: Sun 08 Dec 2024 11:13:49 PM CST*/
 /*Author: ShelpAm*/
 
 // #include <bits/stdc++.h>
@@ -100,19 +100,19 @@ constexpr auto sum_of(std::ranges::range auto const &coll) noexcept
 {
     return std::accumulate(coll.begin(), coll.end(), std::int_fast64_t{});
 }
-constexpr auto pow(auto base, std::int_fast64_t exp, std::uint_fast64_t p)
+constexpr auto pow(auto a, std::int_fast64_t b, std::uint_fast64_t p)
 {
-    static_assert(sizeof(base) > sizeof(int), "Use of `int`s is bug-prone.");
-    if (exp < 0) {
-        throw std::invalid_argument{"Exponent should be non-negative"};
+    static_assert(sizeof(a) > sizeof(int), "Use of int is bug-prone.");
+    if (b < 0) {
+        throw std::invalid_argument{"Invalid exponent. It should be positive."};
     }
-    decltype(base) res{1};
-    while (exp != 0) {
-        if ((exp & 1) == 1) {
-            res = res * base % p;
+    decltype(a) res{1};
+    while (b != 0) {
+        if ((b & 1) == 1) {
+            res = res * a % p;
         }
-        base = base * base % p;
-        exp >>= 1;
+        a = a * a % p;
+        b >>= 1;
     }
     return res;
 }
@@ -139,7 +139,7 @@ constexpr auto msb(std::unsigned_integral auto i) -> int
     if (i == 0) {
         throw std::invalid_argument{"i must be positive."};
     }
-    return (sizeof(i) * CHAR_BIT) - 1 - std::countl_zero(i);
+    return sizeof(i) * CHAR_BIT - 1 - std::countl_zero(i);
 }
 /*[[maybe_unused]] auto gen_rand() noexcept*/
 /*{*/
@@ -156,21 +156,86 @@ auto main() -> int
     constexpr auto my_precision{10};
     std::cout << std::fixed << std::setprecision(my_precision);
     int t{1};
-    // std::cin >> t;
+    std::cin >> t;
     for (int i{}; i != t; ++i) {
-#ifndef ONLINE_JUDGE
-        std::cerr << "Test case " << i << '\n';
-#endif
-        solve_case();
+        try {
+            std::cerr << "Test case " << i << '\n';
+            solve_case();
+        }
+        catch (std::exception &e) {
+            std::cerr << "Exception: " << e.what() << '\n';
+        }
     }
     return 0;
 }
-using namespace shelpam;
 namespace {
 using i64 = std::int_fast64_t;
 using u64 = std::uint_fast64_t;
 void solve_case()
 {
-    /*return;*/
+    int n;
+    i64 k;
+    std::cin >> n >> k;
+
+    if (n <= 63 && 1ULL << (n - 1) < k) {
+        std::cout << -1 << '\n';
+        return;
+    }
+
+    k -= 1;
+    std::vector<int> a(n);
+    int l{}, r{n - 1};
+    int t{1};
+    for (int i{n - 2}; i != -1; --i) {
+        if (i >= 63 || !(k & 1ULL << i)) {
+            a[l++] = t++;
+        }
+        else {
+            a[r--] = t++;
+        }
+    }
+    a[l] = t++;
+
+    for (auto const e : a) {
+        std::cout << e << ' ';
+    }
+    std::cout << '\n';
+
+    // auto s{[](std::ranges::range auto const &a) {
+    //     i64 res{};
+    //     for (int i{}; i != a.size(); ++i) {
+    //         for (int j{i}; j != a.size(); ++j) {
+    //             res +=
+    //                 *std::ranges::min_element(a.begin() + i, a.begin() + j +
+    //                 1);
+    //         }
+    //     }
+    //     return res;
+    // }};
+    //
+    // {
+    //     std::vector<int> a(n);
+    //     std::ranges::iota(a, 1);
+    //     std::map<i64, std::vector<std::vector<int>>> mp;
+    //     do {
+    //         mp[s(a)].push_back(a);
+    //     } while (std::next_permutation(a.begin(), a.end()));
+    //
+    //     debug("?", *mp.rbegin());
+    //     debug("size", mp.rbegin()->second.size());
+    // }
+
+    // std::vector<i64> factorial{1};
+    // for (int i{1}; i != n; ++i) {
+    //     factorial.push_back(factorial.back() * i);
+    //     if (factorial.back() > 1e12) {
+    //         break;
+    //     }
+    // }
+    //
+    // if (factorial[n] < k) {
+    //     std::cout << -1 << '\n';
+    //     return;
+    // }
 }
 } // namespace

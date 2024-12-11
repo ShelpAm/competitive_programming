@@ -1,10 +1,10 @@
 #pragma once
 
-/*Problem: $(PROBLEM)*/
-/*Contest: $(CONTEST)*/
-/*Judge: $(JUDGE)*/
-/*URL: $(URL)*/
-/*Start: $(DATE)*/
+/*Problem: A. Line Breaks*/
+/*Contest: Codeforces Round 991 (Div. 3)*/
+/*Judge: Codeforces*/
+/*URL: https://codeforces.com/contest/2050/problem/A*/
+/*Start: Fri 06 Dec 2024 01:44:01 AM CST*/
 /*Author: ShelpAm*/
 
 // #include <bits/stdc++.h>
@@ -100,19 +100,19 @@ constexpr auto sum_of(std::ranges::range auto const &coll) noexcept
 {
     return std::accumulate(coll.begin(), coll.end(), std::int_fast64_t{});
 }
-constexpr auto pow(auto base, std::int_fast64_t exp, std::uint_fast64_t p)
+constexpr auto pow(auto a, std::int_fast64_t b, std::uint_fast64_t p)
 {
-    static_assert(sizeof(base) > sizeof(int), "Use of `int`s is bug-prone.");
-    if (exp < 0) {
-        throw std::invalid_argument{"Exponent should be non-negative"};
+    static_assert(sizeof(a) > sizeof(int), "Use of int is bug-prone.");
+    if (b < 0) {
+        throw std::invalid_argument{"Invalid exponent. It should be positive."};
     }
-    decltype(base) res{1};
-    while (exp != 0) {
-        if ((exp & 1) == 1) {
-            res = res * base % p;
+    decltype(a) res{1};
+    while (b != 0) {
+        if ((b & 1) == 1) {
+            res = res * a % p;
         }
-        base = base * base % p;
-        exp >>= 1;
+        a = a * a % p;
+        b >>= 1;
     }
     return res;
 }
@@ -139,7 +139,7 @@ constexpr auto msb(std::unsigned_integral auto i) -> int
     if (i == 0) {
         throw std::invalid_argument{"i must be positive."};
     }
-    return (sizeof(i) * CHAR_BIT) - 1 - std::countl_zero(i);
+    return sizeof(i) * CHAR_BIT - 1 - std::countl_zero(i);
 }
 /*[[maybe_unused]] auto gen_rand() noexcept*/
 /*{*/
@@ -156,21 +156,38 @@ auto main() -> int
     constexpr auto my_precision{10};
     std::cout << std::fixed << std::setprecision(my_precision);
     int t{1};
-    // std::cin >> t;
+    std::cin >> t;
     for (int i{}; i != t; ++i) {
-#ifndef ONLINE_JUDGE
-        std::cerr << "Test case " << i << '\n';
-#endif
-        solve_case();
+        try {
+            std::cerr << "Test case " << i << '\n';
+            solve_case();
+        }
+        catch (std::exception &e) {
+            std::cerr << "Exception: " << e.what() << '\n';
+        }
     }
     return 0;
 }
-using namespace shelpam;
 namespace {
 using i64 = std::int_fast64_t;
 using u64 = std::uint_fast64_t;
 void solve_case()
 {
-    /*return;*/
+    int n, k;
+    std::cin >> n >> k;
+    std::vector<std::string> a(n);
+    std::cin >> a;
+
+    for (int i{}; auto const &s : a) {
+        k -= s.size();
+
+        if (k < 0) {
+            std::cout << i << '\n';
+            return;
+        }
+        ++i;
+    }
+
+    std::cout << n << '\n';
 }
 } // namespace

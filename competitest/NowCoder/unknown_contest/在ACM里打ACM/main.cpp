@@ -1,10 +1,10 @@
 #pragma once
 
-/*Problem: $(PROBLEM)*/
-/*Contest: $(CONTEST)*/
-/*Judge: $(JUDGE)*/
-/*URL: $(URL)*/
-/*Start: $(DATE)*/
+/*Problem: 在ACM里打ACM*/
+/*Contest: unknown_contest*/
+/*Judge: NowCoder*/
+/*URL: https://ac.nowcoder.com/acm/contest/97487/A*/
+/*Start: Sat 07 Dec 2024 01:26:11 PM CST*/
 /*Author: ShelpAm*/
 
 // #include <bits/stdc++.h>
@@ -100,19 +100,19 @@ constexpr auto sum_of(std::ranges::range auto const &coll) noexcept
 {
     return std::accumulate(coll.begin(), coll.end(), std::int_fast64_t{});
 }
-constexpr auto pow(auto base, std::int_fast64_t exp, std::uint_fast64_t p)
+constexpr auto pow(auto a, std::int_fast64_t b, std::uint_fast64_t p)
 {
-    static_assert(sizeof(base) > sizeof(int), "Use of `int`s is bug-prone.");
-    if (exp < 0) {
-        throw std::invalid_argument{"Exponent should be non-negative"};
+    static_assert(sizeof(a) > sizeof(int), "Use of int is bug-prone.");
+    if (b < 0) {
+        throw std::invalid_argument{"Invalid exponent. It should be positive."};
     }
-    decltype(base) res{1};
-    while (exp != 0) {
-        if ((exp & 1) == 1) {
-            res = res * base % p;
+    decltype(a) res{1};
+    while (b != 0) {
+        if ((b & 1) == 1) {
+            res = res * a % p;
         }
-        base = base * base % p;
-        exp >>= 1;
+        a = a * a % p;
+        b >>= 1;
     }
     return res;
 }
@@ -139,7 +139,7 @@ constexpr auto msb(std::unsigned_integral auto i) -> int
     if (i == 0) {
         throw std::invalid_argument{"i must be positive."};
     }
-    return (sizeof(i) * CHAR_BIT) - 1 - std::countl_zero(i);
+    return sizeof(i) * CHAR_BIT - 1 - std::countl_zero(i);
 }
 /*[[maybe_unused]] auto gen_rand() noexcept*/
 /*{*/
@@ -158,19 +158,56 @@ auto main() -> int
     int t{1};
     // std::cin >> t;
     for (int i{}; i != t; ++i) {
-#ifndef ONLINE_JUDGE
-        std::cerr << "Test case " << i << '\n';
-#endif
-        solve_case();
+        try {
+            std::cerr << "Test case " << i << '\n';
+            solve_case();
+        }
+        catch (std::exception &e) {
+            std::cerr << "Exception: " << e.what() << '\n';
+        }
     }
     return 0;
 }
-using namespace shelpam;
 namespace {
 using i64 = std::int_fast64_t;
 using u64 = std::uint_fast64_t;
 void solve_case()
 {
-    /*return;*/
+    std::unordered_map<std::string, std::pair<int, int>> ans;
+    std::unordered_map<std::string, std::unordered_set<char>> ac;
+    std::unordered_map<std::string, std::unordered_map<char, int>> penalty;
+
+    int n;
+    std::cin >> n;
+    for (int i{}; i != n; ++i) {
+        std::string s;
+        char c;
+        int passed;
+        int t;
+        std::cin >> s >> c >> passed >> t;
+
+        if (ac[s].contains(c)) {
+            continue;
+        }
+
+        if (passed) {
+            ++ans[s].first;
+            ans[s].second -= t + penalty[s][c];
+            ac[s].insert(c);
+        }
+        else {
+            penalty[s][c] += 20;
+        }
+    }
+
+    std::pair<std::string, std::pair<int, int>> championship;
+    debug("chap", championship);
+    for (auto const &[k, v] : ans) {
+        if (chmax(championship.second, v)) {
+            championship = {k, v};
+        }
+    }
+    std::cout << championship.first << ' ' << championship.second.first << ' '
+              << -championship.second.second << '\n';
 }
 } // namespace

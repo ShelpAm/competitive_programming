@@ -1,10 +1,10 @@
 #pragma once
 
-/*Problem: $(PROBLEM)*/
-/*Contest: $(CONTEST)*/
-/*Judge: $(JUDGE)*/
-/*URL: $(URL)*/
-/*Start: $(DATE)*/
+/*Problem: 民以食为天*/
+/*Contest: unknown_contest*/
+/*Judge: NowCoder*/
+/*URL: https://ac.nowcoder.com/acm/contest/97487/D*/
+/*Start: Sat 07 Dec 2024 01:06:31 PM CST*/
 /*Author: ShelpAm*/
 
 // #include <bits/stdc++.h>
@@ -100,19 +100,19 @@ constexpr auto sum_of(std::ranges::range auto const &coll) noexcept
 {
     return std::accumulate(coll.begin(), coll.end(), std::int_fast64_t{});
 }
-constexpr auto pow(auto base, std::int_fast64_t exp, std::uint_fast64_t p)
+constexpr auto pow(auto a, std::int_fast64_t b, std::uint_fast64_t p)
 {
-    static_assert(sizeof(base) > sizeof(int), "Use of `int`s is bug-prone.");
-    if (exp < 0) {
-        throw std::invalid_argument{"Exponent should be non-negative"};
+    static_assert(sizeof(a) > sizeof(int), "Use of int is bug-prone.");
+    if (b < 0) {
+        throw std::invalid_argument{"Invalid exponent. It should be positive."};
     }
-    decltype(base) res{1};
-    while (exp != 0) {
-        if ((exp & 1) == 1) {
-            res = res * base % p;
+    decltype(a) res{1};
+    while (b != 0) {
+        if ((b & 1) == 1) {
+            res = res * a % p;
         }
-        base = base * base % p;
-        exp >>= 1;
+        a = a * a % p;
+        b >>= 1;
     }
     return res;
 }
@@ -139,7 +139,7 @@ constexpr auto msb(std::unsigned_integral auto i) -> int
     if (i == 0) {
         throw std::invalid_argument{"i must be positive."};
     }
-    return (sizeof(i) * CHAR_BIT) - 1 - std::countl_zero(i);
+    return sizeof(i) * CHAR_BIT - 1 - std::countl_zero(i);
 }
 /*[[maybe_unused]] auto gen_rand() noexcept*/
 /*{*/
@@ -158,19 +158,117 @@ auto main() -> int
     int t{1};
     // std::cin >> t;
     for (int i{}; i != t; ++i) {
-#ifndef ONLINE_JUDGE
-        std::cerr << "Test case " << i << '\n';
-#endif
-        solve_case();
+        try {
+            std::cerr << "Test case " << i << '\n';
+            solve_case();
+        }
+        catch (std::exception &e) {
+            std::cerr << "Exception: " << e.what() << '\n';
+        }
     }
     return 0;
 }
-using namespace shelpam;
 namespace {
 using i64 = std::int_fast64_t;
 using u64 = std::uint_fast64_t;
+namespace shelpam::linear_algebra {
+
+[[maybe_unused]] constexpr long double eps{1e-8};
+
+auto square(auto x) -> decltype(x * x)
+{
+    return x * x;
+}
+
+struct Vector {
+    [[nodiscard]] auto length() const -> long
+    {
+        return std::sqrt((x * x) + (y * y));
+    }
+
+    long x, y;
+};
+using Point = Vector;
+
+auto operator==(Vector u, Vector v) -> bool
+{
+    return std::abs(u.x - v.x) < eps && std::abs(u.y - v.y) < eps;
+}
+
+auto operator+(Vector u, Vector v) -> Vector
+{
+    return {.x = u.x + v.x, .y = u.y + v.y};
+}
+
+auto operator-(Vector u, Vector v) -> Vector
+{
+    return {.x = u.x - v.x, .y = u.y - v.y};
+}
+
+auto dot(Vector u, Vector v) -> long
+{
+    return (u.x * v.x) + (u.y * v.y);
+}
+
+auto cross(Vector u, Vector v) -> long double
+{
+    return (u.x * v.y) - (u.y * v.x);
+}
+
+auto area(Point p, Point q, Point r) -> long double
+{
+    return std::abs(cross(p - q, p - r)) / 2;
+}
+
+using Polygen = std::vector<Point>; // Points in std::vector should be ordered.
+auto in_polygen(Polygen const &poly, Point p) -> bool
+{
+    long double a{};
+    for (std::size_t i{}; i != poly.size(); ++i) {
+        a += area(poly[0], poly[i], poly[(i + 1) % poly.size()]);
+        a -= area(p, poly[i], poly[(i + 1) % poly.size()]);
+    }
+    return std::abs(a) < eps;
+}
+
+struct Rectangle {
+    [[nodiscard]] auto width() const -> long double
+    {
+        return std::abs(p.x - q.x);
+    }
+
+    [[nodiscard]] auto height() const -> long double
+    {
+        return std::abs(p.y - q.y);
+    }
+
+    Point p, q;
+};
+
+// 非相切的相交
+auto intersect(Rectangle const &r1, Rectangle const &r2) -> bool
+{
+    auto const dx{r1.p.x + r1.q.x - r2.p.x - r2.q.x};
+    auto const dy{r1.p.y + r1.q.y - r2.p.y - r2.q.y};
+    return dx < r1.width() + r2.width() && dy < r1.height() + r2.height();
+}
+
+} // namespace shelpam::linear_algebra
 void solve_case()
 {
-    /*return;*/
+    using namespace shelpam::linear_algebra;
+
+    Vector a, b;
+
+    int x, y, p, q, s, t;
+    std::cin >> x >> y >> p >> q >> s >> t;
+
+    a = Vector{x - s, y - t};
+    b = Vector{p - s, q - t};
+
+    std::cout << (4 * (a.x * a.x + a.y * a.y) + (b.x * b.x + b.y * b.y) +
+                  4 * dot(a, b)) /
+                     9
+              << '\n';
 }
 } // namespace
