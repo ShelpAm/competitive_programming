@@ -1,11 +1,11 @@
 #pragma once
 
-// Problem: $(PROBLEM)
-// Contest: $(CONTEST)
-// Judge: $(JUDGE)
-// URL: $(URL)
-// Start: $(DATE)
-// Author: ShelpAm
+/*Problem: P1002 [NOIP2002 普及组] 过河卒*/
+/*Contest: unknown_contest*/
+/*Judge: Luogu*/
+/*URL: https://www.luogu.com.cn/problem/P1002*/
+/*Start: Thu 12 Dec 2024 02:08:54 PM CST*/
+/*Author: ShelpAm*/
 
 // #include <bits/stdc++.h>
 #include <algorithm>
@@ -37,8 +37,8 @@
 #include <vector>
 
 namespace {
-[[maybe_unused]] constexpr std::uint_least64_t mod998244353{998'244'353ULL};
-[[maybe_unused]] constexpr std::uint_least64_t mod1e9p7{1'000'000'007ULL};
+[[maybe_unused]] constexpr std::uint_fast64_t mod998244353{998'244'353ULL};
+[[maybe_unused]] constexpr std::uint_fast64_t mod1e9p7{1'000'000'007ULL};
 [[maybe_unused]] constexpr double eps{1e-8};
 template <typename T> constexpr T inf{std::numeric_limits<T>::max() / 4};
 template <typename T> constexpr T max{std::numeric_limits<T>::max()};
@@ -98,9 +98,9 @@ auto chmin(auto &value, auto const &other) noexcept -> bool
 }
 constexpr auto sum_of(std::ranges::range auto const &coll) noexcept
 {
-    return std::accumulate(coll.begin(), coll.end(), std::int_least64_t{});
+    return std::accumulate(coll.begin(), coll.end(), std::int_fast64_t{});
 }
-constexpr auto pow(auto base, std::int_least64_t exp, std::uint_least64_t p)
+constexpr auto pow(auto base, std::int_fast64_t exp, std::uint_fast64_t p)
 {
     static_assert(sizeof(base) > sizeof(int), "Use of `int`s is bug-prone.");
     if (exp < 0) {
@@ -116,9 +116,9 @@ constexpr auto pow(auto base, std::int_least64_t exp, std::uint_least64_t p)
     }
     return res;
 }
-auto binary_search(std::invocable<std::int_least64_t> auto check,
-                   std::int_least64_t ok, std::int_least64_t ng,
-                   bool check_ok = true) -> std::int_least64_t
+auto binary_search(std::invocable<std::int_fast64_t> auto check,
+                   std::int_fast64_t ok, std::int_fast64_t ng,
+                   bool check_ok = true) -> std::int_fast64_t
 {
     if (check_ok && !check(ok)) {
         throw std::invalid_argument{"check isn't true on 'ok'."};
@@ -167,10 +167,35 @@ auto main() -> int
 }
 using namespace shelpam;
 namespace {
-using i64 = std::int_least64_t;
-using u64 = std::uint_least64_t;
+using i64 = std::int_fast64_t;
+using u64 = std::uint_fast64_t;
 void solve_case()
 {
-    // return;
+    int bx, by, cx, cy;
+    std::cin >> bx >> by >> cx >> cy;
+
+    std::vector<std::vector<i64>> _f(30, std::vector<i64>(30));
+    std::vector<std::vector<int>> _g(30, std::vector<int>(30, 1));
+    constexpr int offx{5}, offy{5};
+    auto f{[&](int x, int y) -> auto & { return _f[x + offx][y + offy]; }};
+    auto g{[&](int x, int y) -> int & { return _g[x + offx][y + offy]; }};
+
+    f(0, 0) = 1;
+    std::vector<std::pair<int, int>> const dirs{{-1, -2}, {-2, -1}, {1, 2},
+                                                {2, 1},   {-1, 2},  {2, -1},
+                                                {1, -2},  {-2, 1},  {0, 0}};
+    for (auto const &[dx, dy] : dirs) {
+        g(cx + dx, cy + dy) = 0;
+    }
+    for (int i{}; i != bx + 1; ++i) {
+        for (int j{}; j != by + 1; ++j) {
+            if (i == 0 && j == 0) {
+                continue;
+            }
+            f(i, j) = (f(i - 1, j) + f(i, j - 1)) * g(i, j);
+        }
+    }
+    std::cout << f(bx, by) << '\n';
+    debug("f", _f);
 }
 } // namespace
