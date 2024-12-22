@@ -1,10 +1,10 @@
 #pragma once
 
-// Problem: $(PROBLEM)
-// Contest: $(CONTEST)
-// Judge: $(JUDGE)
-// URL: $(URL)
-// Start: $(DATE)
+// Problem: 金条切割
+// Contest: unknown_contest
+// Judge: NowCoder
+// URL: https://ac.nowcoder.com/acm/contest/98246/A
+// Start: Fri 20 Dec 2024 09:03:09 PM CST
 // Author: ShelpAm
 
 // #include <bits/stdc++.h>
@@ -39,7 +39,7 @@
 namespace {
 [[maybe_unused]] constexpr std::uint_least64_t mod998244353{998'244'353ULL};
 [[maybe_unused]] constexpr std::uint_least64_t mod1e9p7{1'000'000'007ULL};
-[[maybe_unused]] constexpr double eps{1e-10};
+[[maybe_unused]] constexpr double eps{1e-8};
 template <typename T> constexpr T inf{std::numeric_limits<T>::max() / 4};
 template <typename T> constexpr T max{std::numeric_limits<T>::max()};
 
@@ -156,7 +156,7 @@ auto main() -> int
     constexpr auto my_precision{10};
     std::cout << std::fixed << std::setprecision(my_precision);
     int t{1};
-    // std::cin >> t;
+    std::cin >> t;
     for (int i{}; i != t; ++i) {
 #ifndef ONLINE_JUDGE
         std::cerr << "Test case " << i << '\n';
@@ -168,11 +168,23 @@ auto main() -> int
 using namespace shelpam;
 namespace {
 using i64 = std::int_least64_t;
-using i128 = __int128_t;
 using u64 = std::uint_least64_t;
-using u128 = __uint128_t;
 void solve_case()
 {
-    // return;
+    u64 l, m;
+    std::cin >> l >> m;
+
+    int s{};
+    for (int i{}; i != 31; ++i) {
+        s += 1 << i;
+        if (s >= l) {
+            std::cout << i << '\n';
+            return;
+        }
+        if (s >= m) {
+            std::cout << i + 1 << '\n';
+            return;
+        }
+    }
 }
 } // namespace

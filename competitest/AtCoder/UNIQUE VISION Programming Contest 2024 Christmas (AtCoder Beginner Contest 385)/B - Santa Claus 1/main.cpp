@@ -1,11 +1,10 @@
 #pragma once
 
-// Problem: $(PROBLEM)
-// Contest: $(CONTEST)
-// Judge: $(JUDGE)
-// URL: $(URL)
-// Start: $(DATE)
-// Author: ShelpAm
+// Problem: B - Santa Claus 1
+// Contest: UNIQUE VISION Programming Contest 2024 Christmas (AtCoder Beginner
+// Contest 385) Judge: AtCoder URL:
+// https://atcoder.jp/contests/abc385/tasks/abc385_b Start: Sat 21 Dec 2024
+// 08:41:21 PM CST Author: ShelpAm
 
 // #include <bits/stdc++.h>
 #include <algorithm>
@@ -39,7 +38,7 @@
 namespace {
 [[maybe_unused]] constexpr std::uint_least64_t mod998244353{998'244'353ULL};
 [[maybe_unused]] constexpr std::uint_least64_t mod1e9p7{1'000'000'007ULL};
-[[maybe_unused]] constexpr double eps{1e-10};
+[[maybe_unused]] constexpr double eps{1e-8};
 template <typename T> constexpr T inf{std::numeric_limits<T>::max() / 4};
 template <typename T> constexpr T max{std::numeric_limits<T>::max()};
 
@@ -168,11 +167,33 @@ auto main() -> int
 using namespace shelpam;
 namespace {
 using i64 = std::int_least64_t;
-using i128 = __int128_t;
 using u64 = std::uint_least64_t;
-using u128 = __uint128_t;
 void solve_case()
 {
-    // return;
+    int h, w, x, y;
+    std::cin >> h >> w >> x >> y;
+    --x, --y;
+    std::vector<std::string> a(h);
+    std::cin >> a;
+    std::string t;
+    std::cin >> t;
+
+    std::unordered_map<char, std::pair<int, int>> dirs{
+        {'U', {-1, 0}}, {'D', {1, 0}}, {'L', {0, -1}}, {'R', {0, 1}}};
+
+    std::set<std::pair<int, int>> p;
+
+    for (auto const e : t) {
+        auto [dx, dy]{dirs[e]};
+        dx += x, dy += y;
+        if (dx != -1 && dx != h && dy != -1 && dy != w && a[dx][dy] != '#') {
+            if (a[dx][dy] == '@') {
+                p.insert({dx, dy});
+            }
+            x = dx, y = dy;
+        }
+    }
+
+    std::cout << x + 1 << ' ' << y + 1 << ' ' << p.size() << '\n';
 }
 } // namespace

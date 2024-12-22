@@ -1,11 +1,10 @@
 #pragma once
 
-// Problem: $(PROBLEM)
-// Contest: $(CONTEST)
-// Judge: $(JUDGE)
-// URL: $(URL)
-// Start: $(DATE)
-// Author: ShelpAm
+// Problem: D - Santa Claus 2
+// Contest: UNIQUE VISION Programming Contest 2024 Christmas (AtCoder Beginner
+// Contest 385) Judge: AtCoder URL:
+// https://atcoder.jp/contests/abc385/tasks/abc385_d Start: Sat 21 Dec 2024
+// 08:52:49 PM CST Author: ShelpAm
 
 // #include <bits/stdc++.h>
 #include <algorithm>
@@ -39,7 +38,7 @@
 namespace {
 [[maybe_unused]] constexpr std::uint_least64_t mod998244353{998'244'353ULL};
 [[maybe_unused]] constexpr std::uint_least64_t mod1e9p7{1'000'000'007ULL};
-[[maybe_unused]] constexpr double eps{1e-10};
+[[maybe_unused]] constexpr double eps{1e-8};
 template <typename T> constexpr T inf{std::numeric_limits<T>::max() / 4};
 template <typename T> constexpr T max{std::numeric_limits<T>::max()};
 
@@ -168,11 +167,81 @@ auto main() -> int
 using namespace shelpam;
 namespace {
 using i64 = std::int_least64_t;
-using i128 = __int128_t;
 using u64 = std::uint_least64_t;
-using u128 = __uint128_t;
 void solve_case()
 {
-    // return;
+    int n, m;
+    i64 x, y;
+    std::cin >> n >> m >> x >> y;
+    std::vector<std::pair<int, int>> a(n);
+    std::vector<std::pair<char, int>> b(m);
+    std::cin >> a >> b;
+
+    std::unordered_map<i64, std::multimap<i64, i64>> horizontal;
+    std::unordered_map<i64, std::multimap<i64, i64>> vertical;
+
+    std::unordered_map<char, std::pair<i64, i64>> dirs{
+        {'U', {0, 1}}, {'D', {0, -1}}, {'L', {-1, 0}}, {'R', {1, 0}}};
+
+    for (auto const &[d, c] : b) {
+        auto [dx, dy]{dirs[d]};
+        if (dx != 0) {
+            auto const nx{x + (dx * c)};
+
+            auto p{std::make_pair(x, nx)};
+            if (p.first > p.second) {
+                std::swap(p.first, p.second);
+            }
+            horizontal[y].insert(p);
+
+            x = nx;
+        }
+        else { // dy != 0
+            auto const ny{y + (dy * c)};
+
+            auto p{std::make_pair(y, ny)};
+            if (p.first > p.second) {
+                std::swap(p.first, p.second);
+            }
+            vertical[x].insert(p);
+
+            y = ny;
+        }
+    }
+
+    auto fix{[](std::unordered_map<i64, std::multimap<i64, i64>> &c) {
+        for (auto &[_, c] : c) {
+            for (auto it{c.begin()}; it != c.end(); ++it) {
+                while (std::next(it) != c.end() &&
+                       std::next(it)->first <= it->second + 1) {
+                    chmax(it->second, std::next(it)->second);
+                    c.erase(std::next(it));
+                }
+            }
+        }
+    }};
+
+    fix(horizontal);
+    fix(vertical);
+
+    std::cout << x << ' ' << y << ' '
+              << std::ranges::count_if(
+                     a,
+                     [&](std::pair<int, int> const &p) {
+                         auto const &[x, y]{p};
+                         if (auto it{vertical[x].upper_bound(y)};
+                             it != vertical[x].begin() &&
+                             std::prev(it)->second >= y) {
+                             return true;
+                         }
+                         auto it{horizontal[y].upper_bound(x)};
+                         if (auto it{horizontal[y].upper_bound(x)};
+                             it != horizontal[y].begin() &&
+                             std::prev(it)->second >= x) {
+                             return true;
+                         }
+                         return false;
+                     })
+              << '\n';
 }
 } // namespace

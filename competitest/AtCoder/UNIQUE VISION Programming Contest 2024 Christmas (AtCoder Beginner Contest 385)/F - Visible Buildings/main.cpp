@@ -1,11 +1,10 @@
 #pragma once
 
-// Problem: $(PROBLEM)
-// Contest: $(CONTEST)
-// Judge: $(JUDGE)
-// URL: $(URL)
-// Start: $(DATE)
-// Author: ShelpAm
+// Problem: F - Visible Buildings
+// Contest: UNIQUE VISION Programming Contest 2024 Christmas (AtCoder Beginner
+// Contest 385) Judge: AtCoder URL:
+// https://atcoder.jp/contests/abc385/tasks/abc385_f Start: Sun 22 Dec 2024
+// 03:51:32 PM CST Author: ShelpAm
 
 // #include <bits/stdc++.h>
 #include <algorithm>
@@ -153,7 +152,7 @@ auto main() -> int
 {
     std::ios::sync_with_stdio(false);
     std::cin.tie(nullptr);
-    constexpr auto my_precision{10};
+    constexpr auto my_precision{16};
     std::cout << std::fixed << std::setprecision(my_precision);
     int t{1};
     // std::cin >> t;
@@ -170,9 +169,38 @@ namespace {
 using i64 = std::int_least64_t;
 using i128 = __int128_t;
 using u64 = std::uint_least64_t;
-using u128 = __uint128_t;
 void solve_case()
 {
-    // return;
+    int n;
+    std::cin >> n;
+    std::vector<std::pair<int, int>> a(n);
+    std::cin >> a;
+
+    using Ratio = std::pair<i128, i128>;
+    auto less{[](Ratio l, Ratio r) {
+        return l.first * r.second < l.second * r.first;
+    }};
+    auto value{[](Ratio r) {
+        return static_cast<double>(r.first) / static_cast<double>(r.second);
+    }};
+
+    Ratio ans{-1, 1};
+    for (int i{}; i != n - 1; ++i) {
+        i128 const h1{a[i].second};
+        i128 const h2{a[i + 1].second};
+        i128 const x1{a[i].first};
+        i128 const x2{a[i + 1].first};
+        Ratio const e{(x2 * h1) - (x1 * h2), x2 - x1};
+        if (less(ans, e)) {
+            ans = e;
+        }
+    }
+
+    if (value(ans) < -eps) {
+        std::cout << -1 << '\n';
+    }
+    else {
+        std::cout << value(ans) << '\n';
+    }
 }
 } // namespace
