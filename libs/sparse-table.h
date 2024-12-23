@@ -2,15 +2,16 @@
 
 #include "../templates/main.cpp"
 
-namespace sparse_table {
+namespace shelpam {
+
 // Note: 0-indexed
 template <typename T, typename F> class Sparse_table {
   public:
-    constexpr Sparse_table(std::vector<T> table)
-        : _table(msb(table.size()) + 1, std::move(table))
+    constexpr Sparse_table(std::vector<T> const &base)
+        : _table(msb(base.size()) + 1, base)
     {
         for (std::size_t i{1}; i != _table.size(); ++i) {
-            for (std::size_t j{}; j != _table[0].size(); ++j) {
+            for (std::size_t j{}; j + (1 << i) - 1 != _table[0].size(); ++j) {
                 _table[i][j] =
                     _f(_table[i - 1][j], _table[i - 1][j + (1 << (i - 1))]);
             }
@@ -55,4 +56,5 @@ template <typename T> class Max_st : public Sparse_table<T, details::Max<T>> {
     using Sparse_table<T, details::Max<T>>::Sparse_table;
 };
 template <typename T> Max_st(std::vector<T>) -> Max_st<T>;
-} // namespace sparse_table
+
+} // namespace shelpam
