@@ -1,10 +1,10 @@
 #pragma once
 
-// Problem: F. Sum and Product
-// Contest: Codeforces Round 891 (Div. 3)
+// Problem: C. Sums on Segments
+// Contest: Educational Codeforces Round 173 (Rated for Div. 2)
 // Judge: Codeforces
-// URL: https://codeforces.com/problemset/problem/1857/F
-// Start: Sun 29 Dec 2024 06:36:54 PM CST
+// URL: https://codeforces.com/contest/2043/problem/C
+// Start: Tue 24 Dec 2024 10:59:12 PM CST
 // Author: ShelpAm
 
 // #include <bits/stdc++.h>
@@ -171,41 +171,128 @@ using i64 = std::int_least64_t;
 using i128 = __int128_t;
 using u64 = std::uint_least64_t;
 using u128 = __uint128_t;
+#define int long long
 void solve_case()
 {
     int n;
     std::cin >> n;
     std::vector<int> a(n);
     std::cin >> a;
-    std::map<i64, i64> o;
-    for (auto const e : a) {
-        ++o[e];
+
+    std::set<int> o{0};
+
+    auto simpler_calc{[&o](std::vector<int> s) {
+        auto find_max_subarray{[](std::vector<int> const &a) {
+            int ans{};
+            for (int s{}; auto const e : a) {
+                s += e;
+                chmax(s, 0);
+                chmax(ans, s);
+            }
+            return ans;
+        }};
+        auto const max{find_max_subarray(s)};
+        auto const min{-find_max_subarray(
+            s | std::views::transform([](auto e) { return -e; }) |
+            std::ranges::to<std::vector<int>>())};
+
+        for (int i{min}; i <= max; ++i) {
+            o.insert(i);
+        }
+    }};
+
+    auto calc{[&o](std::span<int> s) {
+        if (s.empty()) {
+            return;
+        }
+
+        std::multimap<int, int> ranges;
+
+        std::vector smin(s.size(), 0), smax(s.size(), 0);
+        std::vector pmin(s.size(), 0), pmax(s.size(), 0);
+        for (int i{}, k{}; i != s.size(); ++i) {
+            k += s[i];
+            chmin(pmin[i], k);
+            chmax(pmax[i], k);
+            if (i > 0) {
+                chmin(pmin[i], pmin[i - 1]);
+                chmax(pmax[i], pmax[i - 1]);
+            }
+        }
+        for (int i = s.size() - 1, k{}; i != -1; --i) {
+            k += s[i];
+            chmin(smin[i], k);
+            chmax(smax[i], k);
+            if (i < s.size() - 1) {
+                chmin(smin[i], smin[i + 1]);
+                chmax(smax[i], smax[i + 1]);
+            }
+        }
+
+        int lsum{};
+        int rsum{sum_of(s)};
+        for (int i{}; i != s.size(); ++i) {
+            ranges.insert(
+                {(rsum - smax[i]) + (lsum - (i > 0 ? pmax[i - 1] : 0)),
+                 (rsum - smin[i]) + (lsum - (i > 0 ? pmin[i - 1] : 0))});
+
+            rsum -= s[i];
+            lsum += s[i];
+        }
+
+        // Merges
+        for (auto it{ranges.begin()}, end{ranges.end()}; it != end; ++it) {
+            while (std::next(it) != end &&
+                   std::next(it)->first <= it->second + 1) {
+                chmax(it->second, std::next(it)->second);
+                ranges.erase(std::next(it));
+            }
+        }
+
+        for (auto const &[l, r] : ranges) {
+            for (int i{l}; i <= r; ++i) {
+                o.insert(i);
+            }
+        }
+    }};
+
+    auto const p{std::ranges::find_if_not(
+        a, [](auto const e) { return std::abs(e) == 1; })};
+
+    if (p != a.end()) {
+        // x excluded
+        simpler_calc({a.begin(), p});
+        simpler_calc({std::next(p), a.end()});
+
+        // x included
+        auto const k{p - a.begin()};
+        int lmin{};
+        int lmax{};
+        int lsum{};
+        for (auto i{k - 1}; i != -1; --i) {
+            lsum += a[i];
+            chmin(lmin, lsum);
+            chmax(lmax, lsum);
+        }
+        int rmin{};
+        int rmax{};
+        int rsum{};
+        for (auto i{k + 1}; i != n; ++i) {
+            rsum += a[i];
+            chmin(rmin, rsum);
+            chmax(rmax, rsum);
+        }
+        for (int i{lmin + rmin}; i <= lmax + rmax; ++i) {
+            o.insert(i + *p);
+        }
     }
-    int q;
-    std::cin >> q;
-    for (int i{}; i != q; ++i) {
-        i64 x, y;
-        std::cin >> x >> y;
-        if (auto const t{(x * x) - (4 * y)}; t < 0) {
-            std::cout << 0 << ' ';
-        }
-        else if (t == 0) {
-            if (x % 2 != 0) {
-                std::cout << 0 << ' ';
-            }
-            else {
-                std::cout << o[x / 2] * (o[x / 2] - 1) / 2 << ' ';
-            }
-        }
-        else { // t > 0
-            if (i64 const r{static_cast<i64>(std::sqrt(t))};
-                r * r != t || (x - r) % 2 != 0 || (x + r) % 2 != 0) {
-                std::cout << 0 << ' ';
-            }
-            else {
-                std::cout << o[(x - r) / 2] * o[(x + r) / 2] << ' ';
-            }
-        }
+    else {
+        calc(a);
+    }
+
+    std::cout << o.size() << '\n';
+    for (auto const e : o) {
+        std::cout << e << ' ';
     }
     std::cout << '\n';
 }

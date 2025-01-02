@@ -1,10 +1,10 @@
 #pragma once
 
-// Problem: F. Sum and Product
-// Contest: Codeforces Round 891 (Div. 3)
-// Judge: Codeforces
-// URL: https://codeforces.com/problemset/problem/1857/F
-// Start: Sun 29 Dec 2024 06:36:54 PM CST
+// Problem: 而后单调
+// Contest: unknown_contest
+// Judge: NowCoder
+// URL: https://ac.nowcoder.com/acm/contest/99458/E
+// Start: Sun 29 Dec 2024 08:57:24 PM CST
 // Author: ShelpAm
 
 // #include <bits/stdc++.h>
@@ -173,40 +173,58 @@ using u64 = std::uint_least64_t;
 using u128 = __uint128_t;
 void solve_case()
 {
-    int n;
-    std::cin >> n;
+    int n, m;
+    std::cin >> n >> m;
     std::vector<int> a(n);
     std::cin >> a;
-    std::map<i64, i64> o;
-    for (auto const e : a) {
-        ++o[e];
+
+    if (std::set<int>{a.begin(), a.end()}.size() != n) {
+        std::cout << "NO\n";
+        return;
     }
-    int q;
-    std::cin >> q;
-    for (int i{}; i != q; ++i) {
-        i64 x, y;
-        std::cin >> x >> y;
-        if (auto const t{(x * x) - (4 * y)}; t < 0) {
-            std::cout << 0 << ' ';
-        }
-        else if (t == 0) {
-            if (x % 2 != 0) {
-                std::cout << 0 << ' ';
-            }
-            else {
-                std::cout << o[x / 2] * (o[x / 2] - 1) / 2 << ' ';
-            }
-        }
-        else { // t > 0
-            if (i64 const r{static_cast<i64>(std::sqrt(t))};
-                r * r != t || (x - r) % 2 != 0 || (x + r) % 2 != 0) {
-                std::cout << 0 << ' ';
-            }
-            else {
-                std::cout << o[(x - r) / 2] * o[(x + r) / 2] << ' ';
-            }
-        }
+
+    if (n == 1 || m == 1) {
+        std::cout << "YES\n";
+        return;
     }
-    std::cout << '\n';
+
+    auto solve{[&](auto const &a) {
+        std::vector<int> greater(n);
+        for (int i{1}; i != n; ++i) {
+            greater[i] = a[i] > a[i - 1];
+        }
+
+        int cnt{};
+        for (int i{1}; i != m - 1; ++i) {
+            cnt += greater[i];
+        }
+        std::set<int> s{max<int>};
+        for (int i{m - 1}; i != n; ++i) {
+            s.insert(a[i]);
+        }
+        for (int i{}, j{m - 1}; j != n; ++i, ++j) {
+            s.erase(a[j]);
+            cnt += greater[j];
+            if (cnt == m - 1 && *s.lower_bound(a[i]) > a[j]) {
+                return true;
+            }
+            s.insert(a[i]);
+            cnt -= greater[i + 1];
+        }
+        return false;
+    }};
+
+    if (solve(a)) {
+        std::cout << "YES\n";
+        return;
+    }
+    for (auto &e : a) {
+        e *= -1;
+    }
+    if (solve(a)) {
+        std::cout << "YES\n";
+        return;
+    }
+    std::cout << "NO\n";
 }
 } // namespace

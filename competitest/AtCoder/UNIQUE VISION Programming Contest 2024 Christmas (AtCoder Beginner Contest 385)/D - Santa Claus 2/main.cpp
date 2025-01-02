@@ -177,8 +177,10 @@ void solve_case()
     std::vector<std::pair<char, int>> b(m);
     std::cin >> a >> b;
 
-    std::unordered_map<i64, std::multimap<i64, i64>> horizontal;
-    std::unordered_map<i64, std::multimap<i64, i64>> vertical;
+    // Wrong answer, we can't use chmax here because the default value is 0, but
+    // it fails on negative ranges....
+    std::unordered_map<i64, std::map<i64, i64>> horizontal;
+    std::unordered_map<i64, std::map<i64, i64>> vertical;
 
     std::unordered_map<char, std::pair<i64, i64>> dirs{
         {'U', {0, 1}}, {'D', {0, -1}}, {'L', {-1, 0}}, {'R', {1, 0}}};
@@ -192,7 +194,7 @@ void solve_case()
             if (p.first > p.second) {
                 std::swap(p.first, p.second);
             }
-            horizontal[y].insert(p);
+            chmax(horizontal[y][p.first], p.second);
 
             x = nx;
         }
@@ -203,17 +205,19 @@ void solve_case()
             if (p.first > p.second) {
                 std::swap(p.first, p.second);
             }
-            vertical[x].insert(p);
+            chmax(vertical[x][p.first], p.second);
 
             y = ny;
         }
     }
 
-    auto fix{[](std::unordered_map<i64, std::multimap<i64, i64>> &c) {
+    auto fix{[](std::unordered_map<i64, std::map<i64, i64>> &c) {
         for (auto &[_, c] : c) {
             for (auto it{c.begin()}; it != c.end(); ++it) {
                 while (std::next(it) != c.end() &&
                        std::next(it)->first <= it->second + 1) {
+                    // Must use chmax here, rather than assign, because the
+                    // std::next(it)->second may be smaller than it->second....
                     chmax(it->second, std::next(it)->second);
                     c.erase(std::next(it));
                 }

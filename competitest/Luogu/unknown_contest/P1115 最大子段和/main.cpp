@@ -1,10 +1,10 @@
 #pragma once
 
-// Problem: F. Sum and Product
-// Contest: Codeforces Round 891 (Div. 3)
-// Judge: Codeforces
-// URL: https://codeforces.com/problemset/problem/1857/F
-// Start: Sun 29 Dec 2024 06:36:54 PM CST
+// Problem: P1115 最大子段和
+// Contest: unknown_contest
+// Judge: Luogu
+// URL: https://www.luogu.com.cn/problem/P1115
+// Start: Wed 25 Dec 2024 03:02:50 PM CST
 // Author: ShelpAm
 
 // #include <bits/stdc++.h>
@@ -156,7 +156,7 @@ auto main() -> int
     constexpr auto my_precision{10};
     std::cout << std::fixed << std::setprecision(my_precision);
     int t{1};
-    std::cin >> t;
+    // std::cin >> t;
     for (int i{}; i != t; ++i) {
 #ifndef ONLINE_JUDGE
         std::cerr << "Test case " << i << '\n';
@@ -175,38 +175,14 @@ void solve_case()
 {
     int n;
     std::cin >> n;
-    std::vector<int> a(n);
+    std::vector a(n, 0);
     std::cin >> a;
-    std::map<i64, i64> o;
-    for (auto const e : a) {
-        ++o[e];
+
+    std::vector f(n + 1, 0);
+    for (int i{1}; i != n + 1; ++i) {
+        f[i] = a[i - 1];
+        chmax(f[i], a[i - 1] + f[i - 1]);
     }
-    int q;
-    std::cin >> q;
-    for (int i{}; i != q; ++i) {
-        i64 x, y;
-        std::cin >> x >> y;
-        if (auto const t{(x * x) - (4 * y)}; t < 0) {
-            std::cout << 0 << ' ';
-        }
-        else if (t == 0) {
-            if (x % 2 != 0) {
-                std::cout << 0 << ' ';
-            }
-            else {
-                std::cout << o[x / 2] * (o[x / 2] - 1) / 2 << ' ';
-            }
-        }
-        else { // t > 0
-            if (i64 const r{static_cast<i64>(std::sqrt(t))};
-                r * r != t || (x - r) % 2 != 0 || (x + r) % 2 != 0) {
-                std::cout << 0 << ' ';
-            }
-            else {
-                std::cout << o[(x - r) / 2] * o[(x + r) / 2] << ' ';
-            }
-        }
-    }
-    std::cout << '\n';
+    std::cout << std::ranges::max(f | std::views::drop(1)) << '\n';
 }
 } // namespace

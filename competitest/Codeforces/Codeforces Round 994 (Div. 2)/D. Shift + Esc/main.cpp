@@ -1,10 +1,10 @@
 #pragma once
 
-// Problem: F. Sum and Product
-// Contest: Codeforces Round 891 (Div. 3)
+// Problem: D. Shift + Esc
+// Contest: Codeforces Round 994 (Div. 2)
 // Judge: Codeforces
-// URL: https://codeforces.com/problemset/problem/1857/F
-// Start: Sun 29 Dec 2024 06:36:54 PM CST
+// URL: https://codeforces.com/contest/2049/problem/D
+// Start: Wed 25 Dec 2024 01:52:25 PM CST
 // Author: ShelpAm
 
 // #include <bits/stdc++.h>
@@ -173,40 +173,25 @@ using u64 = std::uint_least64_t;
 using u128 = __uint128_t;
 void solve_case()
 {
-    int n;
-    std::cin >> n;
-    std::vector<int> a(n);
+    int n, m;
+    i64 k;
+    std::cin >> n >> m >> k;
+    std::vector a(n, std::vector(m, 0));
     std::cin >> a;
-    std::map<i64, i64> o;
-    for (auto const e : a) {
-        ++o[e];
-    }
-    int q;
-    std::cin >> q;
-    for (int i{}; i != q; ++i) {
-        i64 x, y;
-        std::cin >> x >> y;
-        if (auto const t{(x * x) - (4 * y)}; t < 0) {
-            std::cout << 0 << ' ';
-        }
-        else if (t == 0) {
-            if (x % 2 != 0) {
-                std::cout << 0 << ' ';
-            }
-            else {
-                std::cout << o[x / 2] * (o[x / 2] - 1) / 2 << ' ';
-            }
-        }
-        else { // t > 0
-            if (i64 const r{static_cast<i64>(std::sqrt(t))};
-                r * r != t || (x - r) % 2 != 0 || (x + r) % 2 != 0) {
-                std::cout << 0 << ' ';
-            }
-            else {
-                std::cout << o[(x - r) / 2] * o[(x + r) / 2] << ' ';
+
+    std::vector f(n + 1, std::vector(m + 1, inf<i64>));
+    std::vector g(n + 1, std::vector(m + 1, std::vector(m, inf<i64>)));
+    f[0][1] = g[1][0][0] = 0;
+    for (int i{1}; i != n + 1; ++i) {
+        for (int j{1}; j != m + 1; ++j) {
+            for (int x{}; x != m; ++x) {
+                g[i][j][x] = std::min(g[i][j - 1][x], f[i - 1][j] + (k * x)) +
+                             a[i - 1][(j + x - 1) % m];
+                chmin(f[i][j], g[i][j][x]);
             }
         }
     }
-    std::cout << '\n';
+    debug("f", f);
+    std::cout << f[n][m] << '\n';
 }
 } // namespace

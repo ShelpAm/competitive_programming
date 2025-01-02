@@ -1,10 +1,10 @@
 #pragma once
 
-// Problem: F. Sum and Product
-// Contest: Codeforces Round 891 (Div. 3)
+// Problem: F. Joker
+// Contest: Codeforces Round 995 (Div. 3)
 // Judge: Codeforces
-// URL: https://codeforces.com/problemset/problem/1857/F
-// Start: Sun 29 Dec 2024 06:36:54 PM CST
+// URL: https://codeforces.com/contest/2051/problem/F
+// Start: Mon 30 Dec 2024 06:38:04 PM CST
 // Author: ShelpAm
 
 // #include <bits/stdc++.h>
@@ -173,39 +173,72 @@ using u64 = std::uint_least64_t;
 using u128 = __uint128_t;
 void solve_case()
 {
-    int n;
-    std::cin >> n;
-    std::vector<int> a(n);
+    int n, m, q;
+    std::cin >> n >> m >> q;
+    std::vector<int> a(q);
     std::cin >> a;
-    std::map<i64, i64> o;
+
+    int l{m};
+    int r{m + 1};
+    int lo{1};
+    int hi{n + 1};
+    bool side_ok{false};
+    bool mid_ok{true};
+
+    auto intersect{[&](int l, int r, int lo, int hi) {
+        std::multimap<int, int> a{{1, lo}, {hi, n + 1}};
+        if (mid_ok) {
+            a.insert({l, r});
+        }
+
+        for (auto &[l, r] : a) {
+            chmax(r, l);
+        }
+
+        for (auto it{a.begin()}, end{a.end()}; std::next(it) != end;) {
+            if (it->second >= std::next(it)->first) {
+                chmax(it->second, std::next(it)->second);
+                a.erase(std::next(it));
+            }
+            else {
+                ++it;
+            }
+        }
+        int x{};
+        for (auto const &[l, r] : a) {
+            debug("l, r", std::pair{l, r});
+            x += std::min(n + 1, r) - std::max(1, l);
+        }
+        debug("end", "");
+        return x;
+    }};
+
     for (auto const e : a) {
-        ++o[e];
-    }
-    int q;
-    std::cin >> q;
-    for (int i{}; i != q; ++i) {
-        i64 x, y;
-        std::cin >> x >> y;
-        if (auto const t{(x * x) - (4 * y)}; t < 0) {
-            std::cout << 0 << ' ';
-        }
-        else if (t == 0) {
-            if (x % 2 != 0) {
-                std::cout << 0 << ' ';
+        if (mid_ok) {    // 中间可以
+            if (e < l) { // 并且
+                --l;
+            }
+            else if (e >= r) {
+                ++r;
             }
             else {
-                std::cout << o[x / 2] * (o[x / 2] - 1) / 2 << ' ';
+                // 启动！
+                side_ok = true;
+
+                if (l + 1 == r) { // 中间不启动
+                    mid_ok = false;
+                }
             }
         }
-        else { // t > 0
-            if (i64 const r{static_cast<i64>(std::sqrt(t))};
-                r * r != t || (x - r) % 2 != 0 || (x + r) % 2 != 0) {
-                std::cout << 0 << ' ';
+        if (side_ok) {
+            if (e < hi) {
+                --hi;
             }
-            else {
-                std::cout << o[(x - r) / 2] * o[(x + r) / 2] << ' ';
+            if (e >= lo) {
+                ++lo;
             }
         }
+        std::cout << intersect(l, r, lo, hi) << ' ';
     }
     std::cout << '\n';
 }

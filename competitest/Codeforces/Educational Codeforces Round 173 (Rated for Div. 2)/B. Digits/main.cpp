@@ -1,10 +1,10 @@
 #pragma once
 
-// Problem: F. Sum and Product
-// Contest: Codeforces Round 891 (Div. 3)
+// Problem: B. Digits
+// Contest: Educational Codeforces Round 173 (Rated for Div. 2)
 // Judge: Codeforces
-// URL: https://codeforces.com/problemset/problem/1857/F
-// Start: Sun 29 Dec 2024 06:36:54 PM CST
+// URL: https://codeforces.com/contest/2043/problem/B
+// Start: Tue 24 Dec 2024 10:45:25 PM CST
 // Author: ShelpAm
 
 // #include <bits/stdc++.h>
@@ -173,40 +173,34 @@ using u64 = std::uint_least64_t;
 using u128 = __uint128_t;
 void solve_case()
 {
-    int n;
-    std::cin >> n;
-    std::vector<int> a(n);
-    std::cin >> a;
-    std::map<i64, i64> o;
-    for (auto const e : a) {
-        ++o[e];
+    int n, d;
+    std::cin >> n >> d;
+
+    std::cout << "1 ";
+
+    if (n >= 3 || d % 3 == 0) {
+        std::cout << "3 ";
     }
-    int q;
-    std::cin >> q;
-    for (int i{}; i != q; ++i) {
-        i64 x, y;
-        std::cin >> x >> y;
-        if (auto const t{(x * x) - (4 * y)}; t < 0) {
-            std::cout << 0 << ' ';
-        }
-        else if (t == 0) {
-            if (x % 2 != 0) {
-                std::cout << 0 << ' ';
-            }
-            else {
-                std::cout << o[x / 2] * (o[x / 2] - 1) / 2 << ' ';
-            }
-        }
-        else { // t > 0
-            if (i64 const r{static_cast<i64>(std::sqrt(t))};
-                r * r != t || (x - r) % 2 != 0 || (x + r) % 2 != 0) {
-                std::cout << 0 << ' ';
-            }
-            else {
-                std::cout << o[(x - r) / 2] * o[(x + r) / 2] << ' ';
-            }
-        }
+
+    if (d % 5 == 0) {
+        std::cout << "5 ";
     }
+
+    if (d % 7 == 0 || n >= 3) {
+        std::cout << "7 ";
+    }
+
+    auto factorial{[](int x) {
+        i64 res{1};
+        for (int i{1}; i != x + 1; ++i) {
+            res *= i;
+        }
+        return res;
+    }};
+    if (n >= 9 || factorial(n) * d % 9 == 0) {
+        std::cout << "9 ";
+    }
+
     std::cout << '\n';
 }
 } // namespace

@@ -1,10 +1,10 @@
 #pragma once
 
-// Problem: F. Sum and Product
-// Contest: Codeforces Round 891 (Div. 3)
-// Judge: Codeforces
-// URL: https://codeforces.com/problemset/problem/1857/F
-// Start: Sun 29 Dec 2024 06:36:54 PM CST
+// Problem: 小A弹吉他
+// Contest: unknown_contest
+// Judge: NowCoder
+// URL: https://ac.nowcoder.com/acm/contest/99287/D
+// Start: Fri 27 Dec 2024 09:52:10 PM CST
 // Author: ShelpAm
 
 // #include <bits/stdc++.h>
@@ -173,40 +173,27 @@ using u64 = std::uint_least64_t;
 using u128 = __uint128_t;
 void solve_case()
 {
-    int n;
-    std::cin >> n;
-    std::vector<int> a(n);
-    std::cin >> a;
-    std::map<i64, i64> o;
-    for (auto const e : a) {
-        ++o[e];
-    }
-    int q;
-    std::cin >> q;
-    for (int i{}; i != q; ++i) {
-        i64 x, y;
-        std::cin >> x >> y;
-        if (auto const t{(x * x) - (4 * y)}; t < 0) {
-            std::cout << 0 << ' ';
-        }
-        else if (t == 0) {
-            if (x % 2 != 0) {
-                std::cout << 0 << ' ';
-            }
-            else {
-                std::cout << o[x / 2] * (o[x / 2] - 1) / 2 << ' ';
-            }
-        }
-        else { // t > 0
-            if (i64 const r{static_cast<i64>(std::sqrt(t))};
-                r * r != t || (x - r) % 2 != 0 || (x + r) % 2 != 0) {
-                std::cout << 0 << ' ';
-            }
-            else {
-                std::cout << o[(x - r) / 2] * o[(x + r) / 2] << ' ';
-            }
-        }
-    }
-    std::cout << '\n';
+    i64 m;
+    std::cin >> m;
+
+    // std::vector a(2, 0);
+    // std::map<int, std::set<std::vector<int>>> t;
+    // for (int i{1}; i != 5; ++i) {
+    //     std::ranges::iota(a, i);
+    //     do {
+    //         int s{};
+    //         for (int i{}; i != a.size(); ++i) {
+    //             s += (i + 1) * a[i];
+    //         }
+    //         t[s].insert(a);
+    //     } while (std::next_permutation(a.begin(), a.end()));
+    // }
+    // debug("t keys", t | std::views::keys);
+    // debug("t", t);
+
+    auto const x{binary_search(
+        [&](i64 x) { return m >= x * (x + 1) * (x + 2) / 6; }, 0, 2e6)};
+
+    std::cout << x + 1 << '\n';
 }
 } // namespace

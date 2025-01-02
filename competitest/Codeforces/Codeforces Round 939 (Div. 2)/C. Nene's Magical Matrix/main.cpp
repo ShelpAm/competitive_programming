@@ -1,10 +1,10 @@
 #pragma once
 
-// Problem: F. Sum and Product
-// Contest: Codeforces Round 891 (Div. 3)
+// Problem: C. Nene's Magical Matrix
+// Contest: Codeforces Round 939 (Div. 2)
 // Judge: Codeforces
-// URL: https://codeforces.com/problemset/problem/1857/F
-// Start: Sun 29 Dec 2024 06:36:54 PM CST
+// URL: https://codeforces.com/problemset/problem/1956/C
+// Start: Mon 30 Dec 2024 02:12:23 PM CST
 // Author: ShelpAm
 
 // #include <bits/stdc++.h>
@@ -175,38 +175,24 @@ void solve_case()
 {
     int n;
     std::cin >> n;
-    std::vector<int> a(n);
-    std::cin >> a;
-    std::map<i64, i64> o;
-    for (auto const e : a) {
-        ++o[e];
+
+    auto const seq{std::views::iota(1, n + 1) |
+                   std::ranges::to<std::vector<int>>()};
+
+    i64 s{};
+    std::vector<std::tuple<int, int, std::vector<int>>> ops;
+    for (int i{}; i != n; ++i) {
+        s += (2 * i + 1) * (i + 1);
+        ops.push_back({1, n - i, seq});
+        ops.push_back({2, n - i, seq});
     }
-    int q;
-    std::cin >> q;
-    for (int i{}; i != q; ++i) {
-        i64 x, y;
-        std::cin >> x >> y;
-        if (auto const t{(x * x) - (4 * y)}; t < 0) {
-            std::cout << 0 << ' ';
+    std::cout << s << ' ' << ops.size() << '\n';
+    for (auto const &[a, b, c] : ops) {
+        std::cout << a << ' ' << b << ' ';
+        for (auto const e : c) {
+            std::cout << e << ' ';
         }
-        else if (t == 0) {
-            if (x % 2 != 0) {
-                std::cout << 0 << ' ';
-            }
-            else {
-                std::cout << o[x / 2] * (o[x / 2] - 1) / 2 << ' ';
-            }
-        }
-        else { // t > 0
-            if (i64 const r{static_cast<i64>(std::sqrt(t))};
-                r * r != t || (x - r) % 2 != 0 || (x + r) % 2 != 0) {
-                std::cout << 0 << ' ';
-            }
-            else {
-                std::cout << o[(x - r) / 2] * o[(x + r) / 2] << ' ';
-            }
-        }
+        std::cout << '\n';
     }
-    std::cout << '\n';
 }
 } // namespace

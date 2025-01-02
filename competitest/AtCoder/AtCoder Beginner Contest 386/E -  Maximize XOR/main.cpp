@@ -1,10 +1,10 @@
 #pragma once
 
-// Problem: F. Sum and Product
-// Contest: Codeforces Round 891 (Div. 3)
-// Judge: Codeforces
-// URL: https://codeforces.com/problemset/problem/1857/F
-// Start: Sun 29 Dec 2024 06:36:54 PM CST
+// Problem: E -  Maximize XOR
+// Contest: AtCoder Beginner Contest 386
+// Judge: AtCoder
+// URL: https://atcoder.jp/contests/abc386/tasks/abc386_e
+// Start: Sat 28 Dec 2024 09:23:10 PM CST
 // Author: ShelpAm
 
 // #include <bits/stdc++.h>
@@ -156,7 +156,7 @@ auto main() -> int
     constexpr auto my_precision{10};
     std::cout << std::fixed << std::setprecision(my_precision);
     int t{1};
-    std::cin >> t;
+    // std::cin >> t;
     for (int i{}; i != t; ++i) {
 #ifndef ONLINE_JUDGE
         std::cerr << "Test case " << i << '\n';
@@ -171,42 +171,36 @@ using i64 = std::int_least64_t;
 using i128 = __int128_t;
 using u64 = std::uint_least64_t;
 using u128 = __uint128_t;
+// O(K * C(N, K))
 void solve_case()
 {
-    int n;
-    std::cin >> n;
-    std::vector<int> a(n);
+    int n, k;
+    std::cin >> n >> k;
+    std::vector<i64> a(n);
     std::cin >> a;
-    std::map<i64, i64> o;
+
+    i64 all{};
     for (auto const e : a) {
-        ++o[e];
+        all ^= e;
     }
-    int q;
-    std::cin >> q;
-    for (int i{}; i != q; ++i) {
-        i64 x, y;
-        std::cin >> x >> y;
-        if (auto const t{(x * x) - (4 * y)}; t < 0) {
-            std::cout << 0 << ' ';
+
+    i64 ans{};
+    auto dfs{[&](auto dfs, int i, int j, i64 s, int m) -> void {
+        if (j == m) {
+            chmax(ans, (n - k <= k ? all : 0) ^ s);
+            return;
         }
-        else if (t == 0) {
-            if (x % 2 != 0) {
-                std::cout << 0 << ' ';
-            }
-            else {
-                std::cout << o[x / 2] * (o[x / 2] - 1) / 2 << ' ';
-            }
+        if (n == i) {
+            return;
         }
-        else { // t > 0
-            if (i64 const r{static_cast<i64>(std::sqrt(t))};
-                r * r != t || (x - r) % 2 != 0 || (x + r) % 2 != 0) {
-                std::cout << 0 << ' ';
-            }
-            else {
-                std::cout << o[(x - r) / 2] * o[(x + r) / 2] << ' ';
-            }
-        }
-    }
-    std::cout << '\n';
+        // if (n - i < m - j) {
+        //     return;
+        // }
+
+        dfs(dfs, i + 1, j + 1, s ^ a[i], m);
+        dfs(dfs, i + 1, j, s, m);
+    }};
+    dfs(dfs, 0, 0, 0, std::min(n - k, k));
+    std::cout << ans << '\n';
 }
 } // namespace

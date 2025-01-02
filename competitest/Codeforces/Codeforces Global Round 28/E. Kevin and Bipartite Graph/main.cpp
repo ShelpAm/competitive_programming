@@ -1,10 +1,10 @@
 #pragma once
 
-// Problem: F. Sum and Product
-// Contest: Codeforces Round 891 (Div. 3)
+// Problem: E. Kevin and Bipartite Graph
+// Contest: Codeforces Global Round 28
 // Judge: Codeforces
-// URL: https://codeforces.com/problemset/problem/1857/F
-// Start: Sun 29 Dec 2024 06:36:54 PM CST
+// URL: https://codeforces.com/problemset/problem/2048/E
+// Start: Thu 02 Jan 2025 04:48:02 PM CST
 // Author: ShelpAm
 
 // #include <bits/stdc++.h>
@@ -173,40 +173,25 @@ using u64 = std::uint_least64_t;
 using u128 = __uint128_t;
 void solve_case()
 {
-    int n;
-    std::cin >> n;
-    std::vector<int> a(n);
-    std::cin >> a;
-    std::map<i64, i64> o;
-    for (auto const e : a) {
-        ++o[e];
+    int n, m;
+    std::cin >> n >> m;
+    if (m > 2 * n - 1) {
+        std::cout << "NO\n";
+        return;
     }
-    int q;
-    std::cin >> q;
-    for (int i{}; i != q; ++i) {
-        i64 x, y;
-        std::cin >> x >> y;
-        if (auto const t{(x * x) - (4 * y)}; t < 0) {
-            std::cout << 0 << ' ';
-        }
-        else if (t == 0) {
-            if (x % 2 != 0) {
-                std::cout << 0 << ' ';
-            }
-            else {
-                std::cout << o[x / 2] * (o[x / 2] - 1) / 2 << ' ';
-            }
-        }
-        else { // t > 0
-            if (i64 const r{static_cast<i64>(std::sqrt(t))};
-                r * r != t || (x - r) % 2 != 0 || (x + r) % 2 != 0) {
-                std::cout << 0 << ' ';
-            }
-            else {
-                std::cout << o[(x - r) / 2] * o[(x + r) / 2] << ' ';
-            }
+    std::cout << "YES\n";
+    std::vector<std::vector<int>> ans(2 * n, std::vector<int>(2 * n - 1));
+    for (int c{}; c != n; ++c) {
+        for (int j{}; j != 2 * n - 1; ++j) {
+            ans[(j + 2 * c) % (2 * n)][j % (2 * n)] = c;
+            ans[(j + 2 * c + 1) % (2 * n)][j % (2 * n)] = c;
         }
     }
-    std::cout << '\n';
+    for (auto const &row : ans) {
+        for (auto const col : row | std::views::take(m)) {
+            std::cout << col + 1 << ' ';
+        }
+        std::cout << '\n';
+    }
 }
 } // namespace

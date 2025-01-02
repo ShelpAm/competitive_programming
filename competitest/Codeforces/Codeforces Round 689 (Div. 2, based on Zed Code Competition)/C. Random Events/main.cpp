@@ -1,10 +1,10 @@
 #pragma once
 
-// Problem: F. Sum and Product
-// Contest: Codeforces Round 891 (Div. 3)
+// Problem: C. Random Events
+// Contest: Codeforces Round 689 (Div. 2, based on Zed Code Competition)
 // Judge: Codeforces
-// URL: https://codeforces.com/problemset/problem/1857/F
-// Start: Sun 29 Dec 2024 06:36:54 PM CST
+// URL: https://codeforces.com/problemset/problem/1461/C
+// Start: Thu 26 Dec 2024 10:44:42 PM CST
 // Author: ShelpAm
 
 // #include <bits/stdc++.h>
@@ -173,40 +173,34 @@ using u64 = std::uint_least64_t;
 using u128 = __uint128_t;
 void solve_case()
 {
-    int n;
-    std::cin >> n;
+    int n, m;
+    std::cin >> n >> m;
     std::vector<int> a(n);
     std::cin >> a;
-    std::map<i64, i64> o;
-    for (auto const e : a) {
-        ++o[e];
+    std::vector<std::pair<int, double>> b(m);
+    std::cin >> b;
+    for (auto &[i, _] : b) {
+        --i;
     }
-    int q;
-    std::cin >> q;
-    for (int i{}; i != q; ++i) {
-        i64 x, y;
-        std::cin >> x >> y;
-        if (auto const t{(x * x) - (4 * y)}; t < 0) {
-            std::cout << 0 << ' ';
-        }
-        else if (t == 0) {
-            if (x % 2 != 0) {
-                std::cout << 0 << ' ';
-            }
-            else {
-                std::cout << o[x / 2] * (o[x / 2] - 1) / 2 << ' ';
-            }
-        }
-        else { // t > 0
-            if (i64 const r{static_cast<i64>(std::sqrt(t))};
-                r * r != t || (x - r) % 2 != 0 || (x + r) % 2 != 0) {
-                std::cout << 0 << ' ';
-            }
-            else {
-                std::cout << o[(x - r) / 2] * o[(x + r) / 2] << ' ';
-            }
+
+    std::deque<bool> sorted(n);
+    sorted.back() = a.back() == n;
+    for (int i{n - 2}; i != -1; --i) {
+        sorted[i] = sorted[i + 1] && a[i] == i + 1;
+    }
+
+    auto first_sorted{std::ranges::find(sorted, true) - sorted.begin()};
+
+    double ans{1};
+
+    if (first_sorted == 0) {
+        ans = 0;
+    }
+    for (auto const &[i, p] : b) {
+        if (i >= first_sorted - 1) {
+            ans *= 1 - p;
         }
     }
-    std::cout << '\n';
+    std::cout << 1 - ans << '\n';
 }
 } // namespace

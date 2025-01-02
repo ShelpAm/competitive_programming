@@ -1,10 +1,10 @@
 #pragma once
 
-// Problem: F. Sum and Product
-// Contest: Codeforces Round 891 (Div. 3)
-// Judge: Codeforces
-// URL: https://codeforces.com/problemset/problem/1857/F
-// Start: Sun 29 Dec 2024 06:36:54 PM CST
+// Problem: 琪露诺的数学游戏
+// Contest: unknown_contest
+// Judge: NowCoder
+// URL: https://ac.nowcoder.com/acm/contest/99587/B
+// Start: Sat 28 Dec 2024 01:27:55 PM CST
 // Author: ShelpAm
 
 // #include <bits/stdc++.h>
@@ -173,40 +173,51 @@ using u64 = std::uint_least64_t;
 using u128 = __uint128_t;
 void solve_case()
 {
-    int n;
-    std::cin >> n;
-    std::vector<int> a(n);
-    std::cin >> a;
-    std::map<i64, i64> o;
-    for (auto const e : a) {
-        ++o[e];
+    int x, y;
+    std::cin >> x >> y;
+
+    std::vector<int> results; // 1 -> win, 2 -> lost, 3 -> draw
+    for (int z{1}; z != 10; ++z) {
+        std::array<std::unordered_set<int>, 2> u{std::unordered_set{x}, {y}};
+        auto try_use{[&](auto x, int i) {
+            if (x <= 0 || x >= 10 || u[i ^ 1].contains(x)) {
+                return false;
+            }
+            u[i].insert(x);
+            return true;
+        }};
+
+        if (!try_use(z, 0)) {
+            continue;
+        }
+
+        if (!try_use(15 - x - z, 1)) {
+            results.push_back(1);
+            continue;
+        }
+
+        if (!try_use(x - y + z, 0)) {
+            results.push_back(2);
+            continue;
+        }
+
+        if (try_use(15 - (2 * x) + y - z, 0) &&
+            try_use(15 - x + y - (2 * z), 0)) {
+            results.push_back(1);
+            continue;
+        }
+
+        results.push_back(3);
     }
-    int q;
-    std::cin >> q;
-    for (int i{}; i != q; ++i) {
-        i64 x, y;
-        std::cin >> x >> y;
-        if (auto const t{(x * x) - (4 * y)}; t < 0) {
-            std::cout << 0 << ' ';
-        }
-        else if (t == 0) {
-            if (x % 2 != 0) {
-                std::cout << 0 << ' ';
-            }
-            else {
-                std::cout << o[x / 2] * (o[x / 2] - 1) / 2 << ' ';
-            }
-        }
-        else { // t > 0
-            if (i64 const r{static_cast<i64>(std::sqrt(t))};
-                r * r != t || (x - r) % 2 != 0 || (x + r) % 2 != 0) {
-                std::cout << 0 << ' ';
-            }
-            else {
-                std::cout << o[(x - r) / 2] * o[(x + r) / 2] << ' ';
-            }
-        }
+
+    if (std::ranges::find(results, 1) != results.end()) {
+        std::cout << "baka!\n";
     }
-    std::cout << '\n';
+    else if (std::ranges::find(results, 3) != results.end()) {
+        std::cout << "wow\n";
+    }
+    else {
+        std::cout << "impossible!\n";
+    }
 }
 } // namespace

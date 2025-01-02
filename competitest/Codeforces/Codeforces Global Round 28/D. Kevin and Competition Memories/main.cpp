@@ -1,10 +1,10 @@
 #pragma once
 
-// Problem: F. Sum and Product
-// Contest: Codeforces Round 891 (Div. 3)
+// Problem: D. Kevin and Competition Memories
+// Contest: Codeforces Global Round 28
 // Judge: Codeforces
-// URL: https://codeforces.com/problemset/problem/1857/F
-// Start: Sun 29 Dec 2024 06:36:54 PM CST
+// URL: https://codeforces.com/problemset/problem/2048/D
+// Start: Wed 01 Jan 2025 04:44:39 PM CST
 // Author: ShelpAm
 
 // #include <bits/stdc++.h>
@@ -171,41 +171,90 @@ using i64 = std::int_least64_t;
 using i128 = __int128_t;
 using u64 = std::uint_least64_t;
 using u128 = __uint128_t;
+class Fenwick_tree {
+  public:
+    // _tree[1..size] is available
+    explicit Fenwick_tree(int size) : _tree(size + 1) {}
+
+    // The input array should start from the index 1.
+    explicit Fenwick_tree(std::vector<std::int_fast64_t> coll)
+        : _tree{std::move(coll)}
+    {
+        for (int i = 1; i != _tree.size(); ++i) {
+            if (auto const parent_index = i + lsb(i);
+                parent_index < _tree.size()) {
+                _tree[parent_index] += _tree[i];
+            }
+        }
+    }
+
+    [[nodiscard]] auto sum(int l, int r) const -> std::int_fast64_t
+    {
+        assert(l > 0);
+        assert(l <= r);
+        assert(r < _tree.size());
+        return prefix_sum(r) - prefix_sum(l - 1);
+    }
+
+    [[nodiscard]] auto prefix_sum(int index) const -> std::int_fast64_t
+    {
+        std::int_fast64_t sum{};
+        while (index > 0) {
+            sum += _tree[index];
+            index -= lsb(index);
+        }
+        return sum;
+    }
+
+    void add_to(int index, std::int_fast64_t delta)
+    {
+        auto n{static_cast<int>(_tree.size())};
+        while (index < n) {
+            _tree[index] += delta;
+            index += lsb(index);
+        }
+    }
+
+  private:
+    std::vector<std::int_fast64_t> _tree;
+};
 void solve_case()
 {
-    int n;
-    std::cin >> n;
-    std::vector<int> a(n);
-    std::cin >> a;
-    std::map<i64, i64> o;
-    for (auto const e : a) {
-        ++o[e];
+    int n, m;
+    std::cin >> n >> m;
+    std::vector<int> a(1), b(m);
+    std::cin >> a[0];
+    for (int i{1}; i != n; ++i) {
+        int x;
+        std::cin >> x;
+        if (x > a[0]) {
+            a.push_back(x);
+        }
     }
-    int q;
-    std::cin >> q;
-    for (int i{}; i != q; ++i) {
-        i64 x, y;
-        std::cin >> x >> y;
-        if (auto const t{(x * x) - (4 * y)}; t < 0) {
-            std::cout << 0 << ' ';
+    std::cin >> b;
+    std::ranges::sort(b);
+
+    for (auto &e : a) {
+        e = std::ranges::upper_bound(b, e) - b.begin();
+    }
+
+    std::vector<int> sum(m + 2);
+    for (auto const e : a | std::views::drop(1)) {
+        if (e >= 1) {
+            ++sum[e - 1];
         }
-        else if (t == 0) {
-            if (x % 2 != 0) {
-                std::cout << 0 << ' ';
-            }
-            else {
-                std::cout << o[x / 2] * (o[x / 2] - 1) / 2 << ' ';
-            }
+    }
+    for (int i = m - 2; i != -1; --i) {
+        sum[i] += sum[i + 1];
+    }
+
+    for (int k{1}; k != m + 1; ++k) {
+        i64 ranks{m / k};
+        auto const discarded{m % k};
+        for (int i{a[0] + discarded}; i < m; i += k) {
+            ranks += sum[i];
         }
-        else { // t > 0
-            if (i64 const r{static_cast<i64>(std::sqrt(t))};
-                r * r != t || (x - r) % 2 != 0 || (x + r) % 2 != 0) {
-                std::cout << 0 << ' ';
-            }
-            else {
-                std::cout << o[(x - r) / 2] * o[(x + r) / 2] << ' ';
-            }
-        }
+        std::cout << ranks << ' ';
     }
     std::cout << '\n';
 }

@@ -1,10 +1,10 @@
 #pragma once
 
-// Problem: F. Sum and Product
-// Contest: Codeforces Round 891 (Div. 3)
+// Problem: D. Counting Pairs
+// Contest: Codeforces Round 995 (Div. 3)
 // Judge: Codeforces
-// URL: https://codeforces.com/problemset/problem/1857/F
-// Start: Sun 29 Dec 2024 06:36:54 PM CST
+// URL: https://codeforces.com/contest/2051/problem/D
+// Start: Mon 30 Dec 2024 03:00:56 PM CST
 // Author: ShelpAm
 
 // #include <bits/stdc++.h>
@@ -174,39 +174,22 @@ using u128 = __uint128_t;
 void solve_case()
 {
     int n;
-    std::cin >> n;
+    i64 x, y;
+    std::cin >> n >> x >> y;
     std::vector<int> a(n);
     std::cin >> a;
-    std::map<i64, i64> o;
+
+    auto const lb{sum_of(a) - y};
+    auto const ub{sum_of(a) - x};
+    std::ranges::sort(a);
+    i64 ans{};
     for (auto const e : a) {
-        ++o[e];
+        auto const c{std::ranges::upper_bound(a, ub - e) -
+                     std::ranges::lower_bound(a, lb - e) -
+                     (lb <= 2 * e && 2 * e <= ub ? 1 : 0)};
+        debug("c", e);
+        ans += std::max<int>(0, c);
     }
-    int q;
-    std::cin >> q;
-    for (int i{}; i != q; ++i) {
-        i64 x, y;
-        std::cin >> x >> y;
-        if (auto const t{(x * x) - (4 * y)}; t < 0) {
-            std::cout << 0 << ' ';
-        }
-        else if (t == 0) {
-            if (x % 2 != 0) {
-                std::cout << 0 << ' ';
-            }
-            else {
-                std::cout << o[x / 2] * (o[x / 2] - 1) / 2 << ' ';
-            }
-        }
-        else { // t > 0
-            if (i64 const r{static_cast<i64>(std::sqrt(t))};
-                r * r != t || (x - r) % 2 != 0 || (x + r) % 2 != 0) {
-                std::cout << 0 << ' ';
-            }
-            else {
-                std::cout << o[(x - r) / 2] * o[(x + r) / 2] << ' ';
-            }
-        }
-    }
-    std::cout << '\n';
+    std::cout << ans / 2 << '\n';
 }
 } // namespace
