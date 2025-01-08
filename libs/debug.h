@@ -14,9 +14,18 @@ concept string_like = std::same_as<std::string, std::remove_cvref_t<T>> ||
 constexpr auto print(auto &&t, int depth = 0, auto &out = std::cout) -> void
 {
     using T = std::remove_cvref_t<decltype(t)>;
-    static_assert(!shelpam::concepts::tuple<T>,
-                  " tuple: not implemented yet.\n");
-    if constexpr (shelpam::concepts::string_like<T>) {
+    // static_assert(!shelpam::concepts::tuple<T>,
+    //               "??? tuple: not implemented yet.\n");
+    if constexpr (shelpam::concepts::tuple<T>) {
+        out << "{ ";
+        std::apply(
+            [&](auto const &...elements) {
+                ((print(elements, depth + 1, out), out << ", "), ...);
+            },
+            t);
+        out << " }";
+    }
+    else if constexpr (shelpam::concepts::string_like<T>) {
         out << t;
     }
 #ifdef __cpp_lib_ranges
