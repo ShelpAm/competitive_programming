@@ -1,10 +1,10 @@
 #pragma once
 
-// Problem: $(PROBLEM)
-// Contest: $(CONTEST)
-// Judge: $(JUDGE)
-// URL: $(URL)
-// Start: $(DATE)
+// Problem: D - Coming of Age Celebration
+// Contest: HHKB Programming Contest 2025(AtCoder Beginner Contest 388)
+// Judge: AtCoder
+// URL: https://atcoder.jp/contests/abc388/tasks/abc388_d
+// Start: Sun 12 Jan 2025 12:10:17 AM CST
 // Author: ShelpAm
 
 // #include <bits/stdc++.h>
@@ -173,6 +173,24 @@ using u64 = std::uint_least64_t;
 using u128 = __uint128_t;
 void solve_case()
 {
-    // return;
+    int n;
+    std::cin >> n;
+    std::vector<int> a(n);
+    std::cin >> a;
+
+    int gifts{};
+    std::vector<int> d(n + 1); // number of ajustment
+    for (int i{}; i != n; ++i) {
+        gifts += d[i];
+        a[i] += gifts;
+        auto const t{std::min(n - i - 1, a[i])}; // number of sent
+        d[i + t + 1] -= 1;
+        a[i] -= t;
+        gifts += 1; // 1 gift has been sent out.
+    }
+
+    for (auto const e : a) {
+        std::cout << e << ' ';
+    }
 }
 } // namespace

@@ -1,10 +1,10 @@
 #pragma once
 
-// Problem: $(PROBLEM)
-// Contest: $(CONTEST)
-// Judge: $(JUDGE)
-// URL: $(URL)
-// Start: $(DATE)
+// Problem: E - Simultaneous Kagamimochi
+// Contest: HHKB Programming Contest 2025(AtCoder Beginner Contest 388)
+// Judge: AtCoder
+// URL: https://atcoder.jp/contests/abc388/tasks/abc388_e
+// Start: Sun 12 Jan 2025 12:16:43 AM CST
 // Author: ShelpAm
 
 // #include <bits/stdc++.h>
@@ -173,6 +173,25 @@ using u64 = std::uint_least64_t;
 using u128 = __uint128_t;
 void solve_case()
 {
-    // return;
+    int n;
+    std::cin >> n;
+    std::vector<int> a(n);
+    std::cin >> a;
+
+    std::unordered_map<int, int> milestone;
+    for (int i{}; i != n / 2; ++i) {
+        ++milestone[std::max<int>((n + 1) / 2,
+                                  std::ranges::lower_bound(a, a[i] * 2) -
+                                      a.begin() - i)];
+    }
+    debug("milestone", milestone);
+
+    int ans{};
+    int t{};
+    for (int i{(n + 1) / 2}; i != n; ++i) {
+        t += milestone[i];
+        chmax(ans, t + ((n + 1) / 2) - i);
+    }
+    std::cout << ans << '\n';
 }
 } // namespace

@@ -1,10 +1,10 @@
 #pragma once
 
-// Problem: $(PROBLEM)
-// Contest: $(CONTEST)
-// Judge: $(JUDGE)
-// URL: $(URL)
-// Start: $(DATE)
+// Problem: 万年沉睡的宝藏
+// Contest: unknown_contest
+// Judge: NowCoder
+// URL: https://ac.nowcoder.com/acm/contest/100007/A
+// Start: Fri 10 Jan 2025 07:03:00 PM CST
 // Author: ShelpAm
 
 // #include <bits/stdc++.h>
@@ -57,7 +57,7 @@ template <typename... Ts>
 concept tuple = is_tuple_t<Ts...>::value;
 } // namespace shelpam::concepts
 
-std::istream &operator>>(std::istream &istream, auto &&t)
+auto operator>>(auto &istream, auto &&t) -> decltype(istream)
 {
     using T = std::remove_cvref_t<decltype(t)>;
     static_assert(!shelpam::concepts::tuple<T>,
@@ -80,7 +80,7 @@ std::istream &operator>>(std::istream &istream, auto &&t)
 #else
 #define debug(...)
 #endif
-bool chmax(auto &value, auto const &other) noexcept
+auto chmax(auto &value, auto const &other) noexcept -> bool
 {
     if (value < other) {
         value = other;
@@ -88,7 +88,7 @@ bool chmax(auto &value, auto const &other) noexcept
     }
     return false;
 }
-bool chmin(auto &value, auto const &other) noexcept
+auto chmin(auto &value, auto const &other) noexcept -> bool
 {
     if (value > other) {
         value = other;
@@ -112,13 +112,13 @@ constexpr auto pow(auto base, auto exp, std::uint_least64_t p)
             res = res * base % p;
         }
         base = base * base % p;
-        exp >>= 1;
+        exp /= 2;
     }
     return res;
 }
-std::int_least64_t binary_search(std::invocable<std::int_least64_t> auto check,
-                                 std::int_least64_t ok, std::int_least64_t ng,
-                                 bool check_ok = true)
+auto binary_search(std::invocable<std::int_least64_t> auto check,
+                   std::int_least64_t ok, std::int_least64_t ng,
+                   bool check_ok = true) -> std::int_least64_t
 {
     if (check_ok && !check(ok)) {
         throw std::invalid_argument{"check isn't true on 'ok'."};
@@ -129,27 +129,27 @@ std::int_least64_t binary_search(std::invocable<std::int_least64_t> auto check,
     }
     return ok;
 }
-template <std::signed_integral T> constexpr T lsb(T i) noexcept
+constexpr auto lsb(std::signed_integral auto i) noexcept -> decltype(i)
 {
     return i & -i;
 }
 // i mustn't be 0
-constexpr int msb(std::unsigned_integral auto i)
+constexpr auto msb(std::unsigned_integral auto i) -> int
 {
     if (i == 0) {
         throw std::invalid_argument{"i must be positive."};
     }
     return (sizeof(i) * CHAR_BIT) - 1 - std::countl_zero(i);
 }
-// [[maybe_unused]] auto gen_rand() noexcept
-// {
-//     static std::mt19937_64 rng(
-//         std::chrono::steady_clock::now().time_since_epoch().count());
-//     return rng();
-// }
+/*[[maybe_unused]] auto gen_rand() noexcept*/
+/*{*/
+/*  static std::mt19937_64 rng(*/
+/*      std::chrono::steady_clock::now().time_since_epoch().count());*/
+/*  return rng();*/
+/*}*/
 void solve_case();
 } // namespace
-int main()
+auto main() -> int
 {
     std::ios::sync_with_stdio(false);
     std::cin.tie(nullptr);
@@ -173,6 +173,34 @@ using u64 = std::uint_least64_t;
 using u128 = __uint128_t;
 void solve_case()
 {
-    // return;
+    int n;
+    std::cin >> n;
+    std::unordered_map<std::string, std::unordered_set<std::string>> s;
+    int q4{};
+    for (int i{}; i != n; ++i) {
+        int o;
+        std::cin >> o;
+        if (o == 1) {
+            std::string x, y;
+            std::cin >> x >> y;
+            if (s[x].empty()) {
+                ++q4;
+            }
+            s[x].insert(y);
+        }
+        else if (o == 2) {
+            std::string x;
+            std::cin >> x;
+            std::cout << s[x].size() << '\n';
+        }
+        else if (o == 3) {
+            std::string x, y;
+            std::cin >> x >> y;
+            std::cout << s[x].contains(y) << '\n';
+        }
+        else {
+            std::cout << q4 << '\n';
+        }
+    }
 }
 } // namespace

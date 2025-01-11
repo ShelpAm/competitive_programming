@@ -1,10 +1,10 @@
 #pragma once
 
-// Problem: $(PROBLEM)
-// Contest: $(CONTEST)
-// Judge: $(JUDGE)
-// URL: $(URL)
-// Start: $(DATE)
+// Problem: C - Various Kagamimochi
+// Contest: HHKB Programming Contest 2025(AtCoder Beginner Contest 388)
+// Judge: AtCoder
+// URL: https://atcoder.jp/contests/abc388/tasks/abc388_c
+// Start: Sun 12 Jan 2025 12:04:33 AM CST
 // Author: ShelpAm
 
 // #include <bits/stdc++.h>
@@ -173,6 +173,15 @@ using u64 = std::uint_least64_t;
 using u128 = __uint128_t;
 void solve_case()
 {
-    // return;
+    int n;
+    std::cin >> n;
+    std::vector<int> a(n);
+    std::cin >> a;
+
+    i64 ans{};
+    for (auto const e : a) {
+        ans += a.end() - std::ranges::lower_bound(a, e * 2);
+    }
+    std::cout << ans << '\n';
 }
 } // namespace

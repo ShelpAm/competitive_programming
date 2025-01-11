@@ -1,10 +1,10 @@
 #pragma once
 
-// Problem: $(PROBLEM)
-// Contest: $(CONTEST)
-// Judge: $(JUDGE)
-// URL: $(URL)
-// Start: $(DATE)
+// Problem: B - Heavy Snake
+// Contest: HHKB Programming Contest 2025(AtCoder Beginner Contest 388)
+// Judge: AtCoder
+// URL: https://atcoder.jp/contests/abc388/tasks/abc388_b
+// Start: Sat 11 Jan 2025 11:51:43 PM CST
 // Author: ShelpAm
 
 // #include <bits/stdc++.h>
@@ -57,7 +57,7 @@ template <typename... Ts>
 concept tuple = is_tuple_t<Ts...>::value;
 } // namespace shelpam::concepts
 
-std::istream &operator>>(std::istream &istream, auto &&t)
+auto operator>>(auto &istream, auto &&t) -> decltype(istream)
 {
     using T = std::remove_cvref_t<decltype(t)>;
     static_assert(!shelpam::concepts::tuple<T>,
@@ -80,7 +80,7 @@ std::istream &operator>>(std::istream &istream, auto &&t)
 #else
 #define debug(...)
 #endif
-bool chmax(auto &value, auto const &other) noexcept
+auto chmax(auto &value, auto const &other) noexcept -> bool
 {
     if (value < other) {
         value = other;
@@ -88,7 +88,7 @@ bool chmax(auto &value, auto const &other) noexcept
     }
     return false;
 }
-bool chmin(auto &value, auto const &other) noexcept
+auto chmin(auto &value, auto const &other) noexcept -> bool
 {
     if (value > other) {
         value = other;
@@ -100,7 +100,7 @@ constexpr auto sum_of(std::ranges::range auto const &coll) noexcept
 {
     return std::accumulate(coll.begin(), coll.end(), std::int_least64_t{});
 }
-constexpr auto pow(auto base, auto exp, std::uint_least64_t p)
+constexpr auto pow(auto base, std::int_least64_t exp, std::uint_least64_t p)
 {
     static_assert(sizeof(base) > sizeof(int), "Use of `int`s is bug-prone.");
     if (exp < 0) {
@@ -116,9 +116,9 @@ constexpr auto pow(auto base, auto exp, std::uint_least64_t p)
     }
     return res;
 }
-std::int_least64_t binary_search(std::invocable<std::int_least64_t> auto check,
-                                 std::int_least64_t ok, std::int_least64_t ng,
-                                 bool check_ok = true)
+auto binary_search(std::invocable<std::int_least64_t> auto check,
+                   std::int_least64_t ok, std::int_least64_t ng,
+                   bool check_ok = true) -> std::int_least64_t
 {
     if (check_ok && !check(ok)) {
         throw std::invalid_argument{"check isn't true on 'ok'."};
@@ -129,27 +129,27 @@ std::int_least64_t binary_search(std::invocable<std::int_least64_t> auto check,
     }
     return ok;
 }
-template <std::signed_integral T> constexpr T lsb(T i) noexcept
+constexpr auto lsb(std::signed_integral auto i) noexcept -> decltype(i)
 {
     return i & -i;
 }
 // i mustn't be 0
-constexpr int msb(std::unsigned_integral auto i)
+constexpr auto msb(std::unsigned_integral auto i) -> int
 {
     if (i == 0) {
         throw std::invalid_argument{"i must be positive."};
     }
     return (sizeof(i) * CHAR_BIT) - 1 - std::countl_zero(i);
 }
-// [[maybe_unused]] auto gen_rand() noexcept
-// {
-//     static std::mt19937_64 rng(
-//         std::chrono::steady_clock::now().time_since_epoch().count());
-//     return rng();
-// }
+/*[[maybe_unused]] auto gen_rand() noexcept*/
+/*{*/
+/*  static std::mt19937_64 rng(*/
+/*      std::chrono::steady_clock::now().time_since_epoch().count());*/
+/*  return rng();*/
+/*}*/
 void solve_case();
 } // namespace
-int main()
+auto main() -> int
 {
     std::ios::sync_with_stdio(false);
     std::cin.tie(nullptr);
@@ -173,6 +173,16 @@ using u64 = std::uint_least64_t;
 using u128 = __uint128_t;
 void solve_case()
 {
-    // return;
+    int n, d;
+    std::cin >> n >> d;
+    std::vector<std::pair<int, int>> a(n);
+    std::cin >> a;
+
+    for (int i{1}; i != d + 1; ++i) {
+        std::cout << std::ranges::max(a | std::views::transform([i](auto p) {
+                                          return p.first * (p.second + i);
+                                      }))
+                  << '\n';
+    }
 }
 } // namespace

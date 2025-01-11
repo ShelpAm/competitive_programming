@@ -1,10 +1,10 @@
 #pragma once
 
-// Problem: $(PROBLEM)
-// Contest: $(CONTEST)
-// Judge: $(JUDGE)
-// URL: $(URL)
-// Start: $(DATE)
+// Problem: 异或与位移
+// Contest: unknown_contest
+// Judge: NowCoder
+// URL: https://ac.nowcoder.com/acm/contest/100007/C
+// Start: Fri 10 Jan 2025 07:40:07 PM CST
 // Author: ShelpAm
 
 // #include <bits/stdc++.h>
@@ -57,30 +57,30 @@ template <typename... Ts>
 concept tuple = is_tuple_t<Ts...>::value;
 } // namespace shelpam::concepts
 
-std::istream &operator>>(std::istream &istream, auto &&t)
-{
-    using T = std::remove_cvref_t<decltype(t)>;
-    static_assert(!shelpam::concepts::tuple<T>,
-                  "tuple: not implemented yet.\n");
-    if constexpr (std::ranges::range<T>) {
-        for (auto &ele : t) {
-            istream >> ele;
-        }
-    }
-    else if constexpr (shelpam::concepts::pair<T>) {
-        istream >> t.first >> t.second;
-    }
-    else {
-        istream >> t;
-    }
-    return istream;
-}
+// auto operator>>(auto &istream, auto &&t) -> decltype(istream)
+// {
+//     using T = std::remove_cvref_t<decltype(t)>;
+//     static_assert(!shelpam::concepts::tuple<T>,
+//                   "tuple: not implemented yet.\n");
+//     if constexpr (std::ranges::range<T>) {
+//         for (auto &ele : t) {
+//             istream >> ele;
+//         }
+//     }
+//     else if constexpr (shelpam::concepts::pair<T>) {
+//         istream >> t.first >> t.second;
+//     }
+//     else {
+//         istream >> t;
+//     }
+//     return istream;
+// }
 #ifndef ONLINE_JUDGE
 #include "/home/shelpam/Documents/projects/competitive-programming/libs/debug.h"
 #else
 #define debug(...)
 #endif
-bool chmax(auto &value, auto const &other) noexcept
+auto chmax(auto &value, auto const &other) noexcept -> bool
 {
     if (value < other) {
         value = other;
@@ -88,7 +88,7 @@ bool chmax(auto &value, auto const &other) noexcept
     }
     return false;
 }
-bool chmin(auto &value, auto const &other) noexcept
+auto chmin(auto &value, auto const &other) noexcept -> bool
 {
     if (value > other) {
         value = other;
@@ -100,7 +100,7 @@ constexpr auto sum_of(std::ranges::range auto const &coll) noexcept
 {
     return std::accumulate(coll.begin(), coll.end(), std::int_least64_t{});
 }
-constexpr auto pow(auto base, auto exp, std::uint_least64_t p)
+constexpr auto pow(auto base, std::int_least64_t exp, std::uint_least64_t p)
 {
     static_assert(sizeof(base) > sizeof(int), "Use of `int`s is bug-prone.");
     if (exp < 0) {
@@ -116,9 +116,9 @@ constexpr auto pow(auto base, auto exp, std::uint_least64_t p)
     }
     return res;
 }
-std::int_least64_t binary_search(std::invocable<std::int_least64_t> auto check,
-                                 std::int_least64_t ok, std::int_least64_t ng,
-                                 bool check_ok = true)
+auto binary_search(std::invocable<std::int_least64_t> auto check,
+                   std::int_least64_t ok, std::int_least64_t ng,
+                   bool check_ok = true) -> std::int_least64_t
 {
     if (check_ok && !check(ok)) {
         throw std::invalid_argument{"check isn't true on 'ok'."};
@@ -129,27 +129,27 @@ std::int_least64_t binary_search(std::invocable<std::int_least64_t> auto check,
     }
     return ok;
 }
-template <std::signed_integral T> constexpr T lsb(T i) noexcept
+constexpr auto lsb(std::signed_integral auto i) noexcept -> decltype(i)
 {
     return i & -i;
 }
 // i mustn't be 0
-constexpr int msb(std::unsigned_integral auto i)
+constexpr auto msb(std::unsigned_integral auto i) -> int
 {
     if (i == 0) {
         throw std::invalid_argument{"i must be positive."};
     }
     return (sizeof(i) * CHAR_BIT) - 1 - std::countl_zero(i);
 }
-// [[maybe_unused]] auto gen_rand() noexcept
-// {
-//     static std::mt19937_64 rng(
-//         std::chrono::steady_clock::now().time_since_epoch().count());
-//     return rng();
-// }
+/*[[maybe_unused]] auto gen_rand() noexcept*/
+/*{*/
+/*  static std::mt19937_64 rng(*/
+/*      std::chrono::steady_clock::now().time_since_epoch().count());*/
+/*  return rng();*/
+/*}*/
 void solve_case();
 } // namespace
-int main()
+auto main() -> int
 {
     std::ios::sync_with_stdio(false);
     std::cin.tie(nullptr);
@@ -173,6 +173,54 @@ using u64 = std::uint_least64_t;
 using u128 = __uint128_t;
 void solve_case()
 {
-    // return;
+    int n, m, k;
+    std::cin >> n >> m >> k;
+    std::vector<int> a(n);
+    for (auto &e : a) {
+        std::cin >> e;
+    }
+
+    auto normalize{[k](std::bitset<10000> &b) {
+        for (int i{k}; i != std::min<int>(2 * k, b.size()); ++i) {
+            b.reset(i);
+        }
+    }};
+
+    for (int i{}; i != m; ++i) {
+        std::string s;
+        std::cin >> s;
+        std::ranges::reverse(s);
+        s += std::string(k - s.size(), '0');
+
+        std::bitset<10000> prev, cur;
+        for (int i{}; i != s.size(); ++i) {
+            if (s[i] == '1') {
+                cur.set(i);
+            }
+        }
+        for (auto const off : a | std::views::reverse) {
+            std::swap(prev, cur);
+            cur = prev;
+            if (off > 0) {
+                for (int i{off}; i != k; ++i) {
+                    cur.set(i, cur.test(i - off) ^ prev.test(i));
+                }
+            }
+            else {
+                for (int i{k + off - 1}; i != -1; --i) {
+                    cur.set(i, cur.test(i - off) ^ prev.test(i));
+                }
+            }
+            normalize(cur);
+        }
+
+        auto str{cur.to_string()};
+        if (auto const pos{str.find('1')}; pos == std::string::npos) {
+            std::cout << 0 << '\n';
+        }
+        else {
+            std::cout << str.substr(pos) << '\n';
+        }
+    }
 }
 } // namespace

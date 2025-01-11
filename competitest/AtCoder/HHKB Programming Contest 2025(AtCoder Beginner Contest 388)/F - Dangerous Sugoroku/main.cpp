@@ -1,10 +1,10 @@
 #pragma once
 
-// Problem: $(PROBLEM)
-// Contest: $(CONTEST)
-// Judge: $(JUDGE)
-// URL: $(URL)
-// Start: $(DATE)
+// Problem: F - Dangerous Sugoroku
+// Contest: HHKB Programming Contest 2025(AtCoder Beginner Contest 388)
+// Judge: AtCoder
+// URL: https://atcoder.jp/contests/abc388/tasks/abc388_f
+// Start: Sun 12 Jan 2025 12:56:17 AM CST
 // Author: ShelpAm
 
 // #include <bits/stdc++.h>
@@ -173,6 +173,83 @@ using u64 = std::uint_least64_t;
 using u128 = __uint128_t;
 void solve_case()
 {
-    // return;
+    i64 n;
+    int m, a, b;
+    std::cin >> n >> m >> a >> b;
+    std::vector<std::pair<i64, i64>> intervals(m);
+    std::cin >> intervals;
+    intervals.push_back({n + 1, n + 1});
+
+    if (std::ranges::any_of(
+            intervals, [b](auto p) { return p.second - p.first + 1 > b; })) {
+        std::cout << "No\n";
+        return;
+    }
+
+    if (a == b) {
+        std::cout << (std::ranges::any_of(
+                          intervals,
+                          [&](auto p) {
+                              auto const &[l, r]{p};
+                              auto const x{binary_search(
+                                  [&](auto x) { return 1 + x * a < l; }, 0,
+                                  1e12)};
+                              return 1 + (x + 1) * a <= r;
+                          }) ||
+                              (n - 1) % a != 0
+                          ? "No"
+                          : "Yes")
+                  << '\n';
+        return;
+    }
+
+    std::unordered_set<i64> ng;
+    for (auto const &[l, r] : intervals) {
+        for (auto i{l}; i != r + 1; ++i) {
+            ng.insert(i);
+        }
+    }
+
+    i64 p{1}, q{1}; // We guarentee that numbers in [p, q] will be in `ok`.
+    std::unordered_set<i64> ok{1};
+    for (auto const &[l, r] : intervals) {
+        // If a contiguous line of length a can be reached, then we can advance
+        // the boy.
+        int contiguous{};
+        for (auto i{q + 1}; i < l; ++i) {
+            bool found{};
+            for (int j{a}; j != b + 1; ++j) {
+                if (ok.contains(i - j) && !ng.contains(i)) {
+                    ok.insert(i);
+                    ++contiguous;
+                    found = true;
+                    break;
+                }
+            }
+            if (!found) {
+                contiguous = 0;
+            }
+            if (contiguous == a - 1) {
+                for (auto j{r + 1 - b}; j != l; ++j) {
+                    ok.insert(j);
+                }
+                break;
+            }
+        }
+
+        auto reachable{r};
+        for (auto i{r + 1}; i != r + a; ++i) {
+            for (int j{a}; j != b + 1; ++j) {
+                if (ok.contains(i - j) && !ng.contains(i)) {
+                    ok.insert(i);
+                    chmax(reachable, i);
+                }
+            }
+        }
+        p = r + 1;
+        q = reachable;
+    }
+
+    std::cout << (ok.contains(n) ? "Yes\n" : "No\n");
 }
 } // namespace
