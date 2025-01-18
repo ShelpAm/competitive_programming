@@ -1,10 +1,10 @@
 #pragma once
 
-// Problem: $(PROBLEM)
-// Contest: $(CONTEST)
-// Judge: $(JUDGE)
-// URL: $(URL)
-// Start: $(DATE)
+// Problem: E - Square Price
+// Contest: Toyota Programming Contest  2025（AtCoder Beginner Contest 389)
+// Judge: AtCoder
+// URL: https://atcoder.jp/contests/abc389/tasks/abc389_e
+// Start: Sat 18 Jan 2025 08:45:44 PM CST
 // Author: ShelpAm
 
 // #include <bits/stdc++.h>
@@ -177,6 +177,43 @@ using u64 = std::uint_least64_t;
 using u128 = __uint128_t;
 void solve_case()
 {
-    // return;
+    int n;
+    i64 m;
+    std::cin >> n >> m;
+    std::vector<int> a(n);
+    std::cin >> a;
+
+    auto check{[&](i128 x) -> std::pair<bool, i64> {
+        i64 s{m};
+        i64 c{};
+
+        std::vector<i64> t(n);
+        for (int i{}; auto const &e : a) {
+            auto const k{(x / e + 1) / 2};
+            if (auto const cost{static_cast<i128>(k) * k * e}; s >= cost) {
+                s -= cost;
+                c += k;
+                t[i] = (2 * k + 1) * e;
+            }
+            else {
+                return {false, {}};
+            }
+            ++i;
+        }
+
+        std::ranges::sort(t);
+        for (auto const &e : t) {
+            if (s >= e) {
+                s -= e;
+                c += 1;
+            }
+        }
+
+        return {true, c};
+    }};
+
+    auto const x{
+        binary_search([&](auto x) { return check(x).first; }, 0, max<i64>)};
+    std::cout << check(x).second << '\n';
 }
 } // namespace

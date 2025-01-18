@@ -1,10 +1,10 @@
 #pragma once
 
-// Problem: $(PROBLEM)
-// Contest: $(CONTEST)
-// Judge: $(JUDGE)
-// URL: $(URL)
-// Start: $(DATE)
+// Problem: A - 9x9
+// Contest: Toyota Programming Contest  2025（AtCoder Beginner Contest 389)
+// Judge: AtCoder
+// URL: https://atcoder.jp/contests/abc389/tasks/abc389_a
+// Start: Sat 18 Jan 2025 08:18:46 PM CST
 // Author: ShelpAm
 
 // #include <bits/stdc++.h>
@@ -55,30 +55,8 @@ template <typename... Ts>
 struct is_tuple_t<std::tuple<Ts...>> : std::true_type {};
 template <typename... Ts>
 concept tuple = is_tuple_t<Ts...>::value;
-template <typename T>
-concept non_string_range =
-    !std::same_as<T, std::string> && std::ranges::range<T>;
 } // namespace shelpam::concepts
 
-std::istream &operator>>(std::istream &istream,
-                         shelpam::concepts::non_string_range auto &&t)
-{
-    using T = std::remove_cvref_t<decltype(t)>;
-    static_assert(!shelpam::concepts::tuple<T>,
-                  "tuple: not implemented yet.\n");
-    if constexpr (std::ranges::range<T>) {
-        for (auto &ele : t) {
-            istream >> ele;
-        }
-    }
-    else if constexpr (shelpam::concepts::pair<T>) {
-        istream >> t.first >> t.second;
-    }
-    else {
-        istream >> t;
-    }
-    return istream;
-}
 #ifndef ONLINE_JUDGE
 #include "/home/shelpam/Documents/projects/competitive-programming/libs/debug.h"
 #else
@@ -177,6 +155,8 @@ using u64 = std::uint_least64_t;
 using u128 = __uint128_t;
 void solve_case()
 {
-    // return;
+    std::string s;
+    std::cin >> s;
+    std::cout << (s[0] - '0') * (s[2] - '0') << '\n';
 }
 } // namespace

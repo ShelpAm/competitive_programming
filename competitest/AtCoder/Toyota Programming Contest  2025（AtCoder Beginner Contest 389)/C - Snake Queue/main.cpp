@@ -1,10 +1,10 @@
 #pragma once
 
-// Problem: $(PROBLEM)
-// Contest: $(CONTEST)
-// Judge: $(JUDGE)
-// URL: $(URL)
-// Start: $(DATE)
+// Problem: C - Snake Queue
+// Contest: Toyota Programming Contest  2025（AtCoder Beginner Contest 389)
+// Judge: AtCoder
+// URL: https://atcoder.jp/contests/abc389/tasks/abc389_c
+// Start: Sat 18 Jan 2025 08:28:05 PM CST
 // Author: ShelpAm
 
 // #include <bits/stdc++.h>
@@ -177,6 +177,27 @@ using u64 = std::uint_least64_t;
 using u128 = __uint128_t;
 void solve_case()
 {
-    // return;
+    int q;
+    std::cin >> q;
+    std::vector<i64> v{0};
+    int t{};
+    for (int i{}; i != q; ++i) {
+        int o;
+        std::cin >> o;
+
+        if (o == 1) {
+            int l;
+            std::cin >> l;
+            v.push_back(v.back() + l);
+        }
+        else if (o == 2) {
+            ++t;
+        }
+        else if (o == 3) {
+            int k;
+            std::cin >> k;
+            std::cout << v[t + k - 1] - v[t] << '\n';
+        }
+    }
 }
 } // namespace

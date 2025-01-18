@@ -1,10 +1,10 @@
 #pragma once
 
-// Problem: $(PROBLEM)
-// Contest: $(CONTEST)
-// Judge: $(JUDGE)
-// URL: $(URL)
-// Start: $(DATE)
+// Problem: B - tcaF
+// Contest: Toyota Programming Contest  2025（AtCoder Beginner Contest 389)
+// Judge: AtCoder
+// URL: https://atcoder.jp/contests/abc389/tasks/abc389_b
+// Start: Sat 18 Jan 2025 08:24:50 PM CST
 // Author: ShelpAm
 
 // #include <bits/stdc++.h>
@@ -177,6 +177,15 @@ using u64 = std::uint_least64_t;
 using u128 = __uint128_t;
 void solve_case()
 {
-    // return;
+    i64 x;
+    std::cin >> x;
+
+    i64 t{1};
+    for (int i{1}; i != 100; ++i) {
+        if ((t *= i) == x) {
+            std::cout << i << '\n';
+            return;
+        }
+    }
 }
 } // namespace

@@ -1,10 +1,10 @@
 #pragma once
 
-// Problem: $(PROBLEM)
-// Contest: $(CONTEST)
-// Judge: $(JUDGE)
-// URL: $(URL)
-// Start: $(DATE)
+// Problem: D - Squares in Circle
+// Contest: Toyota Programming Contest  2025（AtCoder Beginner Contest 389)
+// Judge: AtCoder
+// URL: https://atcoder.jp/contests/abc389/tasks/abc389_d
+// Start: Sat 18 Jan 2025 08:37:06 PM CST
 // Author: ShelpAm
 
 // #include <bits/stdc++.h>
@@ -177,6 +177,18 @@ using u64 = std::uint_least64_t;
 using u128 = __uint128_t;
 void solve_case()
 {
-    // return;
+    i64 r;
+    std::cin >> r;
+
+    i64 ans{1};
+    i64 t{};
+    for (i64 i{r}; i != 0; --i) {
+        while ((0.5 + t) * (0.5 + t) + (i + 0.5) * (i + 0.5) <= r * r) {
+            ++t;
+        }
+        debug("i, t", std::pair{i, t});
+        ans += 4 * t;
+    }
+    std::cout << ans << '\n';
 }
 } // namespace

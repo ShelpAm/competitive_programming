@@ -6,9 +6,7 @@
 // Includer should contain concept `shelpam::concepts::tuple<T>`.
 namespace shelpam::concepts {
 template <typename T>
-concept string_like = std::same_as<std::string, std::remove_cvref_t<T>> ||
-                      std::same_as<std::string_view, std::remove_cvref_t<T>> ||
-                      std::convertible_to<std::remove_cvref_t<T>, char const *>;
+concept string_like = std::convertible_to<T, std::string_view>;
 }
 
 constexpr auto print(auto &&t, int depth = 0, auto &out = std::cout) -> void

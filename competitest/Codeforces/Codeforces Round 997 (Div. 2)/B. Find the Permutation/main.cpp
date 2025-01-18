@@ -1,10 +1,10 @@
 #pragma once
 
-// Problem: $(PROBLEM)
-// Contest: $(CONTEST)
-// Judge: $(JUDGE)
-// URL: $(URL)
-// Start: $(DATE)
+// Problem: B. Find the Permutation
+// Contest: Codeforces Round 997 (Div. 2)
+// Judge: Codeforces
+// URL: https://codeforces.com/contest/2056/problem/B
+// Start: Fri 17 Jan 2025 11:38:54 PM CST
 // Author: ShelpAm
 
 // #include <bits/stdc++.h>
@@ -55,13 +55,9 @@ template <typename... Ts>
 struct is_tuple_t<std::tuple<Ts...>> : std::true_type {};
 template <typename... Ts>
 concept tuple = is_tuple_t<Ts...>::value;
-template <typename T>
-concept non_string_range =
-    !std::same_as<T, std::string> && std::ranges::range<T>;
 } // namespace shelpam::concepts
 
-std::istream &operator>>(std::istream &istream,
-                         shelpam::concepts::non_string_range auto &&t)
+std::istream &operator>>(std::istream &istream, std::ranges::range auto &&t)
 {
     using T = std::remove_cvref_t<decltype(t)>;
     static_assert(!shelpam::concepts::tuple<T>,
@@ -160,7 +156,7 @@ int main()
     constexpr auto my_precision{10};
     std::cout << std::fixed << std::setprecision(my_precision);
     int t{1};
-    // std::cin >> t;
+    std::cin >> t;
     for (int i{}; i != t; ++i) {
 #ifndef ONLINE_JUDGE
         std::cerr << "Test case " << i << '\n';
@@ -177,6 +173,26 @@ using u64 = std::uint_least64_t;
 using u128 = __uint128_t;
 void solve_case()
 {
-    // return;
+    int n;
+    std::cin >> n;
+    std::vector a(n, std::vector<char>(n));
+    for (int i{}; i != n; ++i) {
+        for (int j{}; j != n; ++j) {
+            std::cin >> a[i][j];
+        }
+    }
+
+    std::vector<int> s{0};
+    for (int i{1}; i != n; ++i) {
+        auto it{s.begin()};
+        while (it != s.end() && a[i][*it] == '1') {
+            ++it;
+        }
+        s.insert(it, i);
+    }
+    for (auto const &e : s) {
+        std::cout << e + 1 << ' ';
+    }
+    std::cout << '\n';
 }
 } // namespace
