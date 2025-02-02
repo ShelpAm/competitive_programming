@@ -1,10 +1,10 @@
 #pragma once
 
-// Problem: $(PROBLEM)
-// Contest: $(CONTEST)
-// Judge: $(JUDGE)
-// URL: $(URL)
-// Start: $(DATE)
+// Problem: 一气贯通之刃
+// Contest: unknown_contest
+// Judge: NowCoder
+// URL: https://ac.nowcoder.com/acm/contest/95323/B
+// Start: Tue 21 Jan 2025 01:12:40 PM CST
 // Author: ShelpAm
 
 // #include <bits/stdc++.h>
@@ -57,7 +57,7 @@ template <typename... Ts>
 concept tuple = is_tuple_t<Ts...>::value;
 template <typename T>
 concept non_string_range =
-    !std::same_as<std::remove_cvref_t<T>, std::string> && std::ranges::range<T>;
+    !std::same_as<T, std::string> && std::ranges::range<T>;
 } // namespace shelpam::concepts
 
 std::istream &operator>>(std::istream &istream,
@@ -177,6 +177,26 @@ using u64 = std::uint_least64_t;
 using u128 = __uint128_t;
 void solve_case()
 {
-    // return;
+    int n;
+    std::cin >> n;
+    std::vector<int> in(n);
+    for (int i{}; i != n - 1; ++i) {
+        int u, v;
+        std::cin >> u >> v;
+        ++in[--u];
+        ++in[--v];
+    }
+
+    if (std::ranges::count(in, 1) == 2 && std::ranges::count(in, 2) == n - 2) {
+        auto it{std::ranges::find(in, 1)};
+        while (it != in.end()) {
+            std::cout << (it - in.begin() + 1) << ' ';
+            it = std::ranges::find(std::next(it), in.end(), 1);
+        }
+        std::cout << '\n';
+    }
+    else {
+        std::cout << -1 << '\n';
+    }
 }
 } // namespace

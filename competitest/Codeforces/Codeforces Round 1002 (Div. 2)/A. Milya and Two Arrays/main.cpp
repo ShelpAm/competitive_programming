@@ -1,10 +1,10 @@
 #pragma once
 
-// Problem: $(PROBLEM)
-// Contest: $(CONTEST)
-// Judge: $(JUDGE)
-// URL: $(URL)
-// Start: $(DATE)
+// Problem: A. Milya and Two Arrays
+// Contest: Codeforces Round 1002 (Div. 2)
+// Judge: Codeforces
+// URL: https://codeforces.com/contest/2059/problem/0
+// Start: Sun 02 Feb 2025 10:38:49 PM CST
 // Author: ShelpAm
 
 // #include <bits/stdc++.h>
@@ -160,7 +160,7 @@ int main()
     constexpr auto my_precision{10};
     std::cout << std::fixed << std::setprecision(my_precision);
     int t{1};
-    // std::cin >> t;
+    std::cin >> t;
     for (int i{}; i != t; ++i) {
 #ifndef ONLINE_JUDGE
         std::cerr << "Test case " << i << '\n';
@@ -177,6 +177,18 @@ using u64 = std::uint_least64_t;
 using u128 = __uint128_t;
 void solve_case()
 {
-    // return;
+    int n;
+    std::cin >> n;
+    std::vector<int> a(n);
+    std::cin >> a;
+    std::vector<int> b(n);
+    std::cin >> b;
+
+    std::cout << (std::set(a.begin(), a.end()).size() *
+                              std::set(b.begin(), b.end()).size() >=
+                          3
+                      ? "YES"
+                      : "NO")
+              << '\n';
 }
 } // namespace

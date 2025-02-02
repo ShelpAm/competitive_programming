@@ -1,10 +1,10 @@
 #pragma once
 
-// Problem: $(PROBLEM)
-// Contest: $(CONTEST)
-// Judge: $(JUDGE)
-// URL: $(URL)
-// Start: $(DATE)
+// Problem: 智乃的牛题
+// Contest: unknown_contest
+// Judge: NowCoder
+// URL: https://ac.nowcoder.com/acm/contest/95335/M
+// Start: Tue 28 Jan 2025 10:51:52 AM CST
 // Author: ShelpAm
 
 // #include <bits/stdc++.h>
@@ -170,6 +170,7 @@ int main()
     return 0;
 }
 using namespace shelpam;
+using namespace std::string_view_literals;
 namespace {
 using i64 = std::int_least64_t;
 using i128 = __int128_t;
@@ -177,6 +178,21 @@ using u64 = std::uint_least64_t;
 using u128 = __uint128_t;
 void solve_case()
 {
-    // return;
+    std::string s;
+    std::cin >> s;
+    std::unordered_map<char, int> o;
+    for (auto const e : s) {
+        ++o[e];
+    }
+
+    auto const obj{"nowcoder"sv};
+    for (auto const e : obj) {
+        if (o[e]-- == 0) {
+            std::cout << "I AK IOI\n";
+            return;
+        }
+    }
+
+    std::cout << "happy new year\n";
 }
 } // namespace

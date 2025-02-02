@@ -1,10 +1,10 @@
 #pragma once
 
-// Problem: $(PROBLEM)
-// Contest: $(CONTEST)
-// Judge: $(JUDGE)
-// URL: $(URL)
-// Start: $(DATE)
+// Problem: 井然有序之衡
+// Contest: unknown_contest
+// Judge: NowCoder
+// URL: https://ac.nowcoder.com/acm/contest/95323/G
+// Start: Tue 21 Jan 2025 01:29:42 PM CST
 // Author: ShelpAm
 
 // #include <bits/stdc++.h>
@@ -57,7 +57,7 @@ template <typename... Ts>
 concept tuple = is_tuple_t<Ts...>::value;
 template <typename T>
 concept non_string_range =
-    !std::same_as<std::remove_cvref_t<T>, std::string> && std::ranges::range<T>;
+    !std::same_as<T, std::string> && std::ranges::range<T>;
 } // namespace shelpam::concepts
 
 std::istream &operator>>(std::istream &istream,
@@ -177,6 +177,22 @@ using u64 = std::uint_least64_t;
 using u128 = __uint128_t;
 void solve_case()
 {
-    // return;
+    i64 n;
+    std::cin >> n;
+    std::vector<int> a(n);
+    std::cin >> a;
+
+    if (std::accumulate(a.begin(), a.end(), 0ULL) != n * (n + 1) / 2) {
+        std::cout << -1 << '\n';
+    }
+    else {
+        i64 s{};
+        std::ranges::sort(a);
+        for (int i{}; i != n; ++i) {
+            s += std::abs(i + 1 - a[i]);
+        }
+        assert(s % 2 == 0);
+        std::cout << s / 2 << '\n';
+    }
 }
 } // namespace

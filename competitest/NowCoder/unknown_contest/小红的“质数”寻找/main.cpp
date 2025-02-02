@@ -1,10 +1,10 @@
 #pragma once
 
-// Problem: $(PROBLEM)
-// Contest: $(CONTEST)
-// Judge: $(JUDGE)
-// URL: $(URL)
-// Start: $(DATE)
+// Problem: 小红的“质数”寻找
+// Contest: unknown_contest
+// Judge: NowCoder
+// URL: https://ac.nowcoder.com/acm/contest/100902/D
+// Start: Sun 02 Feb 2025 10:25:18 PM CST
 // Author: ShelpAm
 
 // #include <bits/stdc++.h>
@@ -160,7 +160,7 @@ int main()
     constexpr auto my_precision{10};
     std::cout << std::fixed << std::setprecision(my_precision);
     int t{1};
-    // std::cin >> t;
+    std::cin >> t;
     for (int i{}; i != t; ++i) {
 #ifndef ONLINE_JUDGE
         std::cerr << "Test case " << i << '\n';
@@ -177,6 +177,24 @@ using u64 = std::uint_least64_t;
 using u128 = __uint128_t;
 void solve_case()
 {
-    // return;
+    std::string n;
+    std::cin >> n;
+
+    std::string zeros(n.size() - 1, '0');
+    if (auto const x{n[0] - '0'}; x <= 1) {
+        std::cout << 2 << zeros << '\n';
+    }
+    else if (x <= 2) {
+        std::cout << 3 << zeros << '\n';
+    }
+    else if (x <= 4) {
+        std::cout << 5 << zeros << '\n';
+    }
+    else if (x <= 6) {
+        std::cout << 7 << zeros << '\n';
+    }
+    else if (x <= 9) {
+        std::cout << 13 << (zeros.size() == 0 ? "" : zeros.substr(1)) << '\n';
+    }
 }
 } // namespace

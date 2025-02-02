@@ -1,10 +1,10 @@
 #pragma once
 
-// Problem: $(PROBLEM)
-// Contest: $(CONTEST)
-// Judge: $(JUDGE)
-// URL: $(URL)
-// Start: $(DATE)
+// Problem: 数值膨胀之美
+// Contest: unknown_contest
+// Judge: NowCoder
+// URL: https://ac.nowcoder.com/acm/contest/95323/M
+// Start: Tue 21 Jan 2025 01:20:19 PM CST
 // Author: ShelpAm
 
 // #include <bits/stdc++.h>
@@ -57,7 +57,7 @@ template <typename... Ts>
 concept tuple = is_tuple_t<Ts...>::value;
 template <typename T>
 concept non_string_range =
-    !std::same_as<std::remove_cvref_t<T>, std::string> && std::ranges::range<T>;
+    !std::same_as<T, std::string> && std::ranges::range<T>;
 } // namespace shelpam::concepts
 
 std::istream &operator>>(std::istream &istream,
@@ -177,6 +177,28 @@ using u64 = std::uint_least64_t;
 using u128 = __uint128_t;
 void solve_case()
 {
-    // return;
+    int n;
+    std::cin >> n;
+    std::vector<int> a(n);
+    std::cin >> a;
+
+    auto const t{std::ranges::min(a)};
+    auto const first{std::ranges::find(a, t)};
+    auto const last{std::ranges::find_last(a, t)};
+
+    auto calc{[](std::span<int> const &a) {
+        return std::ranges::max(a) - std::ranges::min(a);
+    }};
+
+    *first *= 2;
+    auto ans{calc(a)};
+    *first /= 2;
+
+    for (auto &e : std::span<int>(first, last.begin() - first + 1)) {
+        e *= 2;
+    }
+    chmin(ans, calc(a));
+
+    std::cout << ans << '\n';
 }
 } // namespace

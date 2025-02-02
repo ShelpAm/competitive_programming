@@ -1,10 +1,10 @@
 #pragma once
 
-// Problem: $(PROBLEM)
-// Contest: $(CONTEST)
-// Judge: $(JUDGE)
-// URL: $(URL)
-// Start: $(DATE)
+// Problem: 井然有序之窗
+// Contest: unknown_contest
+// Judge: NowCoder
+// URL: https://ac.nowcoder.com/acm/contest/95323/H
+// Start: Tue 21 Jan 2025 10:58:25 PM CST
 // Author: ShelpAm
 
 // #include <bits/stdc++.h>
@@ -57,7 +57,7 @@ template <typename... Ts>
 concept tuple = is_tuple_t<Ts...>::value;
 template <typename T>
 concept non_string_range =
-    !std::same_as<std::remove_cvref_t<T>, std::string> && std::ranges::range<T>;
+    !std::same_as<T, std::string> && std::ranges::range<T>;
 } // namespace shelpam::concepts
 
 std::istream &operator>>(std::istream &istream,
@@ -177,6 +177,37 @@ using u64 = std::uint_least64_t;
 using u128 = __uint128_t;
 void solve_case()
 {
-    // return;
+    int n;
+    std::cin >> n;
+    std::vector<std::array<int, 3>> a(n);
+    for (int idx{}; auto &[x, y, i] : a) {
+        std::cin >> x >> y;
+        i = idx++;
+    }
+
+    std::ranges::sort(
+        a, {}, [](auto const &p) { return std::make_pair(p[1], -p[0]); });
+
+    std::set<int> avail;
+    for (int i{1}; i <= n; ++i) {
+        avail.insert(i);
+    }
+
+    std::vector<int> ans(n);
+    for (auto const &[l, r, i] : a) {
+        if (auto it{avail.lower_bound(l)}; it != avail.end() && *it <= r) {
+            ans[i] = *it;
+            avail.erase(it);
+        }
+        else {
+            std::cout << -1 << '\n';
+            return;
+        }
+    }
+
+    for (auto const e : ans) {
+        std::cout << e << ' ';
+    }
+    std::cout << '\n';
 }
 } // namespace

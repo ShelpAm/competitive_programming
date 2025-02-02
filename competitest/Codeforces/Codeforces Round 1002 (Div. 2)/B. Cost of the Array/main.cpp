@@ -1,10 +1,10 @@
 #pragma once
 
-// Problem: $(PROBLEM)
-// Contest: $(CONTEST)
-// Judge: $(JUDGE)
-// URL: $(URL)
-// Start: $(DATE)
+// Problem: B. Cost of the Array
+// Contest: Codeforces Round 1002 (Div. 2)
+// Judge: Codeforces
+// URL: https://codeforces.com/contest/2059/problem/B
+// Start: Sun 02 Feb 2025 10:59:23 PM CST
 // Author: ShelpAm
 
 // #include <bits/stdc++.h>
@@ -160,7 +160,7 @@ int main()
     constexpr auto my_precision{10};
     std::cout << std::fixed << std::setprecision(my_precision);
     int t{1};
-    // std::cin >> t;
+    std::cin >> t;
     for (int i{}; i != t; ++i) {
 #ifndef ONLINE_JUDGE
         std::cerr << "Test case " << i << '\n';
@@ -177,6 +177,35 @@ using u64 = std::uint_least64_t;
 using u128 = __uint128_t;
 void solve_case()
 {
-    // return;
+    int n, k;
+    std::cin >> n >> k;
+    std::vector<int> a(n);
+    std::cin >> a;
+
+    if (n == k) {
+        for (int i{}; auto const e : a | std::views::chunk(2)) {
+            if (e[1] != ++i) {
+                std::cout << i << '\n';
+                return;
+            }
+        }
+        std::cout << k / 2 + 1 << '\n';
+
+        return;
+    }
+
+    // k <= n - 1
+    if (a[2] != 1) { // Make it as first
+        std::cout << 1 << '\n';
+    }
+    else if (auto const last{a.begin() + 2 + n - k},
+             it{std::ranges::find_if(a.begin() + 1, last,
+                                     [](auto e) { return e != 1; })};
+             it != last) { // Make it as first
+        std::cout << 1 << '\n';
+    }
+    else {
+        std::cout << 2 << '\n';
+    }
 }
 } // namespace

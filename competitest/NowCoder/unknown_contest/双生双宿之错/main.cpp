@@ -1,10 +1,10 @@
 #pragma once
 
-// Problem: $(PROBLEM)
-// Contest: $(CONTEST)
-// Judge: $(JUDGE)
-// URL: $(URL)
-// Start: $(DATE)
+// Problem: 双生双宿之错
+// Contest: unknown_contest
+// Judge: NowCoder
+// URL: https://ac.nowcoder.com/acm/contest/95323/E
+// Start: Tue 21 Jan 2025 11:40:18 PM CST
 // Author: ShelpAm
 
 // #include <bits/stdc++.h>
@@ -57,7 +57,7 @@ template <typename... Ts>
 concept tuple = is_tuple_t<Ts...>::value;
 template <typename T>
 concept non_string_range =
-    !std::same_as<std::remove_cvref_t<T>, std::string> && std::ranges::range<T>;
+    !std::same_as<T, std::string> && std::ranges::range<T>;
 } // namespace shelpam::concepts
 
 std::istream &operator>>(std::istream &istream,
@@ -160,7 +160,7 @@ int main()
     constexpr auto my_precision{10};
     std::cout << std::fixed << std::setprecision(my_precision);
     int t{1};
-    // std::cin >> t;
+    std::cin >> t;
     for (int i{}; i != t; ++i) {
 #ifndef ONLINE_JUDGE
         std::cerr << "Test case " << i << '\n';
@@ -177,6 +177,34 @@ using u64 = std::uint_least64_t;
 using u128 = __uint128_t;
 void solve_case()
 {
-    // return;
+    std::size_t n;
+    std::cin >> n;
+    std::vector<int> a(n);
+    std::cin >> a;
+
+    std::ranges::sort(a);
+
+    auto calc{[](std::span<int> const &a, int t) {
+        i64 ans{};
+        for (auto const e : a) {
+            ans += std::abs(e - t);
+        }
+        return ans;
+    }};
+
+    if (a[n / 4] == a[n / 2 + n / 4]) {
+        std::cout << std::min(
+                         calc({a.begin(), n / 2}, a[n / 4] - 1) +
+                             calc({a.begin() + n / 2, n / 2}, a[n / 2 + n / 4]),
+                         calc({a.begin(), n / 2}, a[n / 4]) +
+                             calc({a.begin() + n / 2, n / 2},
+                                  a[n / 2 + n / 4] + 1))
+                  << '\n';
+    }
+    else {
+        std::cout << calc({a.begin(), n / 2}, a[n / 4]) +
+                         calc({a.begin() + n / 2, n / 2}, a[n / 2 + n / 4])
+                  << '\n';
+    }
 }
 } // namespace

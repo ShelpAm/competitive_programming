@@ -1,10 +1,10 @@
 #pragma once
 
-// Problem: $(PROBLEM)
-// Contest: $(CONTEST)
-// Judge: $(JUDGE)
-// URL: $(URL)
-// Start: $(DATE)
+// Problem: 硝基甲苯之袭
+// Contest: unknown_contest
+// Judge: NowCoder
+// URL: https://ac.nowcoder.com/acm/contest/95323/J
+// Start: Tue 21 Jan 2025 01:51:36 PM CST
 // Author: ShelpAm
 
 // #include <bits/stdc++.h>
@@ -57,7 +57,7 @@ template <typename... Ts>
 concept tuple = is_tuple_t<Ts...>::value;
 template <typename T>
 concept non_string_range =
-    !std::same_as<std::remove_cvref_t<T>, std::string> && std::ranges::range<T>;
+    !std::same_as<T, std::string> && std::ranges::range<T>;
 } // namespace shelpam::concepts
 
 std::istream &operator>>(std::istream &istream,
@@ -177,6 +177,34 @@ using u64 = std::uint_least64_t;
 using u128 = __uint128_t;
 void solve_case()
 {
-    // return;
+    int n;
+    std::cin >> n;
+    std::vector<int> a(n);
+    std::cin >> a;
+
+    std::unordered_map<int, int> o;
+    for (auto const e : a) {
+        ++o[e];
+    }
+
+    i64 ans{};
+    for (auto const e : a) {
+        std::vector<int> factors;
+        for (int i{1}; i * i <= e; ++i) {
+            if (e % i == 0) {
+                factors.push_back(i);
+                factors.push_back(e / i);
+            }
+        }
+        std::ranges::sort(factors);
+        factors.erase(std::ranges::unique(factors).begin());
+
+        for (auto const f : factors) {
+            if (auto const another{e ^ f}; std::gcd(e, another) == f) {
+                ans += o[another];
+            }
+        }
+    }
+    std::cout << ans / 2 << '\n';
 }
 } // namespace

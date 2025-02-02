@@ -57,7 +57,7 @@ template <typename... Ts>
 concept tuple = is_tuple_t<Ts...>::value;
 template <typename T>
 concept non_string_range =
-    !std::same_as<std::remove_cvref_t<T>, std::string> && std::ranges::range<T>;
+    !std::same_as<T, std::string> && std::ranges::range<T>;
 } // namespace shelpam::concepts
 
 std::istream &operator>>(std::istream &istream,
@@ -177,6 +177,20 @@ using u64 = std::uint_least64_t;
 using u128 = __uint128_t;
 void solve_case()
 {
-    // return;
+    // get mex of an array in O(N) time and uses O(1) space
+    auto mex_of{[](std::span<int> a) {
+        int n = a.size();
+        for (int i = 0; i < n; i++) {
+            while (a[i] < n && a[i] != i) {
+                std::swap(a[i], a[a[i]]);
+            }
+        }
+        for (int i = 0; i < n; i++) {
+            if (a[i] != i) {
+                return i;
+            }
+        }
+        return n;
+    }};
 }
 } // namespace
