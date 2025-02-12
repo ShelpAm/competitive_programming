@@ -1,10 +1,10 @@
 #pragma once
 
-// Problem: $(PROBLEM)
-// Contest: $(CONTEST)
-// Judge: $(JUDGE)
-// URL: $(URL)
-// Start: $(DATE)
+// Problem: D. Object Identification
+// Contest: Codeforces Round 1004 (Div. 2)
+// Judge: Codeforces
+// URL: https://codeforces.com/contest/2067/problem/D
+// Start: Wed 12 Feb 2025 12:13:42 AM CST
 // Author: ShelpAm
 
 // #include <bits/stdc++.h>
@@ -160,7 +160,7 @@ int main()
     constexpr auto my_precision{10};
     std::cout << std::fixed << std::setprecision(my_precision);
     int t{1};
-    // std::cin >> t;
+    std::cin >> t;
     for (int i{}; i != t; ++i) {
 #ifndef ONLINE_JUDGE
         std::cerr << "Test case " << i << '\n';
@@ -177,6 +177,52 @@ using u64 = std::uint_least64_t;
 using u128 = __uint128_t;
 void solve_case()
 {
-    // return;
+    int n;
+    std::cin >> n;
+    std::vector<int> a(n);
+    std::cin >> a;
+
+    auto query{[](auto i, auto j) {
+        std::cout << "? " << i << ' ' << j << std::endl;
+        int x;
+        std::cin >> x;
+        return x;
+    }};
+
+    std::vector<int> o(n + 1);
+    for (auto const e : a) {
+        ++o[e];
+    }
+
+    if (auto const it{std::ranges::find(o.begin() + 1, o.end(), 0)}; // 1~n
+        it == o.end()) {
+        auto const i{std::ranges::find(a, 1) - a.begin()};
+        auto const j{std::ranges::find(a, n) - a.begin()};
+        auto const x{query(i + 1, j + 1)};
+        if (x < n - 1) {
+            std::cout << "! A" << std::endl;
+        }
+        else if (x > n - 1) {
+            std::cout << "! B" << std::endl;
+        }
+        else {
+            auto const y{query(j + 1, i + 1)};
+            if (y == n - 1) {
+                std::cout << "! B" << std::endl;
+            }
+            else {
+                std::cout << "! A" << std::endl;
+            }
+        }
+    }
+    else {
+        auto const x{it - o.begin()};
+        if (query(x, x == 1 ? 2 : 1) == 0) {
+            std::cout << "! A" << std::endl;
+        }
+        else {
+            std::cout << "! B" << std::endl;
+        }
+    }
 }
 } // namespace

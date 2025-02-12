@@ -1,10 +1,10 @@
 #pragma once
 
-// Problem: $(PROBLEM)
-// Contest: $(CONTEST)
-// Judge: $(JUDGE)
-// URL: $(URL)
-// Start: $(DATE)
+// Problem: 举手赢棋easy
+// Contest: unknown_contest
+// Judge: NowCoder
+// URL: https://ac.nowcoder.com/acm/contest/101196/C
+// Start: Sun 09 Feb 2025 07:03:33 PM CST
 // Author: ShelpAm
 
 // #include <bits/stdc++.h>
@@ -177,6 +177,49 @@ using u64 = std::uint_least64_t;
 using u128 = __uint128_t;
 void solve_case()
 {
-    // return;
+    int n;
+    std::cin >> n;
+    std::string s;
+    std::cin >> s;
+
+    std::vector<int> a(n);
+    a[0] = s[0] == '1' ? 1 : -1;
+    std::vector<int> ones(n);
+    ones[0] = s[0] == '1' ? 1 : 0;
+    for (int i{1}; i != n; ++i) {
+        a[i] = a[i - 1] + (s[i] == '1' ? 1 : -1);
+        ones[i] = ones[i - 1] + (s[i] == '1' ? 1 : 0);
+    }
+
+    if (std::ranges::any_of(a, [](auto e) { return e < -4; })) { // None is ok
+        std::cout << 0 << '\n';
+        return;
+    }
+
+    auto const first{std::ranges::find_if(a, [](auto e) { return e < 0; }) -
+                     a.begin()};
+    if (first == n) { // All is ok
+        std::cout << static_cast<i64>(n) * (n - 1) / 2 << '\n';
+        return;
+    }
+
+    i64 ans{};
+    auto const second{std::ranges::find_if(a, [](auto e) { return e < -2; }) -
+                      a.begin()};
+    if (second == n) { // Second is free
+        for (int i{}; i != first + 1; ++i) {
+            if (s[i] == '0') {
+                ans += ones[i] + n - i - 1;
+            }
+        }
+    }
+    else {
+        for (int i{}; i != first + 1; ++i) {
+            if (s[i] == '0') {
+                ans += (second - i) - (ones[second] - ones[i]);
+            }
+        }
+    }
+    std::cout << ans << '\n';
 }
 } // namespace

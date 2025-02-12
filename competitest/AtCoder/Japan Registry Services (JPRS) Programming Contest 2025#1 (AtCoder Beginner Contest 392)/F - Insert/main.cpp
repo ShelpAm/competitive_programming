@@ -1,11 +1,10 @@
 #pragma once
 
-// Problem: $(PROBLEM)
-// Contest: $(CONTEST)
-// Judge: $(JUDGE)
-// URL: $(URL)
-// Start: $(DATE)
-// Author: ShelpAm
+// Problem: F - Insert
+// Contest: Japan Registry Services (JPRS) Programming Contest 2025#1 (AtCoder
+// Beginner Contest 392) Judge: AtCoder URL:
+// https://atcoder.jp/contests/abc392/tasks/abc392_f Start: Sun 09 Feb 2025
+// 04:26:03 PM CST Author: ShelpAm
 
 // #include <bits/stdc++.h>
 #include <algorithm>
@@ -175,8 +174,72 @@ using i64 = std::int_least64_t;
 using i128 = __int128_t;
 using u64 = std::uint_least64_t;
 using u128 = __uint128_t;
+class Fenwick_tree {
+  public:
+    // _tree[1..size] is available
+    explicit Fenwick_tree(int size) : _tree(size + 1) {}
+
+    // The input array should start from the index 1.
+    explicit Fenwick_tree(std::vector<std::int_fast64_t> coll)
+        : _tree{std::move(coll)}
+    {
+        for (unsigned i = 1; i != _tree.size(); ++i) {
+            if (auto const parent_index = i + lsb(i);
+                parent_index < _tree.size()) {
+                _tree[parent_index] += _tree[i];
+            }
+        }
+    }
+
+    [[nodiscard]] auto sum(int l, int r) const -> std::int_fast64_t
+    {
+        assert(l > 0);
+        assert(l <= r);
+        assert(r < _tree.size());
+        return prefix_sum(r) - prefix_sum(l - 1);
+    }
+
+    [[nodiscard]] auto prefix_sum(unsigned index) const -> std::int_fast64_t
+    {
+        std::int_fast64_t sum{};
+        while (index > 0) {
+            sum += _tree[index];
+            index -= lsb(index);
+        }
+        return sum;
+    }
+
+    void add_to(unsigned index, std::int_fast64_t delta)
+    {
+        auto n{static_cast<int>(_tree.size())};
+        while (index < n) {
+            _tree[index] += delta;
+            index += lsb(index);
+        }
+    }
+
+  private:
+    std::vector<std::int_fast64_t> _tree;
+};
 void solve_case()
 {
-    // return;
+    int n;
+    std::cin >> n;
+    std::vector<int> a(n);
+    std::cin >> a;
+
+    Fenwick_tree ft(n);
+
+    std::vector<int> ans(n);
+    for (int i{n}; auto e : a | std::views::reverse) {
+        e = binary_search([&](auto f) { return f - ft.prefix_sum(f) >= e; }, n,
+                          e - 1);
+        ans[e - 1] = i--;
+        ft.add_to(e, 1);
+    }
+
+    for (auto const e : ans) {
+        std::cout << e << ' ';
+    }
 }
 } // namespace

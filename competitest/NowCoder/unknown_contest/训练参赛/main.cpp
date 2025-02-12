@@ -1,10 +1,10 @@
 #pragma once
 
-// Problem: $(PROBLEM)
-// Contest: $(CONTEST)
-// Judge: $(JUDGE)
-// URL: $(URL)
-// Start: $(DATE)
+// Problem: 训练参赛
+// Contest: unknown_contest
+// Judge: NowCoder
+// URL: https://ac.nowcoder.com/acm/contest/101196/B
+// Start: Sun 09 Feb 2025 07:01:27 PM CST
 // Author: ShelpAm
 
 // #include <bits/stdc++.h>
@@ -177,6 +177,16 @@ using u64 = std::uint_least64_t;
 using u128 = __uint128_t;
 void solve_case()
 {
-    // return;
+    int n;
+    std::cin >> n;
+    std::vector<int> a(2 * n);
+    std::cin >> a;
+
+    std::ranges::sort(a);
+    i64 ans{};
+    for (auto const r : a | std::views::chunk(2)) {
+        ans += std::abs(r[0] - r[1]);
+    }
+    std::cout << ans << '\n';
 }
 } // namespace

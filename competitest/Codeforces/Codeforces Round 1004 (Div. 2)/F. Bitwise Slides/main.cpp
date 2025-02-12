@@ -1,10 +1,10 @@
 #pragma once
 
-// Problem: $(PROBLEM)
-// Contest: $(CONTEST)
-// Judge: $(JUDGE)
-// URL: $(URL)
-// Start: $(DATE)
+// Problem: F. Bitwise Slides
+// Contest: Codeforces Round 1004 (Div. 2)
+// Judge: Codeforces
+// URL: https://codeforces.com/contest/2067/problem/F
+// Start: Wed 12 Feb 2025 02:57:46 AM CST
 // Author: ShelpAm
 
 // #include <bits/stdc++.h>
@@ -160,7 +160,7 @@ int main()
     constexpr auto my_precision{10};
     std::cout << std::fixed << std::setprecision(my_precision);
     int t{1};
-    // std::cin >> t;
+    std::cin >> t;
     for (int i{}; i != t; ++i) {
 #ifndef ONLINE_JUDGE
         std::cerr << "Test case " << i << '\n';
@@ -177,6 +177,25 @@ using u64 = std::uint_least64_t;
 using u128 = __uint128_t;
 void solve_case()
 {
-    // return;
+    int n;
+    std::cin >> n;
+    std::vector<int> a(n);
+    std::cin >> a;
+
+    std::unordered_map<int, i64> f;
+    f[0] = 1;
+
+    int x{};
+    for (auto const e : a) {
+        f[x] = (2 * f[x ^ e] + 3 * f[x]) % mod1e9p7;
+        x ^= e;
+    }
+
+    i64 s{};
+    for (auto const &[k, v] : f) {
+        (s += v) %= mod1e9p7;
+    }
+
+    std::cout << s << '\n';
 }
 } // namespace

@@ -1,10 +1,10 @@
 #pragma once
 
-// Problem: $(PROBLEM)
-// Contest: $(CONTEST)
-// Judge: $(JUDGE)
-// URL: $(URL)
-// Start: $(DATE)
+// Problem: 训练参赛（二）
+// Contest: unknown_contest
+// Judge: NowCoder
+// URL: https://ac.nowcoder.com/acm/contest/101196/F
+// Start: Wed 12 Feb 2025 07:26:59 AM CST
 // Author: ShelpAm
 
 // #include <bits/stdc++.h>
@@ -160,7 +160,7 @@ int main()
     constexpr auto my_precision{10};
     std::cout << std::fixed << std::setprecision(my_precision);
     int t{1};
-    // std::cin >> t;
+    std::cin >> t;
     for (int i{}; i != t; ++i) {
 #ifndef ONLINE_JUDGE
         std::cerr << "Test case " << i << '\n';
@@ -177,6 +177,44 @@ using u64 = std::uint_least64_t;
 using u128 = __uint128_t;
 void solve_case()
 {
-    // return;
+    i64 n, k;
+    std::cin >> n >> k;
+    auto const t{k};
+
+    if (k < n || k > n * n) {
+        std::cout << -1 << '\n';
+        return;
+    }
+
+    if ((n - k) % 2 != 0) {
+        std::cout << -1 << '\n';
+        return;
+    }
+
+    std::vector<std::pair<int, int>> ans;
+    k -= n;
+    for (int i{}; i != n; ++i) {
+        if (k < 2 * (n - i - 1)) {
+            break;
+        }
+        k -= 2 * (n - i - 1);
+        ans.push_back({i + 1, 2 * n - i});
+    }
+
+    auto const begin{ans.size()};
+    for (auto i{begin}; ans.size() != n; i += 2) {
+        ans.push_back({i + 1, i + 2});
+    }
+
+    for (auto i{begin + 1}; i != begin + k / 2 + 1; ++i) {
+        std::swap(ans[begin].second, ans[i].second);
+    }
+
+    i64 p{};
+    for (auto const &[a, b] : ans) {
+        std::cout << a << ' ' << b << '\n';
+        p += std::abs(a - b);
+    }
+    assert(p == t);
 }
 } // namespace

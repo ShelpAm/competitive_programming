@@ -1,10 +1,10 @@
 #pragma once
 
-// Problem: $(PROBLEM)
-// Contest: $(CONTEST)
-// Judge: $(JUDGE)
-// URL: $(URL)
-// Start: $(DATE)
+// Problem: C. Devyatkino
+// Contest: Codeforces Round 1004 (Div. 2)
+// Judge: Codeforces
+// URL: https://codeforces.com/contest/2067/problem/C
+// Start: Tue 11 Feb 2025 11:10:42 PM CST
 // Author: ShelpAm
 
 // #include <bits/stdc++.h>
@@ -160,7 +160,7 @@ int main()
     constexpr auto my_precision{10};
     std::cout << std::fixed << std::setprecision(my_precision);
     int t{1};
-    // std::cin >> t;
+    std::cin >> t;
     for (int i{}; i != t; ++i) {
 #ifndef ONLINE_JUDGE
         std::cerr << "Test case " << i << '\n';
@@ -177,6 +177,24 @@ using u64 = std::uint_least64_t;
 using u128 = __uint128_t;
 void solve_case()
 {
-    // return;
+    i64 n;
+    std::cin >> n;
+
+    int ans{10};
+
+    i64 s{};
+    for (int i{1}; i != 11; ++i) {
+        s = s * 10 + 9;
+
+        auto m{n};
+        int t{};
+        while (!std::to_string(m).contains('7')) {
+            m += s;
+            ++t;
+        }
+        chmin(ans, t);
+    }
+
+    std::cout << ans << '\n';
 }
 } // namespace

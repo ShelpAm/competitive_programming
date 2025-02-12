@@ -18,10 +18,13 @@ class Combinatorics {
     {
         _inverse[0] = _inverse[1] = _factorial[0] = _factorial[1] =
             _prefix_inverse[0] = _prefix_inverse[1] = 1;
-        for (int i{2}; i != upper_bound + 1; ++i) {
-            _inverse[i] = (mod - mod / i) * _inverse[mod % i] % mod;
-            _factorial[i] = _factorial[i - 1] * i % mod;
-            _prefix_inverse[i] = _prefix_inverse[i - 1] * _inverse[i] % mod;
+
+        if (upper_bound >= 1) {
+            for (int i{2}; i != upper_bound + 1; ++i) {
+                _inverse[i] = (mod - mod / i) * _inverse[mod % i] % mod;
+                _factorial[i] = _factorial[i - 1] * i % mod;
+                _prefix_inverse[i] = _prefix_inverse[i - 1] * _inverse[i] % mod;
+            }
         }
     }
 

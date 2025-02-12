@@ -1,11 +1,10 @@
 #pragma once
 
-// Problem: $(PROBLEM)
-// Contest: $(CONTEST)
-// Judge: $(JUDGE)
-// URL: $(URL)
-// Start: $(DATE)
-// Author: ShelpAm
+// Problem: D - Doubles
+// Contest: Japan Registry Services (JPRS) Programming Contest 2025#1 (AtCoder
+// Beginner Contest 392) Judge: AtCoder URL:
+// https://atcoder.jp/contests/abc392/tasks/abc392_d Start: Sun 09 Feb 2025
+// 02:52:08 PM CST Author: ShelpAm
 
 // #include <bits/stdc++.h>
 #include <algorithm>
@@ -55,9 +54,9 @@ template <typename... Ts>
 struct is_tuple_t<std::tuple<Ts...>> : std::true_type {};
 template <typename... Ts>
 concept tuple = is_tuple_t<Ts...>::value;
-template <typename T, typename U = std::remove_cvref_t<T>>
+template <typename T>
 concept non_string_range =
-    !std::same_as<U, std::string> && (std::ranges::range<U> || pair<U>);
+    !std::same_as<std::remove_cvref_t<T>, std::string> && std::ranges::range<T>;
 } // namespace shelpam::concepts
 
 std::istream &operator>>(std::istream &istream,
@@ -177,6 +176,34 @@ using u64 = std::uint_least64_t;
 using u128 = __uint128_t;
 void solve_case()
 {
-    // return;
+    int n;
+    std::cin >> n;
+    std::vector<int> m(n);
+    std::vector<std::unordered_map<int, int>> a(n);
+    for (int i{}; auto &e : a) {
+        int k;
+        std::cin >> k;
+        m[i++] = k;
+        for (int j{}; j != k; ++j) {
+            int x;
+            std::cin >> x;
+            ++e[x];
+        }
+    }
+
+    double ans{};
+    for (int i{}; i != n; ++i) {
+        std::vector<i64> p(n);
+        for (auto const &[k, _] : a[i]) {
+            for (int j{}; j != i; ++j) {
+                p[j] += static_cast<i64>(a[j][k]) * a[i][k];
+            }
+        }
+        for (int j{}; auto const e : p) {
+            chmax(ans, static_cast<double>(e) / m[i] / m[j]);
+            ++j;
+        }
+    }
+    std::cout << ans << '\n';
 }
 } // namespace

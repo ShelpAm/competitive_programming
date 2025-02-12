@@ -1,10 +1,10 @@
 #pragma once
 
-// Problem: $(PROBLEM)
-// Contest: $(CONTEST)
-// Judge: $(JUDGE)
-// URL: $(URL)
-// Start: $(DATE)
+// Problem: 小L的min-max问题
+// Contest: unknown_contest
+// Judge: NowCoder
+// URL: https://ac.nowcoder.com/acm/contest/95337/H
+// Start: Sun 09 Feb 2025 06:03:26 PM CST
 // Author: ShelpAm
 
 // #include <bits/stdc++.h>
@@ -175,8 +175,115 @@ using i64 = std::int_least64_t;
 using i128 = __int128_t;
 using u64 = std::uint_least64_t;
 using u128 = __uint128_t;
+namespace math {
+// Time complexity:
+// - initialization: O(upper_bound)
+// - query:          O(1)
+class Combinatorics {
+  public:
+    /// @param  upper_bound  Maximum number whose inverse can be queried.
+    /// @param  mod          Modulos of the results.
+    Combinatorics(int const upper_bound, std::int_least64_t const mod)
+        : _inverse(upper_bound + 1), _factorial(upper_bound + 1),
+          _prefix_inverse(upper_bound + 1), _upper_bound(upper_bound), _mod{mod}
+    {
+        _inverse[0] = _inverse[1] = _factorial[0] = _factorial[1] =
+            _prefix_inverse[0] = _prefix_inverse[1] = 1;
+        for (int i{2}; i != upper_bound + 1; ++i) {
+            _inverse[i] = (mod - mod / i) * _inverse[mod % i] % mod;
+            _factorial[i] = _factorial[i - 1] * i % mod;
+            _prefix_inverse[i] = _prefix_inverse[i - 1] * _inverse[i] % mod;
+        }
+    }
+
+    [[nodiscard]] std::int_least64_t inverse(int const n) const
+    {
+        return _inverse[n];
+    }
+
+    [[nodiscard]] std::int_least64_t factorial(int const n) const
+    {
+        assert(n >= 0);
+        assert(n <= _upper_bound);
+        return _factorial[n];
+    }
+
+    [[nodiscard]] std::int_least64_t prefix_inverse(int const n) const
+    {
+        assert(n >= 0);
+        assert(n <= _upper_bound);
+        return _prefix_inverse[n];
+    }
+
+    [[nodiscard]] std::int_least64_t combination(int const n, int const m) const
+    {
+        assert(n >= 0);
+        assert(n <= _upper_bound);
+        if (n < m) {
+            return 0;
+        }
+        return _factorial[n] * _prefix_inverse[m] % _mod *
+               _prefix_inverse[n - m] % _mod;
+    }
+
+    [[nodiscard]] std::int_least64_t arrangement(int const n, int const m) const
+    {
+        assert(n >= 0);
+        assert(n <= _upper_bound);
+        if (m < 0 || n < m) {
+            return 0;
+        }
+        return _factorial[n] * _prefix_inverse[n - m] % _mod;
+    }
+
+  private:
+    std::vector<std::int_least64_t> _inverse;
+    std::vector<std::int_least64_t> _factorial;
+    std::vector<std::int_least64_t> _prefix_inverse;
+    int _upper_bound;
+    std::int_least64_t _mod;
+};
+
+} // namespace math
 void solve_case()
 {
-    // return;
+    int n, k;
+    std::cin >> n >> k;
+    std::vector<int> a(n);
+    std::cin >> a;
+    a.insert(a.begin(), 0);
+
+    std::vector<std::vector<i64>> minmax(n + 1, std::vector<i64>(n + 1));
+    for (int i{n}; i != 0; --i) {
+        i64 min{inf<i64>};
+        i64 max{};
+        for (int j{i}; j != 0; --j) {
+            chmin(min, a[j]);
+            chmax(max, a[j]);
+            minmax[j][i] = min * max;
+        }
+    }
+    for (int i{1}; i != n + 1; ++i) {
+        for (int j{i}; j != n + 1; ++j) {
+            auto [e, f]{
+                std::ranges::minmax_element(a.begin() + i, a.begin() + j + 1)};
+            assert(*e * *f == minmax[i][j]);
+        }
+    }
+
+    math::Combinatorics c(n, mod998244353);
+
+    i64 ans{};
+    for (int l{1}; l != n + 1; ++l) {
+        for (int r{l}; r != n + 1; ++r) {
+            if (n - r + l - 3 >= 0) {
+                ans += minmax[l][r] % mod998244353 *
+                       c.combination(n - r + l - 3, k - 1 - 2) % mod998244353;
+                ans %= mod998244353;
+            }
+        }
+    }
+
+    std::cout << ans << '\n';
 }
 } // namespace

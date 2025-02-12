@@ -1,10 +1,10 @@
 #pragma once
 
-// Problem: $(PROBLEM)
-// Contest: $(CONTEST)
-// Judge: $(JUDGE)
-// URL: $(URL)
-// Start: $(DATE)
+// Problem: B. Two Large Bags
+// Contest: Codeforces Round 1004 (Div. 2)
+// Judge: Codeforces
+// URL: https://codeforces.com/contest/2067/problem/B
+// Start: Tue 11 Feb 2025 10:47:39 PM CST
 // Author: ShelpAm
 
 // #include <bits/stdc++.h>
@@ -160,7 +160,7 @@ int main()
     constexpr auto my_precision{10};
     std::cout << std::fixed << std::setprecision(my_precision);
     int t{1};
-    // std::cin >> t;
+    std::cin >> t;
     for (int i{}; i != t; ++i) {
 #ifndef ONLINE_JUDGE
         std::cerr << "Test case " << i << '\n';
@@ -177,6 +177,28 @@ using u64 = std::uint_least64_t;
 using u128 = __uint128_t;
 void solve_case()
 {
-    // return;
+    int n;
+    std::cin >> n;
+    std::map<int, int> o;
+    for (int i{}; i != n; ++i) {
+        int x;
+        std::cin >> x;
+        ++o[x];
+    }
+
+    for (auto &[k, v] : o) {
+        if (v > 2) {
+            o[k + 1] += v - 2;
+            v = 2;
+        }
+    }
+
+    if (std::ranges::all_of(o,
+                            [](auto const &p) { return p.second % 2 == 0; })) {
+        std::cout << "Yes\n";
+    }
+    else {
+        std::cout << "No\n";
+    }
 }
 } // namespace

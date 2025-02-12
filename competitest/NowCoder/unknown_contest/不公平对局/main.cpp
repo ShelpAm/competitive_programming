@@ -1,10 +1,10 @@
 #pragma once
 
-// Problem: $(PROBLEM)
-// Contest: $(CONTEST)
-// Judge: $(JUDGE)
-// URL: $(URL)
-// Start: $(DATE)
+// Problem: 不公平对局
+// Contest: unknown_contest
+// Judge: NowCoder
+// URL: https://ac.nowcoder.com/acm/contest/101196/G
+// Start: Sun 09 Feb 2025 07:36:50 PM CST
 // Author: ShelpAm
 
 // #include <bits/stdc++.h>
@@ -175,8 +175,110 @@ using i64 = std::int_least64_t;
 using i128 = __int128_t;
 using u64 = std::uint_least64_t;
 using u128 = __uint128_t;
+namespace math {
+// Time complexity:
+// - initialization: O(upper_bound)
+// - query:          O(1)
+class Combinatorics {
+  public:
+    /// @param  upper_bound  Maximum number whose inverse can be queried.
+    /// @param  mod          Modulos of the results.
+    Combinatorics(int const upper_bound, std::int_least64_t const mod)
+        : _inverse(upper_bound + 1), _factorial(upper_bound + 1),
+          _prefix_inverse(upper_bound + 1), _upper_bound(upper_bound), _mod{mod}
+    {
+        _inverse[0] = _inverse[1] = _factorial[0] = _factorial[1] =
+            _prefix_inverse[0] = _prefix_inverse[1] = 1;
+        if (upper_bound >= 1) {
+            for (int i{2}; i != upper_bound + 1; ++i) {
+                _inverse[i] = (mod - mod / i) * _inverse[mod % i] % mod;
+                _factorial[i] = _factorial[i - 1] * i % mod;
+                _prefix_inverse[i] = _prefix_inverse[i - 1] * _inverse[i] % mod;
+            }
+        }
+    }
+
+    [[nodiscard]] std::int_least64_t inverse(int const n) const
+    {
+        return _inverse[n];
+    }
+
+    [[nodiscard]] std::int_least64_t factorial(int const n) const
+    {
+        assert(n >= 0);
+        assert(n <= _upper_bound);
+        return _factorial[n];
+    }
+
+    [[nodiscard]] std::int_least64_t prefix_inverse(int const n) const
+    {
+        assert(n >= 0);
+        assert(n <= _upper_bound);
+        return _prefix_inverse[n];
+    }
+
+    [[nodiscard]] std::int_least64_t combination(int const n, int const m) const
+    {
+        assert(n >= 0);
+        assert(n <= _upper_bound);
+        if (n < m) {
+            return 0;
+        }
+        return _factorial[n] * _prefix_inverse[m] % _mod *
+               _prefix_inverse[n - m] % _mod;
+    }
+
+    [[nodiscard]] std::int_least64_t arrangement(int const n, int const m) const
+    {
+        assert(n >= 0);
+        assert(n <= _upper_bound);
+        if (m < 0 || n < m) {
+            return 0;
+        }
+        return _factorial[n] * _prefix_inverse[n - m] % _mod;
+    }
+
+  private:
+    std::vector<std::int_least64_t> _inverse;
+    std::vector<std::int_least64_t> _factorial;
+    std::vector<std::int_least64_t> _prefix_inverse;
+    int _upper_bound;
+    std::int_least64_t _mod;
+};
+
+} // namespace math
 void solve_case()
 {
-    // return;
+    int x;
+    std::cin >> x;
+    i64 a1, b1, a2, b2;
+    std::cin >> a1 >> b1 >> a2 >> b2;
+
+    auto const p{a1 * pow(b1, mod1e9p7 - 2, mod1e9p7) % mod1e9p7};
+    auto const q{a2 * pow(b2, mod1e9p7 - 2, mod1e9p7) % mod1e9p7};
+    auto const mod{mod1e9p7};
+
+    // f[i, j]: With i left for Red and j left for Purple, the probability of
+    // Red winning.
+    std::vector<std::vector<i64>> f(x + 1, std::vector<i64>(x + 1));
+    for (int i{}; i != x + 1; ++i) {
+        f[i][0] = 1;
+    }
+    for (int i{}; i != x + 1; ++i) {
+        f[0][i] = 0;
+    }
+
+    for (int i{1}; i != x + 1; ++i) {
+        for (int j{1}; j != x + 1; ++j) {
+            f[i][j] = (p * q % mod * f[i - 1][j - 1] % mod +
+                       p * (mod + 1 - q) % mod * f[i - 1][j] % mod +
+                       (mod + 1 - p) * q % mod * f[i][j - 1] % mod) %
+                      mod *
+                      pow((p + q - p * q % mod + mod) % mod, mod - 2, mod) %
+                      mod;
+        }
+    }
+
+    std::cout << f[x][x] << '\n';
 }
 } // namespace

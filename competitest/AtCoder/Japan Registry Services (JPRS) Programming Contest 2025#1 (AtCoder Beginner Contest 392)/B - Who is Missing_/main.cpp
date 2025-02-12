@@ -1,11 +1,10 @@
 #pragma once
 
-// Problem: $(PROBLEM)
-// Contest: $(CONTEST)
-// Judge: $(JUDGE)
-// URL: $(URL)
-// Start: $(DATE)
-// Author: ShelpAm
+// Problem: B - Who is Missing?
+// Contest: Japan Registry Services (JPRS) Programming Contest 2025#1 (AtCoder
+// Beginner Contest 392) Judge: AtCoder URL:
+// https://atcoder.jp/contests/abc392/tasks/abc392_b Start: Sun 09 Feb 2025
+// 02:19:42 PM CST Author: ShelpAm
 
 // #include <bits/stdc++.h>
 #include <algorithm>
@@ -55,9 +54,9 @@ template <typename... Ts>
 struct is_tuple_t<std::tuple<Ts...>> : std::true_type {};
 template <typename... Ts>
 concept tuple = is_tuple_t<Ts...>::value;
-template <typename T, typename U = std::remove_cvref_t<T>>
+template <typename T>
 concept non_string_range =
-    !std::same_as<U, std::string> && (std::ranges::range<U> || pair<U>);
+    !std::same_as<std::remove_cvref_t<T>, std::string> && std::ranges::range<T>;
 } // namespace shelpam::concepts
 
 std::istream &operator>>(std::istream &istream,
@@ -177,6 +176,27 @@ using u64 = std::uint_least64_t;
 using u128 = __uint128_t;
 void solve_case()
 {
-    // return;
+    int n, m;
+    std::cin >> n >> m;
+    std::vector<int> a(m);
+    std::cin >> a;
+    a.push_back(0);
+    a.push_back(n + 1);
+
+    std::ranges::sort(a);
+
+    std::vector<int> ans;
+    for (int i{1}; i != a.size(); ++i) {
+        if (a[i - 1] != a[i]) {
+            for (auto const e : std::views::iota(a[i - 1] + 1, a[i])) {
+                ans.push_back(e);
+            }
+        }
+    }
+
+    std::cout << ans.size() << '\n';
+    for (auto const e : ans) {
+        std::cout << e << ' ';
+    }
 }
 } // namespace

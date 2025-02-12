@@ -1,10 +1,10 @@
 #pragma once
 
-// Problem: $(PROBLEM)
-// Contest: $(CONTEST)
-// Judge: $(JUDGE)
-// URL: $(URL)
-// Start: $(DATE)
+// Problem: 小L的位运算
+// Contest: unknown_contest
+// Judge: NowCoder
+// URL: https://ac.nowcoder.com/acm/contest/95337/C
+// Start: Sun 09 Feb 2025 04:59:24 PM CST
 // Author: ShelpAm
 
 // #include <bits/stdc++.h>
@@ -177,6 +177,38 @@ using u64 = std::uint_least64_t;
 using u128 = __uint128_t;
 void solve_case()
 {
-    // return;
+    int n;
+    i64 x, y;
+    std::cin >> n >> x >> y;
+    std::string a, b, c;
+    std::cin >> a >> b >> c;
+
+    std::vector<std::tuple<int, int, int>> t;
+    for (int i{}; i != n; ++i) {
+        t.push_back({(a[i] - '0'), (b[i] - '0'), c[i] - '0'});
+    }
+
+    auto const z{(std::bitset<1000000>{a} ^ std::bitset<1000000>{b} ^
+                  std::bitset<1000000>{c})
+                     .count()};
+
+    auto p{std::ranges::count(t, std::tuple{0, 0, 1})};
+    auto q{std::ranges::count(t, std::tuple{0, 1, 0})};
+    auto r{std::ranges::count(t, std::tuple{1, 0, 0})};
+    auto s{std::ranges::count(t, std::tuple{1, 1, 1})};
+
+    if (y > 2 * x) {
+        std::cout << z * x << '\n';
+        return;
+    }
+
+    for (auto const e : {p, q, r, s}) {
+        if (e * 2 > z) {
+            std::cout << y * (z - e) + x * (2 * e - z) << '\n';
+            return;
+        }
+    }
+
+    std::cout << ((z % 2) * x) + ((z / 2) * y) << '\n';
 }
 } // namespace

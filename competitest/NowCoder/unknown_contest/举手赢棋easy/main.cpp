@@ -1,10 +1,10 @@
 #pragma once
 
-// Problem: $(PROBLEM)
-// Contest: $(CONTEST)
-// Judge: $(JUDGE)
-// URL: $(URL)
-// Start: $(DATE)
+// Problem: 举手赢棋easy
+// Contest: unknown_contest
+// Judge: NowCoder
+// URL: https://ac.nowcoder.com/acm/contest/101196/C
+// Start: Sun 09 Feb 2025 07:03:33 PM CST
 // Author: ShelpAm
 
 // #include <bits/stdc++.h>
@@ -177,6 +177,30 @@ using u64 = std::uint_least64_t;
 using u128 = __uint128_t;
 void solve_case()
 {
-    // return;
+    int n;
+    std::cin >> n;
+    std::string s;
+    std::cin >> s;
+
+    int sum{};
+    int first{-1};
+    for (int i{}; auto const e : s) {
+        sum += e == '1' ? 1 : -1;
+        if (sum < -2) {
+            std::cout << 0;
+            return;
+        }
+        if (first == -1 && sum < 0) {
+            first = i;
+        }
+        ++i;
+    }
+
+    if (first != -1) {
+        std::cout << std::ranges::count(s.begin(), s.begin() + first + 1, '0');
+    }
+    else {
+        std::cout << n;
+    }
 }
 } // namespace

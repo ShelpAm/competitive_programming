@@ -1,11 +1,10 @@
 #pragma once
 
-// Problem: $(PROBLEM)
-// Contest: $(CONTEST)
-// Judge: $(JUDGE)
-// URL: $(URL)
-// Start: $(DATE)
-// Author: ShelpAm
+// Problem: A - Shuffled Equation
+// Contest: Japan Registry Services (JPRS) Programming Contest 2025#1 (AtCoder
+// Beginner Contest 392) Judge: AtCoder URL:
+// https://atcoder.jp/contests/abc392/tasks/abc392_a Start: Sun 09 Feb 2025
+// 02:18:10 PM CST Author: ShelpAm
 
 // #include <bits/stdc++.h>
 #include <algorithm>
@@ -55,9 +54,9 @@ template <typename... Ts>
 struct is_tuple_t<std::tuple<Ts...>> : std::true_type {};
 template <typename... Ts>
 concept tuple = is_tuple_t<Ts...>::value;
-template <typename T, typename U = std::remove_cvref_t<T>>
+template <typename T>
 concept non_string_range =
-    !std::same_as<U, std::string> && (std::ranges::range<U> || pair<U>);
+    !std::same_as<std::remove_cvref_t<T>, std::string> && std::ranges::range<T>;
 } // namespace shelpam::concepts
 
 std::istream &operator>>(std::istream &istream,
@@ -177,6 +176,10 @@ using u64 = std::uint_least64_t;
 using u128 = __uint128_t;
 void solve_case()
 {
-    // return;
+    std::array<int, 3> a;
+    std::cin >> a;
+    std::ranges::sort(a);
+
+    std::cout << (a[0] * a[1] == a[2] ? "Yes\n" : "No\n");
 }
 } // namespace

@@ -1,10 +1,10 @@
 #pragma once
 
-// Problem: $(PROBLEM)
-// Contest: $(CONTEST)
-// Judge: $(JUDGE)
-// URL: $(URL)
-// Start: $(DATE)
+// Problem: 公平对局
+// Contest: unknown_contest
+// Judge: NowCoder
+// URL: https://ac.nowcoder.com/acm/contest/101196/E
+// Start: Wed 12 Feb 2025 07:07:30 AM CST
 // Author: ShelpAm
 
 // #include <bits/stdc++.h>
@@ -177,6 +177,46 @@ using u64 = std::uint_least64_t;
 using u128 = __uint128_t;
 void solve_case()
 {
-    // return;
+    int n;
+    std::cin >> n;
+    std::vector<std::string> a(n);
+    std::cin >> a;
+
+    std::vector<std::pair<int, int>> const dirs{
+        {-1, 0}, {0, -1}, {1, 0}, {0, 1}};
+
+    std::map<std::pair<int, int>, int> o;
+    for (int i{}; i != n; ++i) {
+        for (int j{}; j != n; ++j) {
+            int cnt{};
+            std::set<std::pair<int, int>> s;
+            auto dfs{[&](auto dfs, int x, int y) -> void {
+                a[x][y] = '#';
+                ++cnt;
+                for (auto [dx, dy] : dirs) {
+                    dx += x;
+                    dy += y;
+                    if (dx >= 0 && dx < n && dy >= 0 && dy < n) {
+                        if (a[dx][dy] == '*') {
+                            dfs(dfs, dx, dy);
+                        }
+                        else if (a[dx][dy] == '.') {
+                            s.insert({dx, dy});
+                        }
+                    }
+                }
+            }};
+            if (a[i][j] == '*') {
+                dfs(dfs, i, j);
+                assert(!s.empty());
+                if (s.size() == 1) {
+                    o[*s.begin()] += cnt;
+                }
+            }
+        }
+    }
+
+    std::cout << (!o.empty() ? std::ranges::max(o | std::views::values) : 0)
+              << '\n';
 }
 } // namespace

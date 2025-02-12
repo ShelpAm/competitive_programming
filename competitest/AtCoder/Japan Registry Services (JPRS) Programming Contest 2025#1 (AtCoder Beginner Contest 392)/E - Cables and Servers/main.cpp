@@ -1,11 +1,10 @@
 #pragma once
 
-// Problem: $(PROBLEM)
-// Contest: $(CONTEST)
-// Judge: $(JUDGE)
-// URL: $(URL)
-// Start: $(DATE)
-// Author: ShelpAm
+// Problem: E - Cables and Servers
+// Contest: Japan Registry Services (JPRS) Programming Contest 2025#1 (AtCoder
+// Beginner Contest 392) Judge: AtCoder URL:
+// https://atcoder.jp/contests/abc392/tasks/abc392_e Start: Sun 09 Feb 2025
+// 03:19:33 PM CST Author: ShelpAm
 
 // #include <bits/stdc++.h>
 #include <algorithm>
@@ -66,13 +65,13 @@ std::istream &operator>>(std::istream &istream,
     using T = std::remove_cvref_t<decltype(t)>;
     static_assert(!shelpam::concepts::tuple<T>,
                   "tuple: not implemented yet.\n");
-    if constexpr (std::ranges::range<T>) {
+    if constexpr (shelpam::concepts::pair<T>) {
+        istream >> t.first >> t.second;
+    }
+    else if constexpr (std::ranges::range<T>) {
         for (auto &ele : t) {
             istream >> ele;
         }
-    }
-    else if constexpr (shelpam::concepts::pair<T>) {
-        istream >> t.first >> t.second;
     }
     else {
         istream >> t;
@@ -175,8 +174,91 @@ using i64 = std::int_least64_t;
 using i128 = __int128_t;
 using u64 = std::uint_least64_t;
 using u128 = __uint128_t;
+namespace shelpam {
+
+class Disjoint_set_union {
+  public:
+    explicit Disjoint_set_union(int size) : _parent(size), _size(size, 1)
+    {
+        std::iota(_parent.begin(), _parent.end(), 0);
+    }
+
+    // With path compression
+    auto find(int x) -> int
+    {
+        return _parent[x] == x ? x : _parent[x] = find(_parent[x]);
+    }
+
+    /// @return:
+    /// false if there has been pair x,y in the set.
+    /// true successfully united
+    auto unite(int x, int y) -> bool
+    {
+        x = find(x), y = find(y);
+        if (x == y) {
+            return false;
+        }
+        _parent[y] = x;
+        _size[x] += _size[y];
+        return true;
+    }
+    [[nodiscard]] auto united(int x, int y) -> bool
+    {
+        return find(x) == find(y);
+    }
+    [[nodiscard]] auto size(int const x) -> int
+    {
+        return _size[find(x)];
+    }
+
+  private:
+    std::vector<int> _parent;
+    std::vector<int> _size;
+};
+
+using Dsu = Disjoint_set_union;
+} // namespace shelpam
 void solve_case()
 {
-    // return;
+    int n, m;
+    std::cin >> n >> m;
+    std::vector<std::pair<int, int>> a(m);
+    std::cin >> a;
+
+    std::vector<int> duplicated_edges;
+    Dsu dsu(n);
+    for (int i{}; auto &[u, v] : a) {
+        if (!dsu.unite(--u, --v)) {
+            duplicated_edges.push_back(i);
+        }
+        ++i;
+    }
+
+    std::set<int> s; // ancestors
+    for (int i{}; i != n; ++i) {
+        s.insert(dsu.find(i));
+    }
+
+    std::vector<std::tuple<int, int, int>> ans;
+    while (s.size() != 1) {
+        auto const u{a[duplicated_edges.back()].first};
+        s.erase(dsu.find(u));
+
+        auto const v{*s.begin()};
+
+        dsu.unite(v, u);
+        ans.push_back({duplicated_edges.back(), u, v});
+
+        duplicated_edges.pop_back();
+    }
+
+    std::cout << ans.size() << '\n';
+    for (auto const &[a, b, c] : ans) {
+        std::cout << a + 1 << ' ' << b + 1 << ' ' << c + 1 << '\n';
+    }
+
+    assert(std::ranges::all_of(std::views::iota(0, n), [&](auto i) {
+        return dsu.find(i) == dsu.find(0);
+    }));
 }
 } // namespace

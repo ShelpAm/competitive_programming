@@ -1,10 +1,10 @@
 #pragma once
 
-// Problem: $(PROBLEM)
-// Contest: $(CONTEST)
-// Judge: $(JUDGE)
-// URL: $(URL)
-// Start: $(DATE)
+// Problem: E. White Magic
+// Contest: Codeforces Round 1004 (Div. 2)
+// Judge: Codeforces
+// URL: https://codeforces.com/contest/2067/problem/E
+// Start: Wed 12 Feb 2025 12:30:20 AM CST
 // Author: ShelpAm
 
 // #include <bits/stdc++.h>
@@ -160,7 +160,7 @@ int main()
     constexpr auto my_precision{10};
     std::cout << std::fixed << std::setprecision(my_precision);
     int t{1};
-    // std::cin >> t;
+    std::cin >> t;
     for (int i{}; i != t; ++i) {
 #ifndef ONLINE_JUDGE
         std::cerr << "Test case " << i << '\n';
@@ -177,6 +177,47 @@ using u64 = std::uint_least64_t;
 using u128 = __uint128_t;
 void solve_case()
 {
-    // return;
+    int n;
+    std::cin >> n;
+    std::vector<int> a(n);
+    std::cin >> a;
+
+    if (!std::ranges::contains(a, 0)) {
+        std::cout << n << '\n';
+        return;
+    }
+
+    auto const p{std::ranges::find(a, 0) - a.begin()};
+    a.erase(std::remove(a.begin() + p + 1, a.end(), 0), a.end());
+
+    auto ans{a.size()};
+    if (![&]() {
+            std::unordered_map<int, int> o;
+            std::set<int> free;
+            for (auto const e : a) {
+                ++o[e];
+            }
+            for (int i{}; i != n + 1; ++i) {
+                if (!o.contains(i)) {
+                    free.insert(i);
+                }
+            }
+
+            int min{max<int>};
+            for (auto const e : a) {
+                chmin(min, e);
+                if (--o[e] == 0) {
+                    free.insert(e);
+                }
+                if (min < *free.begin()) {
+                    return false;
+                }
+            }
+            return true;
+        }()) {
+        --ans;
+    }
+
+    std::cout << ans << '\n';
 }
 } // namespace
