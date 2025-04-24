@@ -21,6 +21,7 @@
 #include <functional>
 #include <iomanip>
 #include <iostream>
+#include <list>
 #include <map>
 #include <numbers>
 #include <numeric>
@@ -84,6 +85,10 @@ std::istream &operator>>(std::istream &istream,
 #else
 #define debug(...)
 #endif
+void YesNo(bool yes)
+{
+    std::cout << (yes ? "Yes\n" : "No\n");
+}
 bool chmax(auto &value, auto const &other) noexcept
 {
     if (value < other) {
@@ -102,7 +107,9 @@ bool chmin(auto &value, auto const &other) noexcept
 }
 constexpr auto sum_of(std::ranges::range auto const &coll) noexcept
 {
-    return std::accumulate(coll.begin(), coll.end(), std::int_least64_t{});
+    return std::accumulate(
+        coll.begin(), coll.end(),
+        typename std::remove_cvref_t<decltype(coll)>::value_type{});
 }
 constexpr auto pow(auto base, auto exp, std::uint_least64_t p)
 {
