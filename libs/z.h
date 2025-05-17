@@ -72,7 +72,7 @@ template <std::int_least64_t mod> class Z {
         return os << rhs.value_;
     }
 
-    friend std::istream &operator>>(std::istream &is, Z rhs)
+    friend std::istream &operator>>(std::istream &is, Z &rhs)
     {
         is >> rhs.value_;
         rhs.value_ %= mod;
