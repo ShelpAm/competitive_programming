@@ -1,10 +1,10 @@
 #pragma once
 
-// Problem: $(PROBLEM)
-// Contest: $(CONTEST)
-// Judge: $(JUDGE)
-// URL: $(URL)
-// Start: $(DATE)
+// Problem: C. Manhattan Pairs
+// Contest: Order Capital Round 1 (Codeforces Round 1038, Div. 1 + Div. 2)
+// Judge: Codeforces
+// URL: https://codeforces.com/contest/2122/problem/C
+// Start: Sat 19 Jul 2025 11:56:42 PM CST
 // Author: ShelpAm
 
 // #include <bits/stdc++.h>
@@ -135,7 +135,7 @@ std::int_least64_t binary_search(std::invocable<std::int_least64_t> auto check,
         throw std::invalid_argument{"check isn't true on 'ok'."};
     }
     while (std::abs(ok - ng) > 1) {
-        auto const x = (ok + ng) / 2;
+        auto const x{(ok + ng) / 2};
         (check(x) ? ok : ng) = x;
     }
     return ok;
@@ -167,7 +167,7 @@ int main()
     constexpr auto my_precision{10};
     std::cout << std::fixed << std::setprecision(my_precision);
     int t{1};
-    // std::cin >> t;
+    std::cin >> t;
     for (int i{}; i != t; ++i) {
 #ifndef ONLINE_JUDGE
         std::cerr << "Test case " << i << '\n';
@@ -184,6 +184,35 @@ using u128 = __uint128_t;
 void solve_case()
 {
     using namespace ::shelpam;
-    // return;
+    int n;
+    std::cin >> n;
+    std::vector<std::pair<int, int>> x(n), y(n);
+    for (int i{}; i != n; ++i) {
+        std::cin >> x[i].first >> y[i].first;
+        x[i].second = i;
+        y[i].second = i;
+    }
+
+    std::ranges::sort(x);
+    std::ranges::sort(y);
+    std::vector<int> k(n);
+    for (auto [_, i] : x | std::views::drop(n / 2)) {
+        k[i] += 1;
+    }
+    for (auto [_, i] : y | std::views::drop(n / 2)) {
+        k[i] += 2;
+    }
+
+    std::vector<std::vector<int>> t(4);
+    for (int i{}; i != n; ++i) {
+        t[k[i]].push_back(i);
+    }
+
+    for (auto [p, q] : std::views::zip(t[0], t[3])) {
+        std::cout << p + 1 << ' ' << q + 1 << '\n';
+    }
+    for (auto [p, q] : std::views::zip(t[1], t[2])) {
+        std::cout << p + 1 << ' ' << q + 1 << '\n';
+    }
 }
 } // namespace

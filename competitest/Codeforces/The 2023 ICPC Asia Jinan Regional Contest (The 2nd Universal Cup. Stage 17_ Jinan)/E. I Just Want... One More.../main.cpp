@@ -1,11 +1,10 @@
 #pragma once
 
-// Problem: $(PROBLEM)
-// Contest: $(CONTEST)
-// Judge: $(JUDGE)
-// URL: $(URL)
-// Start: $(DATE)
-// Author: ShelpAm
+// Problem: E. I Just Want... One More...
+// Contest: The 2023 ICPC Asia Jinan Regional Contest (The 2nd Universal Cup.
+// Stage 17: Jinan) Judge: Codeforces URL:
+// https://codeforces.com/gym/104901/problem/E Start: Mon 21 Jul 2025 01:59:25
+// PM CST Author: ShelpAm
 
 // #include <bits/stdc++.h>
 #include <algorithm>
@@ -135,7 +134,7 @@ std::int_least64_t binary_search(std::invocable<std::int_least64_t> auto check,
         throw std::invalid_argument{"check isn't true on 'ok'."};
     }
     while (std::abs(ok - ng) > 1) {
-        auto const x = (ok + ng) / 2;
+        auto const x{(ok + ng) / 2};
         (check(x) ? ok : ng) = x;
     }
     return ok;
@@ -176,6 +175,88 @@ int main()
     }
     return 0;
 }
+struct BipartiteGraph {
+    int n1, n2;                      // number of vertices in X and Y, resp.
+    std::vector<std::vector<int>> g; // edges from X to Y
+    std::vector<int> ma, mb; // matches from X to Y and from Y to X, resp.
+    std::vector<int> dist;   // distance from unsaturated vertices in X.
+
+    BipartiteGraph(int n1, int n2)
+        : n1(n1), n2(n2), g(n1), ma(n1, -1), mb(n2, -1)
+    {
+    }
+
+    // Add an edge from u in X to v in Y.
+    void add_edge(int u, int v)
+    {
+        g[u].emplace_back(v);
+    }
+
+    // Build the level graph.
+    bool bfs()
+    {
+        dist.assign(n1, -1);
+        std::queue<int> q;
+        for (int u = 0; u < n1; ++u) {
+            if (ma[u] == -1) {
+                dist[u] = 0;
+                q.emplace(u);
+            }
+        }
+        // Build the level graph for all reachable vertices.
+        bool succ = false;
+        while (!q.empty()) {
+            int u = q.front();
+            q.pop();
+            for (int v : g[u]) {
+                if (mb[v] == -1) {
+                    succ = true;
+                }
+                else if (dist[mb[v]] == -1) {
+                    dist[mb[v]] = dist[u] + 1;
+                    q.emplace(mb[v]);
+                }
+            }
+        }
+        return succ;
+    }
+
+    // Find an augmenting path starting at u.
+    bool dfs(int u)
+    {
+        for (int v : g[u]) {
+            if (mb[v] == -1 || (dist[mb[v]] == dist[u] + 1 && dfs(mb[v]))) {
+                ma[u] = v;
+                mb[v] = u;
+                return true;
+            }
+        }
+        dist[u] = -1; // Mark this point as inreachable after one visit.
+        return false;
+    }
+
+    // Hopcroft-Karp maximum matching algorithm.
+    std::vector<std::pair<int, int>> hopcroft_karp_maximum_matching()
+    {
+        // Build the level graph and then find a blocking flow.
+        while (bfs()) {
+            for (int u = 0; u < n1; ++u) {
+                if (ma[u] == -1) {
+                    dfs(u);
+                }
+            }
+        }
+        // Collect the matched pairs.
+        std::vector<std::pair<int, int>> matches;
+        matches.reserve(n1);
+        for (int u = 0; u < n1; ++u) {
+            if (ma[u] != -1) {
+                matches.emplace_back(u, ma[u]);
+            }
+        }
+        return matches;
+    }
+};
 namespace {
 using i64 = std::int_least64_t;
 using i128 = __int128_t;
@@ -184,6 +265,15 @@ using u128 = __uint128_t;
 void solve_case()
 {
     using namespace ::shelpam;
-    // return;
+    int n, m;
+    std::cin >> n >> m;
+    BipartiteGraph g(n, n);
+    for (int i{}; i != m; ++i) {
+        int u, v;
+        std::cin >> u >> v;
+        g.add_edge(u - 1, v - 1);
+    }
+
+    auto res = g.hopcroft_karp_maximum_matching();
 }
 } // namespace

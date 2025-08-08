@@ -1,16 +1,30 @@
-#pragma once
+#include <algorithm>
+#include <array>
 #include <cassert>
 #include <cmath>
-#include <cstdint>
+#include <cstring>
+#include <functional>
+#include <iomanip>
+#include <iostream>
+#include <iterator>
+#include <list>
 #include <map>
-#include <vector>
+#include <numeric>
+#include <queue>
+#include <set>
+#include <stack>
+#include <unordered_map>
+#include <unordered_set>
+#include <utility>
 
-// 线性筛
-// - 可以筛前 n 个自然数以内的所有质数。
-// - 可以对 x 进行质因数分解，根据 x 的大小有 log(x) 和 sqrt(x)
-// 两个时间复杂度，具体请看 Sieve::factorize。
-
-namespace shelpam {
+using namespace std;
+#define int long long
+#define uint unsigned long long
+#define PII pair<int, int>
+#define VI array<int, 2>
+#define VII array<array<int, 2>, 2>
+const int mod = 1e9 + 7;
+int const INF = 2e18;
 
 class Sieve {
   public:
@@ -48,7 +62,6 @@ class Sieve {
             while (x != 1) {
                 auto fact = _min_factor[x];
                 if (res.empty() || res.back().first != fact) {
-                    assert(res.empty() || res.back().first < fact);
                     res.emplace_back(fact, 0);
                 }
                 ++res.back().second; // Count once
@@ -94,4 +107,63 @@ class Sieve {
     std::vector<std::uint_least64_t> _min_factor;
 };
 
-} // namespace shelpam
+void solve()
+{
+    int n;
+    cin >> n;
+    vector<int> w(n + 1), c(n + 1);
+    for (int i = 1; i <= n; i++) {
+        cin >> w[i];
+    }
+    for (int i = 1; i <= n; i++) {
+        cin >> c[i];
+    }
+    Sieve P(1000000);
+    vector<vector<PII>> f(500001, vector<PII>(2));
+    int ans = 0;
+    for (int i = 1; i <= n; i++) {
+        auto p = P.factorize(w[i]);
+        int maxn = 0;
+        for (auto [prime, _] : p) {
+            vector<PII> t = f[prime];
+            if (t[0].second != 0 && t[0].second != c[i]) {
+                maxn = max(maxn, t[0].first);
+            }
+            else if (t[1].second != 0 && t[1].second != c[i]) {
+                maxn = max(maxn, t[1].first);
+            }
+        }
+        maxn += 1;
+        ans = max(ans, maxn);
+        for (auto [prime, _] : p) {
+            vector<PII> t = f[prime];
+            if (t[0].second == c[i]) {
+                t[0].first = max(t[0].first, maxn);
+            }
+            else if (t[1].second == c[i]) {
+                t[1].first = max(t[1].first, maxn);
+            }
+            else {
+                if (maxn > t[0].first) {
+                    t[1] = t[0];
+                    t[0] = {maxn, c[i]};
+                }
+                else if (maxn > t[1].first) {
+                    t[1] = {maxn, c[i]};
+                }
+            }
+            f[prime] = t;
+        }
+    }
+    cout << ans << '\n';
+}
+#undef int
+int main()
+{
+    ios::sync_with_stdio(0), cin.tie(0), cout.tie(0);
+    int T = 1;
+    // cin >> T;
+    while (T--) {
+        solve();
+    }
+}

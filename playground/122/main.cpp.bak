@@ -135,7 +135,7 @@ std::int_least64_t binary_search(std::invocable<std::int_least64_t> auto check,
         throw std::invalid_argument{"check isn't true on 'ok'."};
     }
     while (std::abs(ok - ng) > 1) {
-        auto const x = (ok + ng) / 2;
+        auto const x{(ok + ng) / 2};
         (check(x) ? ok : ng) = x;
     }
     return ok;
@@ -184,6 +184,130 @@ using u128 = __uint128_t;
 void solve_case()
 {
     using namespace ::shelpam;
-    // return;
+    int n, m, p;
+    std::cin >> n >> m >> p;
+    std::vector<std::bitset<2000>> a(n);
+    for (int i{}; i != n; ++i) {
+        for (int j{}; j != m; ++j) {
+            int b;
+            std::cin >> b;
+            a[i].set(j, b);
+        }
+    }
+    for (int i{}; i != n; ++i) {
+        for (int j{}; j != p; ++j) {
+            int b;
+            std::cin >> b;
+            a[i].set(m + j, b);
+        }
+    }
+
+    enum class Solution_kind {
+        infinite,
+        only_one,
+        DNE // Does not exist
+    };
+    auto gauss = [](std::vector<std::bitset<2000>> &a, int n, int m, int p) {
+        int row{};
+        for (int col{}; col != m; ++col) {
+
+            // Find the max row, and swap it to the top(`row`)
+            int mx{row};
+            for (int i{row + 1}; i != n; ++i) {
+                if (std::abs(a[i][col]) > std::abs(a[mx][col])) {
+                    mx = i;
+                }
+            }
+            if (std::abs(a[mx][col]) < eps) {
+                continue;
+            }
+            std::swap(a[row], a[mx]);
+
+            debug("col", col);
+            // Make lines below with 0.
+            for (int i{row + 1}; i != n; ++i) {
+                if (a[i][col]) {
+                    a[i] ^= a[row];
+                }
+            }
+            ++row;
+        }
+
+        // ----------debug--
+        for (int i{}; i != n; ++i) {
+            for (int j{}; j != m + p; ++j) {
+                std::cout << a[i][j] << ' ';
+            }
+            std::cout << '\n';
+        }
+        std::flush(std::cout);
+
+        // Make the matrix diagnal
+        int r = row - 1;
+        for (int i{m - 1}; i != -1; --i) {
+            if (!a[r][i]) {
+                --r;
+            }
+            for (int j{}; j != r; ++j) {
+                if (a[j][i]) {
+                    a[j] ^= a[r];
+                }
+            }
+        }
+
+        // Identify non-normal situations
+        if (row != n) {
+            for (int col{n}; col != n + p; ++col) {
+                for (int i{row}; i != n; ++i) {
+                    if (a[i][col] > 0) {
+                        // No solution
+                        return Solution_kind::DNE;
+                    }
+                }
+            }
+            // Many solutions
+            return Solution_kind::infinite;
+        }
+
+        // Only one solution
+        return Solution_kind::only_one;
+    };
+
+    auto res = gauss(a, n, m, p);
+    if (res == Solution_kind::DNE) {
+        std::cout << "No\n";
+        return;
+    }
+
+    std::cout << "Yes\n";
+    if (n >= m) {
+        for (int i{}; i != m; ++i) {
+            for (int j{}; j != p; ++j) {
+                std::cout << a[i][m + j] << ' ';
+            }
+            std::cout << '\n';
+        }
+    }
+    else {
+        std::vector b(m, std::vector<int>(p));
+        for (int i{}; i != p; ++i) {
+            int r = -1;
+            for (int j{}; j != m; ++j) {
+                if (a[r + 1][j]) { // New pivot
+                    ++r;
+                    b[j][i] = a[r][m + i];
+                }
+                else {
+                    b[j][i] = 0;
+                }
+            }
+        }
+        for (int i{}; i != m; ++i) {
+            for (int j{}; j != p; ++j) {
+                std::cout << b[i][j] << ' ';
+            }
+            std::cout << '\n';
+        }
+    }
 }
 } // namespace

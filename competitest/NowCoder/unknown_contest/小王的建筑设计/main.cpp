@@ -1,10 +1,10 @@
 #pragma once
 
-// Problem: $(PROBLEM)
-// Contest: $(CONTEST)
-// Judge: $(JUDGE)
-// URL: $(URL)
-// Start: $(DATE)
+// Problem: 小王的建筑设计
+// Contest: unknown_contest
+// Judge: NowCoder
+// URL: https://ac.nowcoder.com/acm/contest/112732/I
+// Start: Mon 14 Jul 2025 04:00:02 AM CST
 // Author: ShelpAm
 
 // #include <bits/stdc++.h>
@@ -135,7 +135,7 @@ std::int_least64_t binary_search(std::invocable<std::int_least64_t> auto check,
         throw std::invalid_argument{"check isn't true on 'ok'."};
     }
     while (std::abs(ok - ng) > 1) {
-        auto const x = (ok + ng) / 2;
+        auto const x{(ok + ng) / 2};
         (check(x) ? ok : ng) = x;
     }
     return ok;
@@ -176,6 +176,86 @@ int main()
     }
     return 0;
 }
+#pragma once
+#include <cassert>
+#include <cstdint>
+#include <memory>
+#include <vector>
+
+namespace math {
+// Time complexity:
+// - initialization: O(upper_bound)
+// - query:          O(1)
+class Combinatorics {
+  public:
+    /// @param  upper_bound  Maximum number whose inverse can be queried.
+    /// @param  mod          Modulos of the results.
+    Combinatorics(int const upper_bound, std::int_least64_t const mod)
+        : _inverse(upper_bound + 1), _factorial(upper_bound + 1),
+          _prefix_inverse(upper_bound + 1), _upper_bound(upper_bound), _mod{mod}
+    {
+        _inverse[0] = _inverse[1] = _factorial[0] = _factorial[1] =
+            _prefix_inverse[0] = _prefix_inverse[1] = 1;
+
+        if (upper_bound >= 1) {
+            for (int i{2}; i != upper_bound + 1; ++i) {
+                _inverse[i] = (mod - mod / i) * _inverse[mod % i] % mod;
+                _factorial[i] = _factorial[i - 1] * i % mod;
+                _prefix_inverse[i] = _prefix_inverse[i - 1] * _inverse[i] % mod;
+            }
+        }
+    }
+
+    [[nodiscard]] std::int_least64_t inverse(int const n) const
+    {
+        return _inverse[n];
+    }
+
+    [[nodiscard]] std::int_least64_t factorial(int const n) const
+    {
+        assert(n >= 0);
+        assert(n <= _upper_bound);
+        return _factorial[n];
+    }
+
+    [[nodiscard]] std::int_least64_t prefix_inverse(int const n) const
+    {
+        assert(n >= 0);
+        assert(n <= _upper_bound);
+        return _prefix_inverse[n];
+    }
+
+    [[nodiscard]] std::int_least64_t combination(int const n, int const m) const
+    {
+        assert(n >= 0);
+        assert(n <= _upper_bound);
+        if (n < m) {
+            return 0;
+        }
+        return _factorial[n] * _prefix_inverse[m] % _mod *
+               _prefix_inverse[n - m] % _mod;
+    }
+
+    [[nodiscard]] std::int_least64_t arrangement(int const n, int const m) const
+    {
+        assert(n >= 0);
+        assert(n <= _upper_bound);
+        if (m < 0 || n < m) {
+            return 0;
+        }
+        return _factorial[n] * _prefix_inverse[n - m] % _mod;
+    }
+
+  private:
+    std::vector<std::int_least64_t> _inverse;
+    std::vector<std::int_least64_t> _factorial;
+    std::vector<std::int_least64_t> _prefix_inverse;
+    int _upper_bound;
+    std::int_least64_t _mod;
+};
+
+} // namespace math
+using namespace shelpam;
 namespace {
 using i64 = std::int_least64_t;
 using i128 = __int128_t;
@@ -183,7 +263,17 @@ using u64 = std::uint_least64_t;
 using u128 = __uint128_t;
 void solve_case()
 {
-    using namespace ::shelpam;
-    // return;
+    int t;
+    std::cin >> t;
+    std::vector<i64> f(1e7 + 1);
+    f[0] = f[1] = 1;
+    for (int i{2}; i != f.size(); ++i) {
+        f[i] = (f[i - 1] + (i - 1) * f[i - 2] % mod1e9p7) % mod1e9p7;
+    }
+    for (int i{}; i != t; ++i) {
+        int n;
+        std::cin >> n;
+        std::cout << f[n] << '\n';
+    }
 }
 } // namespace

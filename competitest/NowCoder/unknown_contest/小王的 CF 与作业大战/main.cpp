@@ -1,10 +1,10 @@
 #pragma once
 
-// Problem: $(PROBLEM)
-// Contest: $(CONTEST)
-// Judge: $(JUDGE)
-// URL: $(URL)
-// Start: $(DATE)
+// Problem: 小王的 CF 与作业大战
+// Contest: unknown_contest
+// Judge: NowCoder
+// URL: https://ac.nowcoder.com/acm/contest/112732/C
+// Start: Mon 14 Jul 2025 02:01:31 AM CST
 // Author: ShelpAm
 
 // #include <bits/stdc++.h>
@@ -135,7 +135,7 @@ std::int_least64_t binary_search(std::invocable<std::int_least64_t> auto check,
         throw std::invalid_argument{"check isn't true on 'ok'."};
     }
     while (std::abs(ok - ng) > 1) {
-        auto const x = (ok + ng) / 2;
+        auto const x{(ok + ng) / 2};
         (check(x) ? ok : ng) = x;
     }
     return ok;
@@ -167,7 +167,7 @@ int main()
     constexpr auto my_precision{10};
     std::cout << std::fixed << std::setprecision(my_precision);
     int t{1};
-    // std::cin >> t;
+    std::cin >> t;
     for (int i{}; i != t; ++i) {
 #ifndef ONLINE_JUDGE
         std::cerr << "Test case " << i << '\n';
@@ -176,6 +176,7 @@ int main()
     }
     return 0;
 }
+using namespace shelpam;
 namespace {
 using i64 = std::int_least64_t;
 using i128 = __int128_t;
@@ -183,7 +184,32 @@ using u64 = std::uint_least64_t;
 using u128 = __uint128_t;
 void solve_case()
 {
-    using namespace ::shelpam;
-    // return;
+    std::string t;
+    std::cin >> t;
+
+    i64 min{};
+    i64 c{}, z{};
+    i64 s{};
+    for (auto e : t) {
+        if (e == 'c') {
+            ++c;
+        }
+        else if (e == 'f') {
+            s += c;
+        }
+        else if (e == 'z') {
+            ++z;
+        }
+        else if (e == 'y') {
+            s -= z;
+        }
+        chmin(min, s);
+    }
+    if (min >= 0) {
+        std::cout << "YES\n";
+    }
+    else {
+        std::cout << "NO\n" << -min << '\n';
+    }
 }
 } // namespace

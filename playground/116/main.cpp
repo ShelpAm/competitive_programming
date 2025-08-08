@@ -120,9 +120,9 @@ constexpr auto pow(auto base, auto exp, std::uint_least64_t p)
     decltype(base) res{1};
     while (exp != 0) {
         if ((exp & 1) == 1) {
-            res = res * base % p;
+            res = res * base;
         }
-        base = base * base % p;
+        base = base * base;
         exp >>= 1;
     }
     return res;
@@ -135,7 +135,7 @@ std::int_least64_t binary_search(std::invocable<std::int_least64_t> auto check,
         throw std::invalid_argument{"check isn't true on 'ok'."};
     }
     while (std::abs(ok - ng) > 1) {
-        auto const x = (ok + ng) / 2;
+        auto const x{(ok + ng) / 2};
         (check(x) ? ok : ng) = x;
     }
     return ok;
@@ -167,7 +167,7 @@ int main()
     constexpr auto my_precision{10};
     std::cout << std::fixed << std::setprecision(my_precision);
     int t{1};
-    // std::cin >> t;
+    std::cin >> t;
     for (int i{}; i != t; ++i) {
 #ifndef ONLINE_JUDGE
         std::cerr << "Test case " << i << '\n';
@@ -176,6 +176,151 @@ int main()
     }
     return 0;
 }
+#include <bits/stdc++.h>
+
+namespace math {
+
+// using T = int;
+// constexpr std::size_t n = 3;
+// constexpr std::size_t m = 3;
+// constexpr std::size_t p = 3;
+template <typename T, std::size_t n, std::size_t m> class Matrix {
+  public:
+    Matrix() : mat_() {}
+    Matrix(T val)
+        requires(n == m)
+    {
+        for (std::size_t i{}; i != n; ++i) {
+            get(i, i) = val;
+        }
+    }
+    Matrix(std::array<std::array<T, m>, n> mat) : mat_(mat) {}
+
+    [[nodiscard]] T &get(std::size_t i, std::size_t j)
+    {
+        return mat_.at(i).at(j);
+    }
+
+    [[nodiscard]] T get(std::size_t i, std::size_t j) const
+    {
+        return mat_.at(i).at(j);
+    }
+
+  private:
+    std::array<std::array<T, m>, n> mat_;
+};
+
+template <typename T, std::size_t n, std::size_t m, std::size_t p>
+Matrix<T, n, p> operator*(Matrix<T, n, m> const &lhs,
+                          Matrix<T, m, p> const &rhs)
+{
+    Matrix<T, n, p> res;
+    for (std::size_t i{}; i != n; ++i) {
+        for (std::size_t j{}; j != p; ++j) {
+            for (std::size_t k{}; k != m; ++k) {
+                res.get(i, j) += lhs.get(i, k) * rhs.get(k, j);
+            }
+        }
+    }
+    return res;
+}
+
+template <typename T, std::size_t n, std::size_t m>
+std::ostream &operator<<(std::ostream &os, Matrix<T, n, m> const &mat)
+{
+    for (std::size_t i{}; i != n; ++i) {
+        for (std::size_t j{}; j != m; ++j) {
+            os << mat.get(i, j) << ' ';
+        }
+        os << '\n';
+    }
+    return os;
+}
+
+} // namespace math
+constexpr std::int_least64_t modular_inverse(std::int_least64_t n,
+                                             std::int_least64_t mod)
+{
+    return pow(n % mod, mod - 2, mod);
+}
+
+template <std::int_least64_t mod> class Z {
+  public:
+    constexpr Z() : value_{} {}
+
+    constexpr Z(std::int_least64_t n) : value_{n} {}
+
+    constexpr Z &operator+=(Z rhs)
+    {
+        value_ += rhs.value_;
+        if (value_ >= mod) {
+            value_ -= mod;
+        }
+        return *this;
+    }
+
+    constexpr Z &operator-=(Z rhs)
+    {
+        value_ -= rhs.value_;
+        if (value_ < 0) {
+            value_ += mod;
+        }
+        return *this;
+    }
+
+    constexpr Z &operator*=(Z rhs)
+    {
+        value_ *= rhs.value_;
+        value_ %= mod;
+        return *this;
+    }
+
+    constexpr Z &operator/=(Z rhs)
+    {
+        value_ *= modular_inverse(rhs.value_, mod); // modular_inverse
+        value_ %= mod;
+        return *this;
+    }
+
+    friend constexpr Z operator+(Z lhs, Z rhs)
+    {
+        return lhs += rhs;
+    }
+
+    friend constexpr Z operator-(Z lhs, Z rhs)
+    {
+        return lhs -= rhs;
+    }
+
+    friend constexpr Z operator*(Z lhs, Z rhs)
+    {
+        return lhs *= rhs;
+    }
+
+    friend constexpr Z operator/(Z lhs, Z rhs)
+    {
+        return lhs /= rhs;
+    }
+
+    friend std::ostream &operator<<(std::ostream &os, Z rhs)
+    {
+        return os << rhs.value_;
+    }
+
+    friend std::istream &operator>>(std::istream &is, Z &rhs)
+    {
+        is >> rhs.value_;
+        rhs.value_ %= mod;
+        if (rhs.value_ < 0) {
+            rhs.value_ += mod;
+        }
+        return is;
+    }
+
+  private:
+    std::int_least64_t value_; // n_ is guarenteed to be normalized.
+};
+using namespace shelpam;
 namespace {
 using i64 = std::int_least64_t;
 using i128 = __int128_t;
@@ -183,7 +328,16 @@ using u64 = std::uint_least64_t;
 using u128 = __uint128_t;
 void solve_case()
 {
-    using namespace ::shelpam;
-    // return;
+    using namespace math;
+
+    using T = Z<mod998244353>;
+
+    i64 n;
+    std::cin >> n;
+
+    Matrix<T, 3, 3> p{std::array<std::array<T, 3>, 3>{
+        std::array<T, 3>{1, 1, 1}, {2, 0, 0}, {0, 0, 1}}};
+    Matrix<T, 3, 1> q{{1, 0, 1}};
+    std::cout << (pow(p, n - 1, mod998244353) * q).get(0, 0) << '\n';
 }
 } // namespace

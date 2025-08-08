@@ -85,3 +85,21 @@ template <std::int_least64_t mod> class Z {
   private:
     std::int_least64_t value_; // n_ is guarenteed to be normalized.
 };
+
+template <std::int_least64_t mod>
+Z<mod> pow(Z<mod> base, std::int_least64_t exp)
+{
+    static_assert(sizeof(base) > sizeof(int), "Use of `int`s is bug-prone.");
+    if (exp < 0) {
+        throw std::invalid_argument{"Exponent should be non-negative"};
+    }
+    Z<mod> res{1};
+    while (exp != 0) {
+        if ((exp & 1) == 1) {
+            res = res * base;
+        }
+        base = base * base;
+        exp >>= 1;
+    }
+    return res;
+}

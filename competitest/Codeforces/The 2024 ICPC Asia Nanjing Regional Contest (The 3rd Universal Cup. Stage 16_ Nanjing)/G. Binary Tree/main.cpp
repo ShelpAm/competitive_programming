@@ -1,6 +1,180 @@
 #pragma once
 
-#include "../templates/main.cpp"
+// Problem: G. Binary Tree
+// Contest: The 2024 ICPC Asia Nanjing Regional Contest (The 3rd Universal Cup.
+// Stage 16: Nanjing) Judge: Codeforces URL:
+// https://codeforces.com/gym/105484/problem/G Start: Fri 18 Jul 2025 04:44:05
+// PM CST Author: ShelpAm
+
+// #include <bits/stdc++.h>
+#include <algorithm>
+#include <bit>
+#include <bitset>
+#include <cassert>
+#include <chrono>
+#include <climits>
+#include <concepts>
+#include <cstddef>
+#include <cstdint>
+#include <deque>
+#include <functional>
+#include <iomanip>
+#include <iostream>
+#include <list>
+#include <map>
+#include <numbers>
+#include <numeric>
+#include <queue>
+#include <random>
+#include <ranges>
+#include <set>
+#include <stack>
+#include <string>
+#include <string_view>
+#include <tuple>
+#include <unordered_map>
+#include <unordered_set>
+#include <vector>
+
+namespace {
+[[maybe_unused]] constexpr std::uint_least64_t mod998244353{998'244'353ULL};
+[[maybe_unused]] constexpr std::uint_least64_t mod1e9p7{1'000'000'007ULL};
+[[maybe_unused]] constexpr double eps{1e-10};
+template <typename T> constexpr T inf{std::numeric_limits<T>::max() / 4};
+template <typename T> constexpr T max{std::numeric_limits<T>::max()};
+
+// Concepts.
+namespace shelpam::concepts {
+template <typename> struct is_pair_t : std::false_type {};
+template <typename T, typename U>
+struct is_pair_t<std::pair<T, U>> : std::true_type {};
+template <typename T>
+concept pair = is_pair_t<T>::value;
+template <typename> struct is_tuple_t : std::false_type {};
+template <typename... Ts>
+struct is_tuple_t<std::tuple<Ts...>> : std::true_type {};
+template <typename... Ts>
+concept tuple = is_tuple_t<Ts...>::value;
+template <typename T, typename U = std::remove_cvref_t<T>>
+concept non_string_range =
+    !std::same_as<U, std::string> && (std::ranges::range<U> || pair<U>);
+} // namespace shelpam::concepts
+
+std::istream &operator>>(std::istream &istream,
+                         shelpam::concepts::non_string_range auto &&t)
+{
+    using T = std::remove_cvref_t<decltype(t)>;
+    static_assert(!shelpam::concepts::tuple<T>,
+                  "tuple: not implemented yet.\n");
+    if constexpr (std::ranges::range<T>) {
+        for (auto &ele : t) {
+            istream >> ele;
+        }
+    }
+    else if constexpr (shelpam::concepts::pair<T>) {
+        istream >> t.first >> t.second;
+    }
+    else {
+        istream >> t;
+    }
+    return istream;
+}
+#ifndef ONLINE_JUDGE
+#include "/home/shelpam/Documents/projects/competitive-programming/libs/debug.h"
+#else
+#define debug(...)
+#endif
+void YesNo(bool yes)
+{
+    std::cout << (yes ? "Yes\n" : "No\n");
+}
+bool chmax(auto &value, auto const &other) noexcept
+{
+    if (value < other) {
+        value = other;
+        return true;
+    }
+    return false;
+}
+bool chmin(auto &value, auto const &other) noexcept
+{
+    if (value > other) {
+        value = other;
+        return true;
+    }
+    return false;
+}
+constexpr auto sum_of(std::ranges::range auto const &coll) noexcept
+{
+    return std::accumulate(
+        coll.begin(), coll.end(),
+        typename std::remove_cvref_t<decltype(coll)>::value_type{});
+}
+constexpr auto pow(auto base, auto exp, std::uint_least64_t p)
+{
+    static_assert(sizeof(base) > sizeof(int), "Use of `int`s is bug-prone.");
+    if (exp < 0) {
+        throw std::invalid_argument{"Exponent should be non-negative"};
+    }
+    decltype(base) res{1};
+    while (exp != 0) {
+        if ((exp & 1) == 1) {
+            res = res * base % p;
+        }
+        base = base * base % p;
+        exp >>= 1;
+    }
+    return res;
+}
+std::int_least64_t binary_search(std::invocable<std::int_least64_t> auto check,
+                                 std::int_least64_t ok, std::int_least64_t ng,
+                                 bool check_ok = true)
+{
+    if (check_ok && !check(ok)) {
+        throw std::invalid_argument{"check isn't true on 'ok'."};
+    }
+    while (std::abs(ok - ng) > 1) {
+        auto const x{(ok + ng) / 2};
+        (check(x) ? ok : ng) = x;
+    }
+    return ok;
+}
+template <std::unsigned_integral T> constexpr T lsb(T i) noexcept
+{
+    return i & -i;
+}
+// i mustn't be 0
+constexpr int msb(std::unsigned_integral auto i)
+{
+    if (i == 0) {
+        throw std::invalid_argument{"i must be positive."};
+    }
+    return (sizeof(i) * CHAR_BIT) - 1 - std::countl_zero(i);
+}
+// [[maybe_unused]] auto gen_rand() noexcept
+// {
+//     static std::mt19937_64 rng(
+//         std::chrono::steady_clock::now().time_since_epoch().count());
+//     return rng();
+// }
+void solve_case();
+} // namespace
+int main()
+{
+    std::ios::sync_with_stdio(false);
+    std::cin.tie(nullptr);
+    constexpr auto my_precision{10};
+    std::cout << std::fixed << std::setprecision(my_precision);
+    int t{1};
+    std::cin >> t;
+    for (int i{}; i != t; ++i) {
+#ifndef ONLINE_JUDGE
+        std::cerr << "Test case " << i << '\n';
+#endif
+        solve_case();
+    }
+    return 0;
+}
 #include <cassert>
 #include <cstdint>
 #include <functional>
@@ -63,6 +237,11 @@ class Graph {
     [[nodiscard]] auto size() const -> std::size_t
     {
         return adjacent_.size();
+    }
+
+    auto &adjacent()
+    {
+        return adjacent_;
     }
 
   private:
@@ -532,19 +711,13 @@ auto contract_edges(Graph const &g) -> Contract_edges_result
     return Contract_edges_result{.h = h, .scc_id = scc_id};
 }
 
-struct Get_centroids_result {
-    std::vector<Node_type> centroids;
-    std::vector<int> weight; // Maximum size of all subtrees
-};
-
 /// @return At most two, at least 1 centroid(s) of the given tree.
-Get_centroids_result get_centroids(Graph const &g,
-                                   std::vector<int> const &ok) noexcept
+auto get_centroid(Graph const &g, std::vector<int> const &ok) noexcept
 {
     int sz{};
     int root;
     for (int i{}; i != g.size(); ++i) {
-        if (ok[i] == 1) {
+        if (ok[i]) {
             ++sz;
             root = i;
         }
@@ -569,7 +742,88 @@ Get_centroids_result get_centroids(Graph const &g,
         }
     };
     dfs(dfs, root, root);
-    return Get_centroids_result{.centroids = centroids, .weight = weight};
+    return std::pair{centroids, weight};
 }
 
 } // namespace shelpam::graph
+namespace {
+using i64 = std::int_least64_t;
+using i128 = __int128_t;
+using u64 = std::uint_least64_t;
+using u128 = __uint128_t;
+void solve_case()
+{
+    using namespace ::shelpam;
+    int n;
+    std::cin >> n;
+    graph::Graph g(n);
+    for (int i{}; i != n; ++i) {
+        int u, v;
+        std::cin >> u >> v;
+        if (--u != -1) {
+            g.add_edge(i, u, 1);
+            g.add_edge(u, i, 1);
+        }
+        if (--v != -1) {
+            g.add_edge(i, v, 1);
+            g.add_edge(v, i, 1);
+        }
+    }
+    auto max = msb(static_cast<u64>(n));
+    int cur{};
+
+    auto ask = [&](int u, int v) {
+        if (++cur > max) {
+            assert(false);
+        }
+        std::cout << "? " << u + 1 << ' ' << v + 1 << std::endl;
+        int t;
+        std::cin >> t;
+        return t;
+    };
+
+    std::vector<int> ok(n, 1);
+    do {
+        auto [c, w] = graph::get_centroid(g, ok);
+        auto sons = g.edges_of(c[0]);
+        std::erase_if(sons, [&ok](auto p) { return !ok[p.second]; });
+        if (sum_of(ok) == 2) {
+            auto t = ask(sons[0].second, c[0]);
+            if (t == 0) {
+                std::cout << "! " << sons[0].second + 1 << std::endl;
+            }
+            else {
+                assert(t == 2);
+                std::cout << "! " << c[0] + 1 << std::endl;
+            }
+            return;
+        }
+        std::ranges::sort(sons, {}, [&](auto p) { return w[p.second]; });
+        debug("sons", sons);
+        debug("w", w);
+        auto t = ask(sons[0].second, sons[1].second);
+        // 0 - sons[0]  1 - sons[2]+c[0]  2 - sons[1]
+        auto dfs = [&](this auto dfs, int u, int p) -> void {
+            ok[u] = 0;
+            for (auto [_, v] : g.edges_of(u)) {
+                if (v != p) {
+                    dfs(v, u);
+                }
+            }
+        };
+        if (t == 0) {
+            dfs(c[0], sons[0].second);
+        }
+        else if (t == 1) {
+            dfs(c[0], sons.size() <= 2 ? -1 : sons[2].second);
+            ok[c[0]] = 1;
+        }
+        else {
+            dfs(c[0], sons[1].second);
+        }
+    } while (sum_of(ok) != 1);
+    assert(sum_of(ok) == 1);
+    auto root = std::ranges::find(ok, 1) - ok.begin();
+    std::cout << "! " << root + 1 << std::endl;
+}
+} // namespace

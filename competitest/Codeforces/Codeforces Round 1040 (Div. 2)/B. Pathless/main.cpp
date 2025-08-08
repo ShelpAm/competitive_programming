@@ -1,10 +1,10 @@
 #pragma once
 
-// Problem: $(PROBLEM)
-// Contest: $(CONTEST)
-// Judge: $(JUDGE)
-// URL: $(URL)
-// Start: $(DATE)
+// Problem: B. Pathless
+// Contest: Codeforces Round 1040 (Div. 2)
+// Judge: Codeforces
+// URL: https://codeforces.com/contest/2130/problem/B
+// Start: Thu 07 Aug 2025 02:10:35 PM CST
 // Author: ShelpAm
 
 // #include <bits/stdc++.h>
@@ -135,7 +135,7 @@ std::int_least64_t binary_search(std::invocable<std::int_least64_t> auto check,
         throw std::invalid_argument{"check isn't true on 'ok'."};
     }
     while (std::abs(ok - ng) > 1) {
-        auto const x = (ok + ng) / 2;
+        auto const x{(ok + ng) / 2};
         (check(x) ? ok : ng) = x;
     }
     return ok;
@@ -167,7 +167,7 @@ int main()
     constexpr auto my_precision{10};
     std::cout << std::fixed << std::setprecision(my_precision);
     int t{1};
-    // std::cin >> t;
+    std::cin >> t;
     for (int i{}; i != t; ++i) {
 #ifndef ONLINE_JUDGE
         std::cerr << "Test case " << i << '\n';
@@ -184,6 +184,37 @@ using u128 = __uint128_t;
 void solve_case()
 {
     using namespace ::shelpam;
-    // return;
+    int n, s;
+    std::cin >> n >> s;
+    std::vector<int> c(3);
+    for (int i{}; i != n; ++i) {
+        int x;
+        std::cin >> x;
+        ++c[x];
+    }
+
+    auto x = c[0];
+    auto y = c[2];
+    auto z = c[1];
+
+    auto print = [&] {
+        for (int i{}; i != x; ++i) {
+            std::cout << "0 ";
+        }
+        for (int i{}; i != y; ++i) {
+            std::cout << "2 ";
+        }
+        for (int i{}; i != z; ++i) {
+            std::cout << "1 ";
+        }
+        std::cout << '\n';
+    };
+
+    auto l = (s - (2 * y) - z);
+    if (l < 0 || l == 1) {
+        print();
+        return;
+    }
+    std::cout << -1 << '\n';
 }
 } // namespace

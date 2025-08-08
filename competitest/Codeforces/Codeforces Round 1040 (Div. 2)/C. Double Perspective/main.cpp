@@ -1,10 +1,10 @@
 #pragma once
 
-// Problem: $(PROBLEM)
-// Contest: $(CONTEST)
-// Judge: $(JUDGE)
-// URL: $(URL)
-// Start: $(DATE)
+// Problem: C. Double Perspective
+// Contest: Codeforces Round 1040 (Div. 2)
+// Judge: Codeforces
+// URL: https://codeforces.com/contest/2130/problem/C
+// Start: Thu 07 Aug 2025 02:19:32 PM CST
 // Author: ShelpAm
 
 // #include <bits/stdc++.h>
@@ -135,7 +135,7 @@ std::int_least64_t binary_search(std::invocable<std::int_least64_t> auto check,
         throw std::invalid_argument{"check isn't true on 'ok'."};
     }
     while (std::abs(ok - ng) > 1) {
-        auto const x = (ok + ng) / 2;
+        auto const x{(ok + ng) / 2};
         (check(x) ? ok : ng) = x;
     }
     return ok;
@@ -167,7 +167,7 @@ int main()
     constexpr auto my_precision{10};
     std::cout << std::fixed << std::setprecision(my_precision);
     int t{1};
-    // std::cin >> t;
+    std::cin >> t;
     for (int i{}; i != t; ++i) {
 #ifndef ONLINE_JUDGE
         std::cerr << "Test case " << i << '\n';
@@ -176,6 +176,56 @@ int main()
     }
     return 0;
 }
+namespace shelpam {
+
+class Disjoint_set_union {
+  public:
+    explicit Disjoint_set_union(int size) : _parent(size), _size(size, 1)
+    {
+        std::ranges::iota(_parent, 0);
+    }
+
+    // With path compression
+    int find(int x)
+    {
+        return _parent[x] == x ? x : _parent[x] = find(_parent[x]);
+    }
+
+    /// @return:
+    /// false if there has been pair x,y in the set.
+    /// true successfully united
+    bool unite(int x, int y)
+    {
+        x = find(x), y = find(y);
+        if (x == y) {
+            return false;
+        }
+        if (_size[x] < _size[y]) {
+            std::swap(x, y);
+        }
+        _parent[y] = x;
+        _size[x] += _size[y];
+        return true;
+    }
+
+    [[nodiscard]] bool united(int x, int y)
+    {
+        return find(x) == find(y);
+    }
+
+    [[nodiscard]] auto size(int x)
+    {
+        return _size[find(x)];
+    }
+
+  private:
+    std::vector<int> _parent;
+    std::vector<int> _size;
+};
+
+using Dsu = Disjoint_set_union;
+
+} // namespace shelpam
 namespace {
 using i64 = std::int_least64_t;
 using i128 = __int128_t;
@@ -184,6 +234,25 @@ using u128 = __uint128_t;
 void solve_case()
 {
     using namespace ::shelpam;
-    // return;
+    int n;
+    std::cin >> n;
+    std::vector<std::pair<int, int>> a(n);
+    std::cin >> a;
+
+    std::vector<int> b;
+    Disjoint_set_union dsu(2 * n);
+    for (int i{}; auto &[x, y] : a) {
+        --x;
+        --y;
+        if (dsu.unite(x, y)) {
+            b.push_back(i);
+        }
+        ++i;
+    }
+    std::cout << b.size() << '\n';
+    for (auto e : b) {
+        std::cout << e + 1 << ' ';
+    }
+    std::cout << '\n';
 }
 } // namespace

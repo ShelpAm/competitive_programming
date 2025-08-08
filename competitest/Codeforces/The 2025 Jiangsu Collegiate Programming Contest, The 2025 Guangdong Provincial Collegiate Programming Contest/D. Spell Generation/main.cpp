@@ -1,11 +1,10 @@
 #pragma once
 
-// Problem: $(PROBLEM)
-// Contest: $(CONTEST)
-// Judge: $(JUDGE)
-// URL: $(URL)
-// Start: $(DATE)
-// Author: ShelpAm
+// Problem: D. Spell Generation
+// Contest: The 2025 Jiangsu Collegiate Programming Contest, The 2025 Guangdong
+// Provincial Collegiate Programming Contest Judge: Codeforces URL:
+// https://codeforces.com/gym/105945/problem/D Start: Sun 03 Aug 2025 02:03:50
+// PM CST Author: ShelpAm
 
 // #include <bits/stdc++.h>
 #include <algorithm>
@@ -135,7 +134,7 @@ std::int_least64_t binary_search(std::invocable<std::int_least64_t> auto check,
         throw std::invalid_argument{"check isn't true on 'ok'."};
     }
     while (std::abs(ok - ng) > 1) {
-        auto const x = (ok + ng) / 2;
+        auto const x{(ok + ng) / 2};
         (check(x) ? ok : ng) = x;
     }
     return ok;
@@ -167,7 +166,7 @@ int main()
     constexpr auto my_precision{10};
     std::cout << std::fixed << std::setprecision(my_precision);
     int t{1};
-    // std::cin >> t;
+    std::cin >> t;
     for (int i{}; i != t; ++i) {
 #ifndef ONLINE_JUDGE
         std::cerr << "Test case " << i << '\n';
@@ -184,6 +183,15 @@ using u128 = __uint128_t;
 void solve_case()
 {
     using namespace ::shelpam;
-    // return;
+    i64 n;
+    std::cin >> n;
+
+    i64 s{};
+    for (int i{}; i != 19; ++i) {
+        auto k = n % 10;
+        n /= 10;
+        s += k << i;
+    }
+    std::cout << s << '\n';
 }
 } // namespace

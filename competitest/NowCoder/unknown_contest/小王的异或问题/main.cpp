@@ -1,10 +1,10 @@
 #pragma once
 
-// Problem: $(PROBLEM)
-// Contest: $(CONTEST)
-// Judge: $(JUDGE)
-// URL: $(URL)
-// Start: $(DATE)
+// Problem: 小王的异或问题
+// Contest: unknown_contest
+// Judge: NowCoder
+// URL: https://ac.nowcoder.com/acm/contest/112732/J
+// Start: Mon 14 Jul 2025 04:37:42 AM CST
 // Author: ShelpAm
 
 // #include <bits/stdc++.h>
@@ -135,7 +135,7 @@ std::int_least64_t binary_search(std::invocable<std::int_least64_t> auto check,
         throw std::invalid_argument{"check isn't true on 'ok'."};
     }
     while (std::abs(ok - ng) > 1) {
-        auto const x = (ok + ng) / 2;
+        auto const x{(ok + ng) / 2};
         (check(x) ? ok : ng) = x;
     }
     return ok;
@@ -167,7 +167,7 @@ int main()
     constexpr auto my_precision{10};
     std::cout << std::fixed << std::setprecision(my_precision);
     int t{1};
-    // std::cin >> t;
+    std::cin >> t;
     for (int i{}; i != t; ++i) {
 #ifndef ONLINE_JUDGE
         std::cerr << "Test case " << i << '\n';
@@ -176,6 +176,7 @@ int main()
     }
     return 0;
 }
+using namespace shelpam;
 namespace {
 using i64 = std::int_least64_t;
 using i128 = __int128_t;
@@ -183,7 +184,47 @@ using u64 = std::uint_least64_t;
 using u128 = __uint128_t;
 void solve_case()
 {
-    using namespace ::shelpam;
-    // return;
+    i64 n, k;
+    std::cin >> n >> k;
+
+    auto f = [](i64 n) {
+        n += 1;
+        i64 res{};
+        for (int i{1}; i != 64; ++i) {
+            i64 cnt = (n >> i << (i - 1)) +
+                      std::max((n & ((1LL << i) - 1)) - (1LL << (i - 1)), 0LL);
+            res ^= (cnt % 2) << (i - 1);
+        }
+        return res;
+    };
+    assert(f(1) == 1);
+    assert(f(2) == 3);
+    assert((f(5) ^ f(4)) == 5);
+
+    auto odd = [f](i64 n) {
+        return (f((n + 1) >> 1) << 1) | (((n + 1) >> 1) % 2 == 1);
+    };
+    auto even = [f](i64 n) { return f((n + 1) >> 1) << 1; };
+
+    auto g = [odd, even](i64 l, i64 r, bool oddity) {
+        if (oddity) {
+            return odd(r) ^ odd(l - 1);
+        }
+        return even(r) ^ even(l - 1);
+    };
+
+    //          k-th  n-k+1 th
+    // 1 2 3 ... k  k   k ... 3 2 1
+    if (n >= 2 * k - 1) {
+        auto res = g(1, k - 1, true); // 1 3 5 7 ...
+        std::cout << res << '\n';
+        res ^= g(n - k + 2, n, n % 2 == 1); // n n-2 n-4 ...
+        std::cout << res << '\n';
+        if (k % 2 == 1) {
+            res ^= f(n - k + 1) ^ f(k - 1);
+        }
+        std::cout << res << '\n';
+        return;
+    }
 }
 } // namespace

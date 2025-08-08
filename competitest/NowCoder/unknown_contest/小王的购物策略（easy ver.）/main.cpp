@@ -1,10 +1,10 @@
 #pragma once
 
-// Problem: $(PROBLEM)
-// Contest: $(CONTEST)
-// Judge: $(JUDGE)
-// URL: $(URL)
-// Start: $(DATE)
+// Problem: 小王的购物策略（easy ver.）
+// Contest: unknown_contest
+// Judge: NowCoder
+// URL: https://ac.nowcoder.com/acm/contest/112732/D
+// Start: Mon 14 Jul 2025 02:08:49 AM CST
 // Author: ShelpAm
 
 // #include <bits/stdc++.h>
@@ -135,7 +135,7 @@ std::int_least64_t binary_search(std::invocable<std::int_least64_t> auto check,
         throw std::invalid_argument{"check isn't true on 'ok'."};
     }
     while (std::abs(ok - ng) > 1) {
-        auto const x = (ok + ng) / 2;
+        auto const x{(ok + ng) / 2};
         (check(x) ? ok : ng) = x;
     }
     return ok;
@@ -159,6 +159,7 @@ constexpr int msb(std::unsigned_integral auto i)
 //     return rng();
 // }
 void solve_case();
+void solve_v2();
 } // namespace
 int main()
 {
@@ -167,15 +168,17 @@ int main()
     constexpr auto my_precision{10};
     std::cout << std::fixed << std::setprecision(my_precision);
     int t{1};
-    // std::cin >> t;
+    std::cin >> t;
     for (int i{}; i != t; ++i) {
 #ifndef ONLINE_JUDGE
         std::cerr << "Test case " << i << '\n';
 #endif
-        solve_case();
+        // solve_case();
+        solve_v2();
     }
     return 0;
 }
+using namespace shelpam;
 namespace {
 using i64 = std::int_least64_t;
 using i128 = __int128_t;
@@ -183,7 +186,87 @@ using u64 = std::uint_least64_t;
 using u128 = __uint128_t;
 void solve_case()
 {
-    using namespace ::shelpam;
-    // return;
+    i64 n, w;
+    std::cin >> n >> w;
+    std::vector<i64> p(n), k(n);
+    std::cin >> p >> k;
+
+    std::priority_queue<i64, std::vector<i64>, std::greater<>>
+        q; // half use while using tickets
+    i64 ans{};
+    i64 t{}; // current ticktes
+    for (auto [c, ki] : std::views::zip(p, k)) {
+        // std::cout << "Cost: " << c << '\n';
+        auto use = std::min(c / w, t);
+        t -= use;
+        c -= use * w;
+        // std::cout << "Using " << use << " tickets to fully refund\n";
+
+        if (t != 0) {
+            assert(c < w);
+            // std::cout << "Ticket left to refund, using one\n";
+            t -= 1;
+            q.push(c);
+        }
+        else {
+            // w <-> w-
+            while (!q.empty() && w <= c) {
+                // std::cout << "Refunding via replacing previous half used "
+                //              "tickets, value: "
+                //           << q.top() << "\n";
+                auto this_change = std::min(c, w);
+                c -= this_change;
+                ans += q.top();
+                // std::cout << "ANSWER += " << q.top() << '\n';
+                q.pop();
+            }
+            if (!q.empty() && q.top() < c) { // w- w-
+                ans += q.top();
+                q.pop();
+                q.push(c);
+            }
+            else {
+                ans += c;
+                // std::cout << "ANSWER += " << c << '\n';
+            }
+        }
+
+        t += ki;
+        // std::cout << "This round, left tickets: " << t
+        // << ", and number of half used: " << q.size() << '\n';
+    }
+
+    std::cout << ans << '\n';
+}
+void solve_v2()
+{
+    i64 n, w;
+    std::cin >> n >> w;
+    std::vector<i64> p(n), k(n);
+    std::cin >> p >> k;
+
+    std::priority_queue<i64> q; // goods
+    i64 ans{};
+    for (auto [c, t] : std::views::zip(p, k) | std::views::reverse) {
+        while (t != 0 && !q.empty()) {
+            auto v = q.top();
+            q.pop();
+
+            if (v >= w) { // Full
+                auto use = std::min(t, v / w);
+                t -= use;
+                q.push(v - use * w);
+            }
+            else { // Half
+                --t;
+            }
+        }
+        q.push(c);
+    }
+    while (!q.empty()) {
+        ans += q.top();
+        q.pop();
+    }
+    std::cout << ans << '\n';
 }
 } // namespace

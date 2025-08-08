@@ -1,11 +1,10 @@
 #pragma once
 
-// Problem: $(PROBLEM)
-// Contest: $(CONTEST)
-// Judge: $(JUDGE)
-// URL: $(URL)
-// Start: $(DATE)
-// Author: ShelpAm
+// Problem: F. Ranking Prediction
+// Contest: The 2025 Jiangsu Collegiate Programming Contest, The 2025 Guangdong
+// Provincial Collegiate Programming Contest Judge: Codeforces URL:
+// https://codeforces.com/gym/105945/problem/F Start: Sun 03 Aug 2025 02:14:21
+// PM CST Author: ShelpAm
 
 // #include <bits/stdc++.h>
 #include <algorithm>
@@ -135,7 +134,7 @@ std::int_least64_t binary_search(std::invocable<std::int_least64_t> auto check,
         throw std::invalid_argument{"check isn't true on 'ok'."};
     }
     while (std::abs(ok - ng) > 1) {
-        auto const x = (ok + ng) / 2;
+        auto const x{(ok + ng) / 2};
         (check(x) ? ok : ng) = x;
     }
     return ok;
@@ -167,7 +166,7 @@ int main()
     constexpr auto my_precision{10};
     std::cout << std::fixed << std::setprecision(my_precision);
     int t{1};
-    // std::cin >> t;
+    std::cin >> t;
     for (int i{}; i != t; ++i) {
 #ifndef ONLINE_JUDGE
         std::cerr << "Test case " << i << '\n';
@@ -184,6 +183,53 @@ using u128 = __uint128_t;
 void solve_case()
 {
     using namespace ::shelpam;
-    // return;
+    int n, a, b;
+    std::cin >> n >> a >> b;
+    int s;
+    std::cin >> s;
+    std::vector<std::tuple<int, char, std::string>> subs(s);
+    for (auto &[t, p, v] : subs) {
+        std::cin >> t >> p >> v;
+    }
+
+    std::unordered_map<char, int> wa;
+    std::unordered_set<char> ac;
+    std::unordered_set<char> ex_ac;
+    int penalty{};
+    std::priority_queue<int, std::vector<int>, std::greater<>> expected_penalty;
+
+    for (auto const &[t, p, v] : subs) {
+        if (ac.contains(p) || ex_ac.contains(p)) {
+            continue;
+        }
+        if (v == "rj") {
+            wa[p] += 1;
+        }
+        else if (v == "ac") {
+            ac.insert(p);
+            penalty += t + 20 * wa[p];
+        }
+        else if (v == "pd") {
+            expected_penalty.push(t + (20 * wa[p]));
+            ex_ac.insert(p);
+        }
+    }
+
+    int ex{};
+    auto currently_not_enough = [&] {
+        return std::pair{ac.size() + ex, -penalty} <= std::pair{a, -b};
+    };
+    while (currently_not_enough() && !expected_penalty.empty()) {
+        penalty += expected_penalty.top();
+        expected_penalty.pop();
+        ex += 1;
+    }
+
+    if (currently_not_enough()) {
+        std::cout << -1 << '\n';
+    }
+    else {
+        std::cout << ex << '\n';
+    }
 }
 } // namespace

@@ -1,11 +1,10 @@
 #pragma once
 
-// Problem: $(PROBLEM)
-// Contest: $(CONTEST)
-// Judge: $(JUDGE)
-// URL: $(URL)
-// Start: $(DATE)
-// Author: ShelpAm
+// Problem: B. Birthday Gift
+// Contest: The 2024 ICPC Asia Nanjing Regional Contest (The 3rd Universal Cup.
+// Stage 16: Nanjing) Judge: Codeforces URL:
+// https://codeforces.com/gym/105484/problem/B Start: Fri 18 Jul 2025 03:02:12
+// PM CST Author: ShelpAm
 
 // #include <bits/stdc++.h>
 #include <algorithm>
@@ -135,7 +134,7 @@ std::int_least64_t binary_search(std::invocable<std::int_least64_t> auto check,
         throw std::invalid_argument{"check isn't true on 'ok'."};
     }
     while (std::abs(ok - ng) > 1) {
-        auto const x = (ok + ng) / 2;
+        auto const x{(ok + ng) / 2};
         (check(x) ? ok : ng) = x;
     }
     return ok;
@@ -167,7 +166,7 @@ int main()
     constexpr auto my_precision{10};
     std::cout << std::fixed << std::setprecision(my_precision);
     int t{1};
-    // std::cin >> t;
+    std::cin >> t;
     for (int i{}; i != t; ++i) {
 #ifndef ONLINE_JUDGE
         std::cerr << "Test case " << i << '\n';
@@ -176,6 +175,7 @@ int main()
     }
     return 0;
 }
+using namespace shelpam;
 namespace {
 using i64 = std::int_least64_t;
 using i128 = __int128_t;
@@ -183,7 +183,20 @@ using u64 = std::uint_least64_t;
 using u128 = __uint128_t;
 void solve_case()
 {
-    using namespace ::shelpam;
-    // return;
+    std::string s;
+    std::cin >> s;
+
+    std::vector<int> cnt(3);
+    for (int i{}; i != s.size(); ++i) {
+        if (i % 2 == 0 && s[i] != '2') {
+            s[i] ^= 1;
+        }
+        ++cnt[s[i] - '0'];
+    }
+
+    auto d = std::abs(cnt[0] - cnt[1]);
+    auto k = cnt[2];
+    auto ans = d >= k ? d - k : (k - d) % 2;
+    std::cout << ans << '\n';
 }
 } // namespace

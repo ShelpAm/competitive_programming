@@ -1,10 +1,10 @@
 #pragma once
 
-// Problem: $(PROBLEM)
-// Contest: $(CONTEST)
-// Judge: $(JUDGE)
-// URL: $(URL)
-// Start: $(DATE)
+// Problem: D. Stay or Mirror
+// Contest: Codeforces Round 1040 (Div. 2)
+// Judge: Codeforces
+// URL: https://codeforces.com/contest/2130/problem/D
+// Start: Thu 07 Aug 2025 02:50:38 PM CST
 // Author: ShelpAm
 
 // #include <bits/stdc++.h>
@@ -135,7 +135,7 @@ std::int_least64_t binary_search(std::invocable<std::int_least64_t> auto check,
         throw std::invalid_argument{"check isn't true on 'ok'."};
     }
     while (std::abs(ok - ng) > 1) {
-        auto const x = (ok + ng) / 2;
+        auto const x{(ok + ng) / 2};
         (check(x) ? ok : ng) = x;
     }
     return ok;
@@ -167,7 +167,7 @@ int main()
     constexpr auto my_precision{10};
     std::cout << std::fixed << std::setprecision(my_precision);
     int t{1};
-    // std::cin >> t;
+    std::cin >> t;
     for (int i{}; i != t; ++i) {
 #ifndef ONLINE_JUDGE
         std::cerr << "Test case " << i << '\n';
@@ -184,6 +184,54 @@ using u128 = __uint128_t;
 void solve_case()
 {
     using namespace ::shelpam;
-    // return;
+    int n;
+    std::cin >> n;
+    std::vector<int> a(n);
+    std::cin >> a;
+
+    std::vector<int> s(n);
+    int ans{};
+    for (int i{}; i != n; ++i) {
+        for (int j{i + 1}; j != n; ++j) {
+            if (a[i] > a[j]) {
+                ++ans;
+                ++s[j];
+            }
+            else {
+                --s[i];
+            }
+        }
+    }
+    debug("s", s);
+
+    for (auto e : s) {
+        ans -= std::max(0, e);
+    }
+    std::cout << ans << '\n';
+
+    // std::multimap<int, std::vector<int>> m;
+    // for (int i{}; i != 1 << n; ++i) {
+    //     auto b = a;
+    //     for (int j{}; j != n; ++j) {
+    //         if (i & 1 << j) {
+    //             b[j] = 2 * 7 - b[j];
+    //         }
+    //     }
+    //     int t{};
+    //     for (int i{}; i != n; ++i) {
+    //         for (int j{i + 1}; j != n; ++j) {
+    //             if (b[i] > b[j]) {
+    //                 ++t;
+    //             }
+    //         }
+    //     }
+    //     m.insert({t, b});
+    // }
+    // auto ans = m.begin()->first;
+    // debug("ans", ans);
+    // auto [begin, end] = m.equal_range(ans);
+    // for (auto it = begin; it != end; ++it) {
+    //     debug("", it->second);
+    // }
 }
 } // namespace

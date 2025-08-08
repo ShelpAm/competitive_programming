@@ -135,7 +135,7 @@ std::int_least64_t binary_search(std::invocable<std::int_least64_t> auto check,
         throw std::invalid_argument{"check isn't true on 'ok'."};
     }
     while (std::abs(ok - ng) > 1) {
-        auto const x = (ok + ng) / 2;
+        auto const x{(ok + ng) / 2};
         (check(x) ? ok : ng) = x;
     }
     return ok;
@@ -167,7 +167,7 @@ int main()
     constexpr auto my_precision{10};
     std::cout << std::fixed << std::setprecision(my_precision);
     int t{1};
-    // std::cin >> t;
+    std::cin >> t;
     for (int i{}; i != t; ++i) {
 #ifndef ONLINE_JUDGE
         std::cerr << "Test case " << i << '\n';
@@ -181,9 +181,53 @@ using i64 = std::int_least64_t;
 using i128 = __int128_t;
 using u64 = std::uint_least64_t;
 using u128 = __uint128_t;
+std::size_t min_chuck(std::string s, char ele)
+{
+    std::size_t len{-1UZ};
+
+    s.push_back('#');
+    char last{s.front()};
+    int sz{};
+    for (char c : s) {
+        if (c != last) {
+            if (ele == last) {
+                chmin(len, sz);
+            }
+            last = c;
+            sz = 0;
+        }
+        ++sz;
+    }
+
+    debug("len", len);
+    return len;
+}
 void solve_case()
 {
     using namespace ::shelpam;
-    // return;
+    int n;
+    std::cin >> n;
+    std::string s;
+    std::cin >> s;
+
+    auto ans = [&]() -> std::string {
+        // 0..1 or 1..0
+        if (s.front() != s.back()) {
+            return "";
+        }
+
+        // 0..11..0 or 1..00..1
+        for (int i{1}; i + 1 < s.size(); ++i) {
+            if (s[i] != s.front() && s[i + 1] != s.back()) {
+                return "";
+            }
+        }
+
+        // 1101110111 or 0001000010000
+        // find shortest 0,1 string
+        return std::string(min_chuck(s, s.front()), s.front());
+    }();
+
+    std::cout << (ans.size() == 0 ? "empty" : ans) << '\n';
 }
 } // namespace
