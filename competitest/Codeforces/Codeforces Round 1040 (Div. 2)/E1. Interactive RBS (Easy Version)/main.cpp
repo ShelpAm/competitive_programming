@@ -1,10 +1,10 @@
 #pragma once
 
-// Problem: P3811 【模板】模意义下的乘法逆元
-// Contest: unknown_contest
-// Judge: Luogu
-// URL: https://www.luogu.com.cn/problem/P3811
-// Start: Sat 09 Aug 2025 04:08:38 PM CST
+// Problem: E1. Interactive RBS (Easy Version)
+// Contest: Codeforces Round 1040 (Div. 2)
+// Judge: Codeforces
+// URL: https://codeforces.com/contest/2130/problem/E1
+// Start: Fri 08 Aug 2025 11:56:31 PM CST
 // Author: ShelpAm
 
 // #include <bits/stdc++.h>
@@ -111,12 +111,11 @@ constexpr auto sum_of(std::ranges::range auto const &coll) noexcept
         coll.begin(), coll.end(),
         typename std::remove_cvref_t<decltype(coll)>::value_type{});
 }
-constexpr auto pow(auto base, auto exp, std::uint_least64_t p) -> decltype(base)
+constexpr auto pow(auto base, auto exp, std::uint_least64_t p)
 {
     static_assert(sizeof(base) > sizeof(int), "Use of `int`s is bug-prone.");
     if (exp < 0) {
-        base = pow(base, p - 2, p);
-        exp = -exp;
+        throw std::invalid_argument{"Exponent should be non-negative"};
     }
     decltype(base) res{1};
     while (exp != 0) {
@@ -168,7 +167,7 @@ int main()
     constexpr auto my_precision{10};
     std::cout << std::fixed << std::setprecision(my_precision);
     int t{1};
-    // std::cin >> t;
+    std::cin >> t;
     for (int i{}; i != t; ++i) {
 #ifndef ONLINE_JUDGE
         std::cerr << "Test case " << i << '\n';
@@ -185,10 +184,49 @@ using u128 = __uint128_t;
 void solve_case()
 {
     using namespace ::shelpam;
-    int n, p;
-    std::cin >> n >> p;
-    for (int i{1}; i != n + 1; ++i) {
-        std::cout << pow(static_cast<i64>(i), -1, p) << '\n';
+    int n;
+    std::cin >> n;
+
+    auto ask = [](std::ranges::range auto const &a) {
+        std::cout << "? " << a.size() << ' ';
+        for (auto e : a) {
+            std::cout << e << ' ';
+        }
+        std::cout << std::endl;
+        int n;
+        std::cin >> n;
+        return n;
+    };
+
+    auto check = [&](auto i) { return ask(std::views::iota(1, i + 1)) > 0; };
+    auto i = binary_search(check, n + 1, 1, false);
+    int l, r;
+    if (i <= n) { // i->), i-1->(
+        l = i - 1;
+        r = i;
     }
+    else { // 1->), n->(
+        l = n;
+        r = 1;
+    }
+
+    std::unordered_map<int, std::array<int, 2>> const ans{
+        {6, {'(', '('}},
+        {2, {'(', ')'}},
+        {3, {')', '('}},
+        {1, {')', ')'}},
+    };
+    std::string s;
+    for (int i{1}; i + 1 <= n; i += 2) {
+        auto x = ask(std::vector{i, r, i + 1, r, l, r});
+        auto [p, q] = ans.at(x);
+        s += p;
+        s += q;
+    }
+    if (n % 2 == 1) {
+        auto ans = ask(std::vector{n, r});
+        s += ans == 1 ? '(' : ')';
+    }
+    std::cout << "! " << s << std::endl;
 }
 } // namespace

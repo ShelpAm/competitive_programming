@@ -1,10 +1,10 @@
 #pragma once
 
-// Problem: P3811 【模板】模意义下的乘法逆元
-// Contest: unknown_contest
-// Judge: Luogu
-// URL: https://www.luogu.com.cn/problem/P3811
-// Start: Sat 09 Aug 2025 04:08:38 PM CST
+// Problem: C - Flush
+// Contest: AtCoder Beginner Contest 418
+// Judge: AtCoder
+// URL: https://atcoder.jp/contests/abc418/tasks/abc418_c
+// Start: Sun 10 Aug 2025 07:02:17 PM CST
 // Author: ShelpAm
 
 // #include <bits/stdc++.h>
@@ -111,7 +111,7 @@ constexpr auto sum_of(std::ranges::range auto const &coll) noexcept
         coll.begin(), coll.end(),
         typename std::remove_cvref_t<decltype(coll)>::value_type{});
 }
-constexpr auto pow(auto base, auto exp, std::uint_least64_t p) -> decltype(base)
+template <typename T> constexpr T pow(T base, auto exp, std::uint_least64_t p)
 {
     static_assert(sizeof(base) > sizeof(int), "Use of `int`s is bug-prone.");
     if (exp < 0) {
@@ -185,10 +185,31 @@ using u128 = __uint128_t;
 void solve_case()
 {
     using namespace ::shelpam;
-    int n, p;
-    std::cin >> n >> p;
-    for (int i{1}; i != n + 1; ++i) {
-        std::cout << pow(static_cast<i64>(i), -1, p) << '\n';
+    int n, q;
+    std::cin >> n >> q;
+    std::vector<i64> a(n);
+    std::cin >> a;
+    std::vector<int> b(q);
+    std::cin >> b;
+
+    auto max_a = std::ranges::max(a);
+    std::ranges::sort(a);
+    auto s = a;
+    s.insert(s.begin(), 0);
+    std::partial_sum(s.begin(), s.end(), s.begin());
+
+    debug("a", a);
+    debug("s", s);
+    for (auto e : b) {
+        if (e > max_a) {
+            std::cout << -1 << '\n';
+            continue;
+        }
+        auto it = std::ranges::lower_bound(a, e - 1);
+        i64 t = a.end() - it; // num of >= b-1
+        i64 i = n - t;
+        debug("b t i", std::tuple{e, t, i});
+        std::cout << (t * (e - 1)) + s[i] + 1 << '\n';
     }
 }
 } // namespace

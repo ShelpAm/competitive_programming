@@ -1,10 +1,10 @@
 #pragma once
 
-// Problem: P3811 【模板】模意义下的乘法逆元
-// Contest: unknown_contest
-// Judge: Luogu
-// URL: https://www.luogu.com.cn/problem/P3811
-// Start: Sat 09 Aug 2025 04:08:38 PM CST
+// Problem: E. Adjacent XOR
+// Contest: Codeforces Round 1042 (Div. 3)
+// Judge: Codeforces
+// URL: https://codeforces.com/contest/2131/problem/E
+// Start: Mon 11 Aug 2025 02:28:56 AM CST
 // Author: ShelpAm
 
 // #include <bits/stdc++.h>
@@ -111,7 +111,7 @@ constexpr auto sum_of(std::ranges::range auto const &coll) noexcept
         coll.begin(), coll.end(),
         typename std::remove_cvref_t<decltype(coll)>::value_type{});
 }
-constexpr auto pow(auto base, auto exp, std::uint_least64_t p) -> decltype(base)
+template <typename T> constexpr T pow(T base, auto exp, std::integral auto p)
 {
     static_assert(sizeof(base) > sizeof(int), "Use of `int`s is bug-prone.");
     if (exp < 0) {
@@ -168,7 +168,7 @@ int main()
     constexpr auto my_precision{10};
     std::cout << std::fixed << std::setprecision(my_precision);
     int t{1};
-    // std::cin >> t;
+    std::cin >> t;
     for (int i{}; i != t; ++i) {
 #ifndef ONLINE_JUDGE
         std::cerr << "Test case " << i << '\n';
@@ -185,10 +185,25 @@ using u128 = __uint128_t;
 void solve_case()
 {
     using namespace ::shelpam;
-    int n, p;
-    std::cin >> n >> p;
-    for (int i{1}; i != n + 1; ++i) {
-        std::cout << pow(static_cast<i64>(i), -1, p) << '\n';
+    int n;
+    std::cin >> n;
+    std::vector<int> a(n), b(n);
+    std::cin >> a >> b;
+
+    if (a.back() != b.back()) {
+        std::cout << "NO\n";
+        return;
     }
+
+    auto c = a;
+    for (int i{n - 2}; i != -1; --i) {
+        if ((a[i] ^ c[i + 1]) == b[i]) {
+            a[i] ^= c[i + 1];
+        }
+        else if ((a[i] ^ a[i + 1]) == b[i]) {
+            a[i] ^= a[i + 1];
+        }
+    }
+    std::cout << (a == b ? "YES" : "NO") << '\n';
 }
 } // namespace

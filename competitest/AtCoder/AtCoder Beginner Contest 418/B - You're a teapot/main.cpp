@@ -1,10 +1,10 @@
 #pragma once
 
-// Problem: P3811 【模板】模意义下的乘法逆元
-// Contest: unknown_contest
-// Judge: Luogu
-// URL: https://www.luogu.com.cn/problem/P3811
-// Start: Sat 09 Aug 2025 04:08:38 PM CST
+// Problem: B - You're a teapot
+// Contest: AtCoder Beginner Contest 418
+// Judge: AtCoder
+// URL: https://atcoder.jp/contests/abc418/tasks/abc418_b
+// Start: Sun 10 Aug 2025 06:52:35 PM CST
 // Author: ShelpAm
 
 // #include <bits/stdc++.h>
@@ -111,7 +111,7 @@ constexpr auto sum_of(std::ranges::range auto const &coll) noexcept
         coll.begin(), coll.end(),
         typename std::remove_cvref_t<decltype(coll)>::value_type{});
 }
-constexpr auto pow(auto base, auto exp, std::uint_least64_t p) -> decltype(base)
+template <typename T> constexpr T pow(T base, auto exp, std::uint_least64_t p)
 {
     static_assert(sizeof(base) > sizeof(int), "Use of `int`s is bug-prone.");
     if (exp < 0) {
@@ -185,10 +185,18 @@ using u128 = __uint128_t;
 void solve_case()
 {
     using namespace ::shelpam;
-    int n, p;
-    std::cin >> n >> p;
-    for (int i{1}; i != n + 1; ++i) {
-        std::cout << pow(static_cast<i64>(i), -1, p) << '\n';
+    std::string s;
+    std::cin >> s;
+    double ans{};
+    for (int i{}; i != s.size(); ++i) {
+        for (int j{3}; i + j < s.size() + 1; ++j) {
+            auto t = s.substr(i, j);
+            if (t.starts_with("t") && t.ends_with("t")) {
+                chmax(ans, static_cast<double>(std::ranges::count(t, 't') - 2) /
+                               (j - 2));
+            }
+        }
     }
+    std::cout << ans << '\n';
 }
 } // namespace

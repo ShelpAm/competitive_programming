@@ -1,10 +1,10 @@
 #pragma once
 
-// Problem: P3811 【模板】模意义下的乘法逆元
-// Contest: unknown_contest
-// Judge: Luogu
-// URL: https://www.luogu.com.cn/problem/P3811
-// Start: Sat 09 Aug 2025 04:08:38 PM CST
+// Problem: F. Unjust Binary Life
+// Contest: Codeforces Round 1042 (Div. 3)
+// Judge: Codeforces
+// URL: https://codeforces.com/contest/2131/problem/F
+// Start: Mon 11 Aug 2025 02:42:52 AM CST
 // Author: ShelpAm
 
 // #include <bits/stdc++.h>
@@ -111,7 +111,7 @@ constexpr auto sum_of(std::ranges::range auto const &coll) noexcept
         coll.begin(), coll.end(),
         typename std::remove_cvref_t<decltype(coll)>::value_type{});
 }
-constexpr auto pow(auto base, auto exp, std::uint_least64_t p) -> decltype(base)
+template <typename T> constexpr T pow(T base, auto exp, std::integral auto p)
 {
     static_assert(sizeof(base) > sizeof(int), "Use of `int`s is bug-prone.");
     if (exp < 0) {
@@ -168,7 +168,7 @@ int main()
     constexpr auto my_precision{10};
     std::cout << std::fixed << std::setprecision(my_precision);
     int t{1};
-    // std::cin >> t;
+    std::cin >> t;
     for (int i{}; i != t; ++i) {
 #ifndef ONLINE_JUDGE
         std::cerr << "Test case " << i << '\n';
@@ -185,10 +185,40 @@ using u128 = __uint128_t;
 void solve_case()
 {
     using namespace ::shelpam;
-    int n, p;
-    std::cin >> n >> p;
-    for (int i{1}; i != n + 1; ++i) {
-        std::cout << pow(static_cast<i64>(i), -1, p) << '\n';
+    int n;
+    std::cin >> n;
+    std::string s;
+    std::string t;
+    std::cin >> s >> t;
+
+    std::vector<i64> diff(n + 1);
+    std::vector<i64> pref_diff(n + 1);
+    std::vector<i64> pref_sum(n + 1);
+    {
+        i64 c0{};
+        i64 c1{};
+        for (int i{}; i != n; ++i) {
+            (t[i] == '0' ? c0 : c1) += 1;
+            diff[i + 1] = c0 - c1;
+            pref_sum[i + 1] = c0 + c1 + pref_sum[i];
+        }
+        std::ranges::sort(diff.begin() + 1, diff.end());
+        pref_diff = diff;
+        std::partial_sum(pref_diff.begin(), pref_diff.end(), pref_diff.begin());
     }
+
+    i64 p{};
+    i64 q{};
+    i64 ans{};
+    for (int i{}; i != n; ++i) {
+        (s[i] == '0' ? p : q) += 1;
+        auto k = pref_sum[n] + ((p + q) * n);
+        auto it = std::ranges::lower_bound(diff.begin() + 1, diff.end(), q - p);
+        auto cnt = diff.end() - it;
+        k -= pref_diff[n] - pref_diff[n - cnt] + cnt * (p - q);
+        k += pref_diff[n - cnt] + (n - cnt) * (p - q);
+        ans += k / 2;
+    }
+    std::cout << ans << '\n';
 }
 } // namespace

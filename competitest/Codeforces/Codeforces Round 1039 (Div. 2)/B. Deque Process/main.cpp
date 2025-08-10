@@ -1,10 +1,10 @@
 #pragma once
 
-// Problem: P3811 【模板】模意义下的乘法逆元
-// Contest: unknown_contest
-// Judge: Luogu
-// URL: https://www.luogu.com.cn/problem/P3811
-// Start: Sat 09 Aug 2025 04:08:38 PM CST
+// Problem: B. Deque Process
+// Contest: Codeforces Round 1039 (Div. 2)
+// Judge: Codeforces
+// URL: https://codeforces.com/contest/2128/problem/B
+// Start: Sat 09 Aug 2025 12:37:08 AM CST
 // Author: ShelpAm
 
 // #include <bits/stdc++.h>
@@ -111,12 +111,11 @@ constexpr auto sum_of(std::ranges::range auto const &coll) noexcept
         coll.begin(), coll.end(),
         typename std::remove_cvref_t<decltype(coll)>::value_type{});
 }
-constexpr auto pow(auto base, auto exp, std::uint_least64_t p) -> decltype(base)
+constexpr auto pow(auto base, auto exp, std::uint_least64_t p)
 {
     static_assert(sizeof(base) > sizeof(int), "Use of `int`s is bug-prone.");
     if (exp < 0) {
-        base = pow(base, p - 2, p);
-        exp = -exp;
+        throw std::invalid_argument{"Exponent should be non-negative"};
     }
     decltype(base) res{1};
     while (exp != 0) {
@@ -168,7 +167,7 @@ int main()
     constexpr auto my_precision{10};
     std::cout << std::fixed << std::setprecision(my_precision);
     int t{1};
-    // std::cin >> t;
+    std::cin >> t;
     for (int i{}; i != t; ++i) {
 #ifndef ONLINE_JUDGE
         std::cerr << "Test case " << i << '\n';
@@ -185,10 +184,40 @@ using u128 = __uint128_t;
 void solve_case()
 {
     using namespace ::shelpam;
-    int n, p;
-    std::cin >> n >> p;
-    for (int i{1}; i != n + 1; ++i) {
-        std::cout << pow(static_cast<i64>(i), -1, p) << '\n';
+    int n;
+    std::cin >> n;
+    std::deque<int> a(n);
+    std::cin >> a;
+
+    auto L = [&]() {
+        a.pop_front();
+        std::cout << "L";
+    };
+    auto R = [&]() {
+        a.pop_back();
+        std::cout << "R";
+    };
+
+    int last = a.front();
+    L();
+    while (a.size() >= 2) {
+        std::vector<std::pair<int, char>> b{std::pair{a.front(), 'L'},
+                                            {a.back(), 'R'}};
+        std::ranges::sort(b);
+        if ((last > a.front()) + (last > a.back()) >= 1) {
+            std::cout << b[0].second << b[1].second;
+            last = b[1].first;
+        }
+        else {
+            std::cout << b[1].second << b[0].second;
+            last = b[0].first;
+        }
+        a.pop_front();
+        a.pop_back();
     }
+    if (a.size() == 1) {
+        L();
+    }
+    std::cout << '\n';
 }
 } // namespace

@@ -30,6 +30,25 @@ template <typename Value_type, std::size_t Dimension> struct Vector {
         return result;
     }
 
+    // 向量 * 标量
+    friend auto operator*(Vector lhs, Value_type const &scalar)
+    {
+        return lhs *= scalar;
+    }
+
+    // 标量 * 向量
+    friend auto operator*(Value_type const &scalar, Vector const &rhs)
+    {
+        Vector result = rhs;
+        return result *= scalar;
+    }
+
+    // 向量 / 标量
+    friend auto operator/(Vector lhs, Value_type const &scalar)
+    {
+        return lhs /= scalar;
+    }
+
     friend std::istream &operator>>(std::istream &is, Vector &self)
     {
         for (auto &v : self.coordinate) {
@@ -54,6 +73,27 @@ template <typename Value_type, std::size_t Dimension> struct Vector {
         return *this;
     }
 
+    // 数乘赋值运算符
+    Vector &operator*=(Value_type const &scalar)
+    {
+        for (std::size_t i{}; i != Dimension; ++i) {
+            coordinate.at(i) *= scalar;
+        }
+        return *this;
+    }
+
+    // 数除赋值运算符
+    Vector &operator/=(Value_type const &scalar)
+    {
+        if (scalar == Value_type{}) {
+            throw std::invalid_argument("Division by zero");
+        }
+        for (std::size_t i{}; i != Dimension; ++i) {
+            coordinate.at(i) /= scalar;
+        }
+        return *this;
+    }
+
     bool operator==(Vector const &rhs) const
     {
         return coordinate == rhs.coordinate;
@@ -72,6 +112,15 @@ template <typename Value_type, std::size_t Dimension> struct Vector {
     [[nodiscard]] Value_type z() const
     {
         return coordinate.at(2);
+    }
+
+    [[nodiscard]] auto length() const
+    {
+        Value_type result{};
+        for (auto e : coordinate) {
+            result += e * e;
+        }
+        return std::sqrt(result);
     }
 
     std::array<Value_type, Dimension> coordinate{};

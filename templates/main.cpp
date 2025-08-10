@@ -111,11 +111,12 @@ constexpr auto sum_of(std::ranges::range auto const &coll) noexcept
         coll.begin(), coll.end(),
         typename std::remove_cvref_t<decltype(coll)>::value_type{});
 }
-constexpr auto pow(auto base, auto exp, std::uint_least64_t p)
+template <typename T> constexpr T pow(T base, auto exp, std::integral auto p)
 {
     static_assert(sizeof(base) > sizeof(int), "Use of `int`s is bug-prone.");
     if (exp < 0) {
-        throw std::invalid_argument{"Exponent should be non-negative"};
+        base = pow(base, p - 2, p);
+        exp = -exp;
     }
     decltype(base) res{1};
     while (exp != 0) {

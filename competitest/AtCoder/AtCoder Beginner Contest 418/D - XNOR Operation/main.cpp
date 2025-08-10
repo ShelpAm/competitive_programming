@@ -1,10 +1,10 @@
 #pragma once
 
-// Problem: P3811 【模板】模意义下的乘法逆元
-// Contest: unknown_contest
-// Judge: Luogu
-// URL: https://www.luogu.com.cn/problem/P3811
-// Start: Sat 09 Aug 2025 04:08:38 PM CST
+// Problem: D - XNOR Operation
+// Contest: AtCoder Beginner Contest 418
+// Judge: AtCoder
+// URL: https://atcoder.jp/contests/abc418/tasks/abc418_d
+// Start: Sun 10 Aug 2025 07:21:24 PM CST
 // Author: ShelpAm
 
 // #include <bits/stdc++.h>
@@ -111,7 +111,7 @@ constexpr auto sum_of(std::ranges::range auto const &coll) noexcept
         coll.begin(), coll.end(),
         typename std::remove_cvref_t<decltype(coll)>::value_type{});
 }
-constexpr auto pow(auto base, auto exp, std::uint_least64_t p) -> decltype(base)
+template <typename T> constexpr T pow(T base, auto exp, std::uint_least64_t p)
 {
     static_assert(sizeof(base) > sizeof(int), "Use of `int`s is bug-prone.");
     if (exp < 0) {
@@ -185,10 +185,30 @@ using u128 = __uint128_t;
 void solve_case()
 {
     using namespace ::shelpam;
-    int n, p;
-    std::cin >> n >> p;
-    for (int i{1}; i != n + 1; ++i) {
-        std::cout << pow(static_cast<i64>(i), -1, p) << '\n';
+    int n;
+    std::cin >> n;
+    std::string s;
+    std::cin >> s;
+
+    std::vector<int> o(2);
+    int c0{};
+    for (auto e : s) {
+        c0 += static_cast<int>(e == '0');
+        ++o[c0 % 2];
     }
+
+    i64 ans{o[0]};
+    for (int i{}; i != n; ++i) {
+        // lose a [i, i]
+        if (s[i] == '0') {
+            --o[1];
+            std::swap(o[0], o[1]);
+        }
+        else {
+            --o[0];
+        }
+        ans += o[0];
+    }
+    std::cout << ans << '\n';
 }
 } // namespace

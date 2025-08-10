@@ -1,10 +1,10 @@
 #pragma once
 
-// Problem: P3811 【模板】模意义下的乘法逆元
-// Contest: unknown_contest
-// Judge: Luogu
-// URL: https://www.luogu.com.cn/problem/P3811
-// Start: Sat 09 Aug 2025 04:08:38 PM CST
+// Problem: G. Wafu!
+// Contest: Codeforces Round 1042 (Div. 3)
+// Judge: Codeforces
+// URL: https://codeforces.com/contest/2131/problem/G
+// Start: Mon 11 Aug 2025 03:17:29 AM CST
 // Author: ShelpAm
 
 // #include <bits/stdc++.h>
@@ -111,7 +111,7 @@ constexpr auto sum_of(std::ranges::range auto const &coll) noexcept
         coll.begin(), coll.end(),
         typename std::remove_cvref_t<decltype(coll)>::value_type{});
 }
-constexpr auto pow(auto base, auto exp, std::uint_least64_t p) -> decltype(base)
+template <typename T> constexpr T pow(T base, auto exp, std::integral auto p)
 {
     static_assert(sizeof(base) > sizeof(int), "Use of `int`s is bug-prone.");
     if (exp < 0) {
@@ -168,7 +168,7 @@ int main()
     constexpr auto my_precision{10};
     std::cout << std::fixed << std::setprecision(my_precision);
     int t{1};
-    // std::cin >> t;
+    std::cin >> t;
     for (int i{}; i != t; ++i) {
 #ifndef ONLINE_JUDGE
         std::cerr << "Test case " << i << '\n';
@@ -177,6 +177,123 @@ int main()
     }
     return 0;
 }
+namespace shelpam {
+
+// mod需与n互质，否则没有模逆。
+constexpr std::int_least64_t modular_inverse(std::int_least64_t n,
+                                             std::int_least64_t mod)
+{
+    return pow(n % mod, mod - 2, mod);
+}
+
+template <std::int_least64_t mod> class Mod_int {
+    static_assert(mod > 0, "Modulus must be positive");
+
+  public:
+    constexpr Mod_int() : value_{} {}
+
+    constexpr Mod_int(std::int_least64_t n) : value_{(n % mod + mod) % mod} {}
+
+    constexpr Mod_int &operator+=(Mod_int rhs)
+    {
+        value_ += rhs.value_;
+        if (value_ >= mod) {
+            value_ -= mod;
+        }
+        return *this;
+    }
+
+    constexpr Mod_int &operator-=(Mod_int rhs)
+    {
+        value_ -= rhs.value_;
+        if (value_ < 0) {
+            value_ += mod;
+        }
+        return *this;
+    }
+
+    constexpr Mod_int &operator*=(Mod_int rhs)
+    {
+        value_ *= rhs.value_;
+        value_ %= mod;
+        return *this;
+    }
+
+    constexpr Mod_int &operator/=(Mod_int rhs)
+    {
+        value_ *= modular_inverse(rhs.value_, mod); // modular_inverse
+        value_ %= mod;
+        return *this;
+    }
+
+    friend constexpr Mod_int operator+(Mod_int lhs, Mod_int rhs)
+    {
+        return lhs += rhs;
+    }
+
+    friend constexpr Mod_int operator-(Mod_int lhs, Mod_int rhs)
+    {
+        return lhs -= rhs;
+    }
+
+    friend constexpr Mod_int operator*(Mod_int lhs, Mod_int rhs)
+    {
+        return lhs *= rhs;
+    }
+
+    friend constexpr Mod_int operator/(Mod_int lhs, Mod_int rhs)
+    {
+        return lhs /= rhs;
+    }
+
+    friend std::ostream &operator<<(std::ostream &os, Mod_int rhs)
+    {
+        return os << rhs.value_;
+    }
+
+    friend std::istream &operator>>(std::istream &is, Mod_int &rhs)
+    {
+        is >> rhs.value_;
+        rhs.value_ %= mod;
+        if (rhs.value_ < 0) {
+            rhs.value_ += mod;
+        }
+        return is;
+    }
+
+    friend constexpr bool operator==(Mod_int lhs, Mod_int rhs)
+    {
+        return lhs.value_ == rhs.value_;
+    }
+
+    friend constexpr bool operator!=(Mod_int lhs, Mod_int rhs)
+    {
+        return !(lhs == rhs);
+    }
+
+  private:
+    std::int_least64_t value_; // n_ is guarenteed to be normalized.
+};
+
+template <std::int_least64_t mod>
+Mod_int<mod> pow(Mod_int<mod> base, std::int_least64_t exp)
+{
+    if (exp < 0) {
+        exp = -exp;
+        base = modular_inverse(base, exp);
+    }
+    Mod_int<mod> res{1};
+    while (exp != 0) {
+        if ((exp & 1) == 1) {
+            res = res * base;
+        }
+        base = base * base;
+        exp >>= 1;
+    }
+    return res;
+}
+
+} // namespace shelpam
 namespace {
 using i64 = std::int_least64_t;
 using i128 = __int128_t;
@@ -185,10 +302,40 @@ using u128 = __uint128_t;
 void solve_case()
 {
     using namespace ::shelpam;
-    int n, p;
-    std::cin >> n >> p;
-    for (int i{1}; i != n + 1; ++i) {
-        std::cout << pow(static_cast<i64>(i), -1, p) << '\n';
+    int n, k;
+    std::cin >> n >> k;
+    std::vector<int> a(n);
+    std::cin >> a;
+
+    std::priority_queue<int, std::vector<int>, std::greater<>> q;
+    for (auto e : a) {
+        q.push(e);
     }
+    Mod_int<mod1e9p7> ans{1};
+    while (!q.empty() && k != 0) {
+        auto e = q.top();
+        q.pop();
+
+        if (e < 31 && (1 << (e - 1)) <= k) {
+            k -= 1 << (e - 1);
+            ans *= e;
+            for (int i{}; i != e - 1; ++i) {
+                ans *= pow(static_cast<i64>(e - 1 - i), 1 << i, mod1e9p7);
+            }
+        }
+        else {
+            auto x = msb(static_cast<u64>(k));
+            k -= (1 << x);
+            ans *= e;
+            q.push(x + 1);
+            for (int i{1}; i != x + 1; ++i) {
+                ans *= pow(static_cast<i64>(i), 1 << (x - i), mod1e9p7);
+            }
+            debug("x", x);
+        }
+        debug("k", k);
+        debug("ans", ans);
+    }
+    std::cout << ans << '\n';
 }
 } // namespace
