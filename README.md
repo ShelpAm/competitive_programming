@@ -2,10 +2,10 @@
 ## Installation
 
 - `git clone https://github.com/ShelpAm/competitive_programming ~/competitive-programming`
-- Install [Competitive-companion](`https://github.com/jmerle/competitive-companion`) browser extention
+- Install [competitive-companion](https://github.com/jmerle/competitive-companion) browser extention
 
-Note that if you don't clone this repository to `~/competitive-programming`, the
-neovim plugin for competitive programming won't work any more.
+Note that you must clone this repository to `~/competitive-programming`, to make the
+neovim plugin [competitest.nvim](https://github.com/xeluxee/competitest.nvim) work.
 
 ## Plan
 
